@@ -338,6 +338,7 @@ tr:hover td{background:var(--off)}
 <div class="tabs" role="tablist">
   <button class="tab active" onclick="showSection('overview',this)">📍 Overview</button>
   <button class="tab" onclick="showSection('play',this)">🎮 Play My Path</button>
+  <button class="tab" onclick="showSection('budget',this)">💵 Budget</button>
   <button class="tab" onclick="showSection('invest',this)">💼 Investments</button>
   <button class="tab" onclick="showSection('paths',this)">📁 My Paths</button>
   <button class="tab" onclick="showSection('mos',this)">🔖 MOS</button>
@@ -534,10 +535,14 @@ tr:hover td{background:var(--off)}
       </div>
       <div class="dash-card">
         <h4>Money</h4>
-        <div class="dash-row big pos"><span>Savings</span><strong id="d-savings">$0</strong></div>
+        <div class="dash-row big pos"><span>Cash savings</span><strong id="d-savings">$0</strong></div>
         <div class="dash-row pos"><span>TSP / Retirement</span><strong id="d-tsp">$0</strong></div>
+        <div class="dash-row pos"><span>Roth IRA</span><strong id="d-ira">$0</strong></div>
+        <div class="dash-row pos"><span>Index funds</span><strong id="d-tax">$0</strong></div>
+        <div class="dash-row pos"><span>Emergency fund</span><strong id="d-ef">$0</strong></div>
+        <div class="dash-row pos"><span>Home fund</span><strong id="d-hf">$0</strong></div>
         <div class="dash-row neg"><span>Debt</span><strong id="d-debt">$0</strong></div>
-        <div class="dash-row"><span>Net Worth</span><strong id="d-net">$0</strong></div>
+        <div class="dash-row" style="border-top:1px solid var(--border);padding-top:.4rem"><span>Net Worth</span><strong id="d-net">$0</strong></div>
         <div class="dash-row"><span>Monthly take-home</span><strong id="d-income">$0</strong></div>
       </div>
       <div class="dash-card">
@@ -573,6 +578,42 @@ tr:hover td{background:var(--off)}
         <div class="dash-row big pos"><span>Pension est.</span><strong id="d-pension">—</strong></div>
         <div class="dash-row"><span>TSP at 20 yrs</span><strong id="d-tsp20">—</strong></div>
         <div class="dash-row"><span>On track?</span><strong id="d-ontrack">Too early</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BUDGET ==================== -->
+<div id="budget" class="section">
+  <h2>💵 My Monthly Budget — Customize the Numbers</h2>
+  <p style="margin-bottom:var(--s4)">The defaults are estimates based on married/kids/housing. Override any line item with my actual number — they flow into the Monthly Budget panel and the savings projection. Leave a field blank to use the auto-calculated default. Toggle to <strong>Auto</strong> to reset a category.</p>
+
+  <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:var(--s5);margin-top:var(--s4)" id="budgetGrid">
+    <div class="card pad">
+      <h3>━ Necessities ━</h3>
+      <p style="font-size:var(--text-xs);margin-bottom:var(--s3);color:var(--muted)">Bills I have to pay. Default = computed from married/kids/housing.</p>
+      <div id="bills-necessities"></div>
+
+      <h3 style="margin-top:var(--s5)">━ Discretionary ━</h3>
+      <p style="font-size:var(--text-xs);margin-bottom:var(--s3);color:var(--muted)">Stuff I choose. Default = $0; bump it up to be honest about lifestyle.</p>
+      <div id="bills-discretionary"></div>
+
+      <h3 style="margin-top:var(--s5)">━ Savings Goals ━</h3>
+      <p style="font-size:var(--text-xs);margin-bottom:var(--s3);color:var(--muted)">Money I want to <em>set aside</em> toward specific goals before "investing" — emergency fund first, then home down-payment fund.</p>
+      <div id="bills-goals"></div>
+    </div>
+
+    <div class="card pad">
+      <h3>📊 Live Budget Summary</h3>
+      <p style="font-size:var(--text-xs);margin-bottom:var(--s4);color:var(--muted)">Auto-updates as I edit. This is what flows into Play and the email report.</p>
+      <div id="budget-live-summary"></div>
+
+      <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px solid var(--primary);border-radius:var(--r-md);font-size:var(--text-sm);line-height:1.7">
+        <strong>How this connects:</strong><br>
+        • <strong>Bills</strong> reduce my monthly take-home before any savings.<br>
+        • <strong>Emergency fund</strong> aims for 3-6 months of expenses in cash.<br>
+        • <strong>Home fund</strong> builds toward a down payment (VA loan = $0 down, but closing costs + furniture = real).<br>
+        • Whatever's left at the end goes to Roth IRA / index funds (set on the 💼 Investments tab).
       </div>
     </div>
   </div>
@@ -1222,9 +1263,17 @@ function defaultState(){
     // money — current balances
     savings:1500, tsp:0, debt:0, debt_apr:0.08, tsp_pct:5,
     roth_ira:0, taxable_invest:0,
+    // Sub-goals (separate accumulating buckets)
+    emergency_fund:0, home_fund:0,
     // investment monthly allocations (apply in settleCashFlow)
     ira_monthly:0, taxable_monthly:0, extra_savings_monthly:0,
     invest_strategy:'balanced', // conservative | balanced | aggressive
+    // Custom monthly bill overrides (null = use computed default)
+    bills_custom: {
+      groceries:null, eating_out:0, gas:null, car_insurance:null,
+      subscriptions:0, fun_money:0, personal:null, misc:null,
+      emergency_fund_monthly:0, home_fund_monthly:0
+    },
     // life
     married:false, kids:0, pets:0,
     housing:'barracks', // barracks | on_base | off_base | own
@@ -1410,17 +1459,17 @@ const SCENES = {
   'first_unit_arrive':{
     stage:'First Unit',
     title:`Arrival at First Unit — Age {{age}}, {{tis}}`,
-    text:`I check into my first battalion. Single, junior enlisted (E-2). Assigned to barracks — 2-man room, shared bathroom, on-base. <strong>Housing: FREE. Chow hall: FREE.</strong> The reality I never knew: as a single junior Marine, I have almost no required expenses. My monthly base pay is {{base}}, and I keep nearly all of it.`,
+    text:`I check into my first battalion. <strong>{{arrivalSituation}}</strong> My monthly base pay is {{base}}{{arrivalIncomeNote}}.`,
     choices:[
-      {label:'Settle in, meet my roommate',
-       apply:g=>{g.tis_months+=1;g.housing='barracks';},
+      {label:'{{arrivalCta}}',
+       apply:g=>{g.tis_months+=1;},
        next:'first_paycheck'}
     ]
   },
   'first_paycheck':{
     stage:'First Unit',
     title:`First Real Paycheck — Reading the LES`,
-    text:`My Leave and Earnings Statement (LES) shows:<br>• Base Pay: {{base}}/mo (taxable)<br>• BAS (food allowance): $460/mo (non-taxable — I still get it even eating at chow)<br>• Federal Tax: ~{{ftax}}/mo<br>• FICA: ~{{fica}}/mo<br>• TSP: 5% of base = {{tspc}}/mo<br><br><strong>Take-home: {{net}}/mo</strong><br><br>Since I live in barracks and eat at chow, I have ALMOST NO BILLS. If I bank everything I could save <strong>{{netsave}}/month</strong>. Most Marines don\'t. The choice is mine. <em>(See the budget panel below for the full breakdown.)</em>`,
+    text:`My Leave and Earnings Statement (LES) shows:<br>• Base Pay: {{base}}/mo (taxable)<br>• BAS (food allowance): $460/mo (non-taxable — I still get it even eating at chow)<br>{{bahLine}}• Federal Tax: ~{{ftax}}/mo<br>• FICA: ~{{fica}}/mo<br>• TSP: 5% of base = {{tspc}}/mo<br><br><strong>Take-home: {{net}}/mo</strong><br><br>{{paycheckContext}} <em>(See the budget panel below for the full breakdown — or jump to the 💵 Budget tab to set your own line items.)</em>`,
     choices:[
       {label:'Continue to my first big financial decision',
        apply:g=>{g.tis_months+=1;},
@@ -1770,21 +1819,30 @@ const SCENES = {
   'marriage_question':{
     stage:'Marriage Decision',
     title:`Age ~23 — The Marriage Question`,
-    text:`If I\'ve been dating seriously, this is the real moment. <strong>Getting married triggers BAH</strong> — housing allowance added to my pay (~{{bah}}/mo at my rank). It also triggers a new household budget.`,
+    text:`{{marriageQContext}}`,
     choices:[
       {label:'Get married, move off-base',
        desc:'BAH added (~{{bah}}/mo). $1,800/mo rental + utilities. Spouse may or may not work.',
        tags:['info:+BAH','warn:New expenses'],
+       requires:g=>!g.married,
        apply:g=>{g.married=true;g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.event={type:'info',text:'Got married. BAH starts (~{{bah}}/mo). Rent + utilities ~$2,200/mo. Net is positive but smaller than people think.'};},
        next:'housing_choice_married'},
       {label:'Get married, take on-base family housing',
        desc:'BAH paid directly to housing office. No surprises. Less privacy.',
        tags:['ok:Predictable cost'],
+       requires:g=>!g.married,
        apply:g=>{g.married=true;g.housing='on_base';g.tis_months+=1;g.event={type:'info',text:'Got married. On-base housing. BAH covers it 1:1. Predictable.'};},
        next:'housing_choice_married'},
       {label:'Stay single — focus on MARSOC',
        desc:'Recon→MARSOC tempo punishes relationships. Consider marriage post-ITC.',
+       requires:g=>!g.married,
        apply:g=>{g.tis_months+=1;},
+       next:'sniper_or_promo'},
+      {label:'Already married — press on toward MARSOC',
+       desc:'Spouse and I are settled. Marriage isn\'t the question at age 23; pipeline performance is.',
+       tags:['info:Already married'],
+       requires:g=>g.married,
+       apply:g=>{g.tis_months+=1;g.morale+=3;},
        next:'sniper_or_promo'}
     ]
   },
@@ -2113,20 +2171,35 @@ function calcBudget(g){
   else if(g.housing==='on_base') housing_cost = bah;
   else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
   else if(g.housing==='own') housing_cost = g.mortgage;
-  const food = g.housing==='barracks' ? 0 : 600 + (g.kids*200) + (g.married?250:0);
-  const car_total = g.car_payment + (g.car==='none'?0:180);
+  // Customizable bill categories (override default if user has set one)
+  const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
+  const groceries     = _bill('groceries');
+  const car_insurance = _bill('car_insurance');
+  const car_gas       = _bill('gas');
+  const personal      = _bill('personal');
+  const misc          = _bill('misc');
+  const eating_out    = _bill('eating_out');
+  const subscriptions = _bill('subscriptions');
+  const fun_money     = _bill('fun_money');
+  const ef_monthly    = _bill('emergency_fund_monthly');
+  const hf_monthly    = _bill('home_fund_monthly');
+  // Car payment kept separately; insurance + gas now broken out
+  const car_total = g.car_payment + (g.car==='none' ? 0 : (car_insurance + car_gas));
+  const food = groceries; // 'food' kept for back-compat
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
   const phone = g.has_phone ? (g.phone_bill||0) : 0;
-  const misc = 350;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + misc;
-  // Savings = net take-home minus bills
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly;
   const net_to_savings = net - total_bills;
   return {
     bp, bah, bas, special, gross,
     taxable, ftax, fica, stax,
     tsp_contrib, net,
-    housing_cost, food, car_total, kids_cost, pet_cost, phone, misc, total_bills,
+    housing_cost, food, groceries, car_total, car_insurance, car_gas,
+    kids_cost, pet_cost, phone, personal, misc,
+    eating_out, subscriptions, fun_money,
+    ef_monthly, hf_monthly,
+    total_bills,
     net_to_savings
   };
 }
@@ -2152,6 +2225,8 @@ function settleCashFlow(){
   const blendedApr = G.debt > 0 ? (carApr * Math.min(G.car_value||0, G.debt) + (G.debt_apr||0.08) * otherDebt) / G.debt : 0;
 
   // Grow each bucket with monthly compounding for the elapsed period
+  const efIn = b.ef_monthly || 0;
+  const hfIn = b.hf_monthly || 0;
   for(let i=0;i<elapsed;i++){
     // TSP: contribution + DoD 5% match (after 2yr TIS) + growth
     const tspMatch = (G.tis_months - elapsed + i) >= 24 ? b.tsp_contrib : 0;
@@ -2159,6 +2234,9 @@ function settleCashFlow(){
     G.roth_ira = ((G.roth_ira||0) + ira_in) * (1 + strat.ira/12);
     G.taxable_invest = ((G.taxable_invest||0) + tax_in) * (1 + strat.taxable/12);
     G.savings = (G.savings + remaining_after_alloc + sav_in) * (1 + strat.savings/12);
+    // Goal buckets — HY-savings rate, simpler interest
+    G.emergency_fund = ((G.emergency_fund||0) + efIn) * (1 + strat.savings/12);
+    G.home_fund      = ((G.home_fund||0) + hfIn) * (1 + strat.savings/12);
     // Debt: accrue monthly interest, then apply any scheduled payment (car_payment) + extra paydown
     if(G.debt > 0){
       G.debt = G.debt * (1 + blendedApr/12);
@@ -2194,8 +2272,16 @@ function renderDash(){
   if(retAgeEl) retAgeEl.textContent = G.enlistment_date && G.birth_date ? `age ${retirementAge(G)}` : '—';
   document.getElementById('d-savings').textContent = fmt(G.savings);
   document.getElementById('d-tsp').textContent = fmt(G.tsp);
+  const iraEl = document.getElementById('d-ira');
+  const taxEl = document.getElementById('d-tax');
+  const efEl  = document.getElementById('d-ef');
+  const hfEl  = document.getElementById('d-hf');
+  if(iraEl) iraEl.textContent = fmt(G.roth_ira||0);
+  if(taxEl) taxEl.textContent = fmt(G.taxable_invest||0);
+  if(efEl)  efEl.textContent  = fmt(G.emergency_fund||0);
+  if(hfEl)  hfEl.textContent  = fmt(G.home_fund||0);
   document.getElementById('d-debt').textContent = fmt(G.debt);
-  document.getElementById('d-net').textContent = fmt(G.savings + G.tsp - G.debt);
+  document.getElementById('d-net').textContent = fmt(G.savings + G.tsp + (G.roth_ira||0) + (G.taxable_invest||0) + (G.emergency_fund||0) + (G.home_fund||0) - G.debt);
   const b = calcBudget(G);
   document.getElementById('d-income').textContent = fmt(b.gross);
   document.getElementById('d-marital').textContent = G.married?'Married':'Single';
@@ -2254,11 +2340,21 @@ function renderBudget(){
     <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--warn);text-transform:uppercase;letter-spacing:.08em">━ Monthly Bills ━</div>
     ${b.housing_cost?`<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(${G.housing.replace('_',' ')})</span></span><span class="budget-amt neg">−${fmt(b.housing_cost)}</span></div>`:'<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(barracks — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
     ${b.food?`<div class="budget-row"><span>Food / groceries</span><span class="budget-amt neg">−${fmt(b.food)}</span></div>`:'<div class="budget-row"><span>Food <span style="color:var(--muted);font-size:.85em">(chow hall — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
-    ${b.car_total?`<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(${G.car==='financed'?'pmt + ins + gas':G.car==='used_cash'?'paid off — ins + gas':G.car==='upgrade'?'pmt + ins + gas':G.car==='none'?'':'pmt + ins + gas'})</span></span><span class="budget-amt neg">−${fmt(b.car_total)}</span></div>`:'<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(none)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${G.car!=='none' ? `
+      ${G.car_payment?`<div class="budget-row"><span>Car payment</span><span class="budget-amt neg">−${fmt(G.car_payment)}</span></div>`:''}
+      <div class="budget-row"><span>Car insurance</span><span class="budget-amt neg">−${fmt(b.car_insurance)}</span></div>
+      <div class="budget-row"><span>Gas</span><span class="budget-amt neg">−${fmt(b.car_gas)}</span></div>
+    ` : '<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(none)</span></span><span class="budget-amt pos">$0</span></div>'}
     ${b.phone?`<div class="budget-row"><span>Cell phone <span style="color:var(--muted);font-size:.85em">(monthly plan)</span></span><span class="budget-amt neg">−${fmt(b.phone)}</span></div>`:''}
     ${b.kids_cost?`<div class="budget-row"><span>Kids <span style="color:var(--muted);font-size:.85em">(${G.kids} × $600)</span></span><span class="budget-amt neg">−${fmt(b.kids_cost)}</span></div>`:''}
     ${b.pet_cost?`<div class="budget-row"><span>Pets <span style="color:var(--muted);font-size:.85em">(${G.pets})</span></span><span class="budget-amt neg">−${fmt(b.pet_cost)}</span></div>`:''}
-    <div class="budget-row"><span>Misc / personal <span style="color:var(--muted);font-size:.85em">(gym, hygiene, weekend)</span></span><span class="budget-amt neg">−${fmt(b.misc)}</span></div>
+    <div class="budget-row"><span>Personal <span style="color:var(--muted);font-size:.85em">(gym, hygiene, haircuts)</span></span><span class="budget-amt neg">−${fmt(b.personal)}</span></div>
+    <div class="budget-row"><span>Other necessities</span><span class="budget-amt neg">−${fmt(b.misc)}</span></div>
+    ${b.eating_out?`<div class="budget-row"><span>Eating out / coffee</span><span class="budget-amt neg">−${fmt(b.eating_out)}</span></div>`:''}
+    ${b.subscriptions?`<div class="budget-row"><span>Subscriptions <span style="color:var(--muted);font-size:.85em">(Netflix, etc.)</span></span><span class="budget-amt neg">−${fmt(b.subscriptions)}</span></div>`:''}
+    ${b.fun_money?`<div class="budget-row"><span>Fun money / hobbies</span><span class="budget-amt neg">−${fmt(b.fun_money)}</span></div>`:''}
+    ${b.ef_monthly?`<div class="budget-row"><span>→ Emergency fund <span style="color:var(--muted);font-size:.85em">(savings goal)</span></span><span class="budget-amt neg">−${fmt(b.ef_monthly)}</span></div>`:''}
+    ${b.hf_monthly?`<div class="budget-row"><span>→ Home fund <span style="color:var(--muted);font-size:.85em">(down payment / closing)</span></span><span class="budget-amt neg">−${fmt(b.hf_monthly)}</span></div>`:''}
     <div class="budget-row total"><span>Total Bills</span><span class="budget-amt neg"><strong>−${fmt(b.total_bills)}/mo</strong></span></div>
 
     <div style="margin-top:1rem;padding:var(--s4);background:${b.net_to_savings>=0?'color-mix(in srgb,var(--success) 12%,transparent)':'color-mix(in srgb,var(--error) 12%,transparent)'};border-radius:var(--r-md);border:1px solid ${b.net_to_savings>=0?'var(--success)':'var(--error)'}">
@@ -2343,7 +2439,33 @@ function renderScene(){
     '{{date}}': G.enlistment_date ? formatDate(currentDate(G)) : '—',
     '{{year}}': G.enlistment_date ? currentDate(G).getFullYear() : '—',
     '{{retdate}}': G.enlistment_date ? formatMonthYear(retirementDate(G)) : '—',
-    '{{retage}}': G.birth_date ? retirementAge(G) : '—'
+    '{{retage}}': G.birth_date ? retirementAge(G) : '—',
+    // Married-aware narrative tokens
+    '{{arrivalSituation}}': (()=>{
+      if(G.married && G.housing==='on_base') return `Married Marine — my family moves into on-base family housing. Free housing via BAH, base community, short commute. The Corps pays the housing office directly.`;
+      if(G.married && G.housing==='off_base') return `Married Marine — we live off-base in a rental. BAH (~${fmt(b.bah)}/mo) covers most of the rent; the rest comes from my paycheck.`;
+      if(G.married && G.housing==='own') return `Married Marine, home owner — VA loan, building equity each month.`;
+      return `Single, junior enlisted (E-${G.rank.replace('E-','')}). Assigned to barracks — 2-man room, shared bathroom, on-base. <strong>Housing: FREE. Chow hall: FREE.</strong> As a single junior Marine I have almost no required expenses.`;
+    })(),
+    '{{arrivalIncomeNote}}': (()=>{
+      if(G.married) return `, plus BAH ~${fmt(b.bah)}/mo and BAS ${fmt(b.bas)}/mo for food`;
+      return `, and I keep nearly all of it`;
+    })(),
+    '{{arrivalCta}}': (()=>{
+      if(G.married && G.housing==='on_base') return 'Move spouse + family in, settle into on-base housing';
+      if(G.married && G.housing==='off_base') return 'Sign the off-base lease, set up the household';
+      if(G.married && G.housing==='own') return 'Close on the house, move in';
+      return 'Settle in, meet my roommate';
+    })(),
+    '{{bahLine}}': (G.married ? `• BAH (housing allowance): ${fmt(b.bah)}/mo (non-taxable)<br>` : ''),
+    '{{paycheckContext}}': (()=>{
+      if(G.married) return `My take-home covers rent (${fmt(b.housing_cost)}), food (${fmt(b.food)}), and the rest of the household. After bills I have <strong>${fmt(b.net_to_savings)}/mo</strong> for savings + investments. The whole household runs off this paycheck.`;
+      return `Since I live in barracks and eat at chow, I have ALMOST NO BILLS. If I bank everything I could save <strong>${fmt(b.net_to_savings)}/month</strong>. Most Marines don't. The choice is mine.`;
+    })(),
+    '{{marriageQContext}}': (()=>{
+      if(G.married) return `I'm already married — that decision is behind me. The MARSOC pipeline ahead is real on family life, but my spouse and I have already navigated the early years. The bigger question now is performance and packet timing.`;
+      return `If I've been dating seriously, this is the real moment. <strong>Getting married triggers BAH</strong> — housing allowance added to my pay (~${fmt(b.bah||BAH[G.rank]||0)}/mo at my rank). It also triggers a new household budget.`;
+    })()
   };
   const sub = (str)=>{ if(!str) return str; let o=str; Object.entries(tokens).forEach(([k,v])=>{o=o.split(k).join(v);}); return o; };
 
@@ -2784,15 +2906,25 @@ calcBudget = function(g){
   else if(g.housing==='on_base') housing_cost = bah;
   else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
   else if(g.housing==='own') housing_cost = g.mortgage;
-  const food = g.housing==='barracks' ? 0 : 600 + (g.kids*200) + (g.married?250:0);
-  const car_total = g.car_payment + (g.car==='none'?0:180);
+  const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
+  const groceries     = _bill('groceries');
+  const car_insurance = _bill('car_insurance');
+  const car_gas       = _bill('gas');
+  const personal      = _bill('personal');
+  const misc          = _bill('misc');
+  const eating_out    = _bill('eating_out');
+  const subscriptions = _bill('subscriptions');
+  const fun_money     = _bill('fun_money');
+  const ef_monthly    = _bill('emergency_fund_monthly');
+  const hf_monthly    = _bill('home_fund_monthly');
+  const car_total = g.car_payment + (g.car==='none' ? 0 : (car_insurance + car_gas));
+  const food = groceries;
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
   const phone = g.has_phone ? (g.phone_bill||0) : 0;
-  const misc = 350;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + misc;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly;
   const net_to_savings = net - total_bills;
-  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, car_total, kids_cost, pet_cost, phone, misc, total_bills, net_to_savings };
+  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, groceries, car_total, car_insurance, car_gas, kids_cost, pet_cost, phone, personal, misc, eating_out, subscriptions, fun_money, ef_monthly, hf_monthly, total_bills, net_to_savings };
 };
 
 /* Render MOS Deep Dive table dynamically from data */
@@ -2941,6 +3073,109 @@ function renderPayTableFromData(){
       </div>
     </div>
   `;
+}
+
+/* ════════════════════════════════════════════════════════════
+   💵  BUDGET CUSTOMIZATION — editable line-item bills + goals
+   ═══════════════════════════════════════════════════════════ */
+const BILL_CATEGORIES = {
+  necessities: [
+    {key:'groceries',     label:'Groceries',         hint:'Default scales with married/kids; barracks = $0 (chow hall)'},
+    {key:'car_insurance', label:'Car insurance',     hint:'Default ~$120/mo if I own a car, else $0'},
+    {key:'gas',           label:'Gas',               hint:'Default ~$60/mo if I own a car'},
+    {key:'personal',      label:'Personal / hygiene',hint:'Haircuts, toiletries, gym, etc. Default $150/mo'},
+    {key:'misc',          label:'Other necessities', hint:'Phone separately above. Default $150/mo (was misc/personal)'}
+  ],
+  discretionary: [
+    {key:'eating_out',    label:'Eating out / coffee', hint:'Subway, Starbucks, weekend out. Default $0 — I set it.'},
+    {key:'subscriptions', label:'Subscriptions',       hint:'Netflix, Spotify, gym apps, gaming. Default $0.'},
+    {key:'fun_money',     label:'Fun money / hobbies', hint:'Allowance for myself: hobbies, games, weekend trips. Default $0.'}
+  ],
+  goals: [
+    {key:'emergency_fund_monthly', label:'Emergency fund ($/mo)', hint:'Target: 3-6 months of bills. Currently set aside in this bucket.'},
+    {key:'home_fund_monthly',      label:'Home down-payment fund ($/mo)', hint:'For closing costs, furniture, repairs (VA loan covers down payment).'}
+  ]
+};
+
+// Default values that depend on game state
+function defaultBills(g){
+  return {
+    groceries: g.housing==='barracks' ? 0 : (600 + g.kids*200 + (g.married?250:0)),
+    car_insurance: g.car==='none' ? 0 : 120,
+    gas:           g.car==='none' ? 0 : 60,
+    personal: 150,
+    misc: 150,
+    eating_out: 0,
+    subscriptions: 0,
+    fun_money: 0,
+    emergency_fund_monthly: 0,
+    home_fund_monthly: 0
+  };
+}
+
+function billValue(g, key){
+  const c = (g.bills_custom||{})[key];
+  return (c==null) ? defaultBills(g)[key] : c;
+}
+
+function renderBudgetTab(){
+  const nec = document.getElementById('bills-necessities');
+  const dis = document.getElementById('bills-discretionary');
+  const goals = document.getElementById('bills-goals');
+  if(!nec) return;
+  const rowFor = (cat)=>{
+    const def = defaultBills(G)[cat.key];
+    const isCustom = (G.bills_custom||{})[cat.key] != null;
+    const cur = billValue(G, cat.key);
+    return `<div class="alloc-row" style="grid-template-columns:170px 1fr 110px 80px">
+      <div class="alloc-label">${cat.label}<span class="hint">${cat.hint}</span></div>
+      <div style="font-size:var(--text-xs);color:var(--muted);font-family:var(--mono)">${isCustom?'<span style="color:var(--gold)">Custom</span>':'<span style="color:var(--success)">Auto:</span>'} $${def.toLocaleString()}/mo</div>
+      <input type="number" class="alloc-input" id="bill-${cat.key}" min="0" max="10000" step="10" value="${isCustom?cur:''}" placeholder="${def}" oninput="updateBill('${cat.key}', this.value)">
+      <button class="dlog-revert" onclick="resetBill('${cat.key}')" style="margin:0;padding:.35rem .55rem">Auto</button>
+    </div>`;
+  };
+  nec.innerHTML   = BILL_CATEGORIES.necessities.map(rowFor).join('');
+  dis.innerHTML   = BILL_CATEGORIES.discretionary.map(rowFor).join('');
+  goals.innerHTML = BILL_CATEGORIES.goals.map(rowFor).join('');
+  renderBudgetLiveSummary();
+}
+
+function renderBudgetLiveSummary(){
+  const b = calcBudget(G);
+  const out = document.getElementById('budget-live-summary');
+  if(!out) return;
+  out.innerHTML = `
+    <div class="budget-row"><span>Gross income</span><span class="budget-amt pos">+${fmt(b.gross)}</span></div>
+    <div class="budget-row"><span>Total taxes + TSP</span><span class="budget-amt neg">−${fmt(b.ftax+b.fica+b.stax+b.tsp_contrib)}</span></div>
+    <div class="budget-row total"><span>Net Take-Home</span><span class="budget-amt pos"><strong>${fmt(b.net)}</strong></span></div>
+    <div class="budget-row"><span>Bills total</span><span class="budget-amt neg">−${fmt(b.total_bills)}</span></div>
+    <div class="budget-row"><span>→ Emergency fund</span><span class="budget-amt neg">−${fmt(billValue(G,'emergency_fund_monthly'))}</span></div>
+    <div class="budget-row"><span>→ Home fund</span><span class="budget-amt neg">−${fmt(billValue(G,'home_fund_monthly'))}</span></div>
+    <div class="budget-row total"><span>Free cash flow</span><span class="budget-amt ${b.net_to_savings>=0?'pos':'neg'}"><strong>${b.net_to_savings>=0?'+':'−'}${fmt(Math.abs(b.net_to_savings))}</strong></span></div>
+    <div style="margin-top:var(--s4);padding:var(--s3);background:var(--surf2);border-radius:var(--r-md);font-size:var(--text-xs)">
+      <div><strong>Emergency fund balance:</strong> <span style="font-family:var(--mono);color:var(--success)">${fmt(G.emergency_fund||0)}</span></div>
+      <div><strong>Home fund balance:</strong> <span style="font-family:var(--mono);color:var(--success)">${fmt(G.home_fund||0)}</span></div>
+    </div>
+  `;
+}
+
+function updateBill(key, val){
+  if(!G.bills_custom) G.bills_custom = {};
+  const v = parseFloat(val);
+  G.bills_custom[key] = (val==='' || isNaN(v)) ? null : v;
+  renderBudgetLiveSummary();
+  if(typeof renderBudget==='function') renderBudget();
+  if(typeof renderDash==='function') renderDash();
+  autoSave();
+}
+function resetBill(key){
+  if(!G.bills_custom) G.bills_custom = {};
+  G.bills_custom[key] = null;
+  const inp = document.getElementById('bill-'+key);
+  if(inp) inp.value = '';
+  renderBudgetTab();
+  if(typeof renderBudget==='function') renderBudget();
+  autoSave();
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -3363,6 +3598,7 @@ function showSection(id, btn){
   document.getElementById(id).classList.add('active');
   if(btn) btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='budget'){ renderBudgetTab(); }
   if(id==='invest'){ renderInvestmentsTab(); wireInvestmentListeners(); }
   if(id==='paths'){ renderPathsList(); }
 }
