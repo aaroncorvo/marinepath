@@ -340,6 +340,7 @@ tr:hover td{background:var(--off)}
   <button class="tab" onclick="showSection('play',this)">🎮 Play My Path</button>
   <button class="tab" onclick="showSection('budget',this)">💵 Budget</button>
   <button class="tab" onclick="showSection('invest',this)">💼 Investments</button>
+  <button class="tab" onclick="showSection('edu',this)">🎓 Education + Career</button>
   <button class="tab" onclick="showSection('paths',this)">📁 My Paths</button>
   <button class="tab" onclick="showSection('mos',this)">🔖 MOS</button>
   <button class="tab" onclick="showSection('recon',this)">🌊 Recon</button>
@@ -564,10 +565,12 @@ tr:hover td{background:var(--off)}
         <div class="dash-row" style="margin-top:.5rem"><span>Health</span><strong id="d-health">Healthy</strong></div>
       </div>
       <div class="dash-card">
-        <h4>Education</h4>
+        <h4>Education + Civilian Path</h4>
         <div class="dash-row big"><span>College credits</span><strong id="d-credits">0</strong></div>
         <div class="dash-row"><span>Degree status</span><strong id="d-degree">None</strong></div>
         <div class="dash-row"><span>GI Bill</span><strong id="d-gibill">Intact</strong></div>
+        <div class="dash-row" style="border-top:1px solid var(--border);margin-top:.4rem;padding-top:.4rem"><span>Studying for</span><strong id="d-program">—</strong></div>
+        <div class="dash-row big pos"><span>Civ salary if I exit today</span><strong id="d-civsalary">—</strong></div>
       </div>
       <div class="dash-card">
         <h4>Qualifications</h4>
@@ -698,6 +701,41 @@ tr:hover td{background:var(--off)}
       <div style="margin-top:var(--s5);font-size:var(--text-sm)">
         <h4 style="margin-bottom:.5rem">What this would mean</h4>
         <div id="proj-meaning" style="color:var(--muted);line-height:1.7"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== EDUCATION + CIVILIAN CAREER ==================== -->
+<div id="edu" class="section">
+  <h2>🎓 My Education + Civilian Career Plan</h2>
+  <p style="margin-bottom:var(--s4)">My degree shapes my civilian salary <strong>at every exit point</strong> — whether I get out at 4 years, 8 years, or retire at 20. Pick a program now so every TA class I take builds toward something real. The numbers below project my civilian first-year salary based on my <em>current</em> degree progress + MOS + clearance.</p>
+
+  <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:var(--s5);margin-top:var(--s4)">
+
+    <div class="card pad">
+      <h3>📚 My Degree Program</h3>
+      <p style="font-size:var(--text-sm);margin-bottom:var(--s3);color:var(--muted)">Pick one. I can change it later but earlier is better — the path I pick shapes which TA classes to prioritize.</p>
+      <div id="degree-grid" style="display:grid;gap:.5rem"></div>
+
+      <h3 style="margin-top:var(--s5)">🏅 Certifications</h3>
+      <p style="font-size:var(--text-sm);margin-bottom:var(--s3);color:var(--muted)">Each cert I earn boosts my civilian salary. Check the ones I've already earned (or plan to earn) — they apply to my projection.</p>
+      <div id="cert-grid" style="display:grid;gap:.4rem"></div>
+    </div>
+
+    <div class="card pad">
+      <h3>💵 Civilian First-Year Salary Projection</h3>
+      <p style="font-size:var(--text-sm);margin-bottom:var(--s3);color:var(--muted)">If I separated TODAY with my current degree progress + MOS + clearance + certs, this is what I'd realistically land in my first civilian job.</p>
+
+      <div id="career-projection"></div>
+
+      <div style="margin-top:var(--s4);padding:var(--s4);background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid var(--gold);border-radius:var(--r-md);font-size:var(--text-sm);line-height:1.7">
+        <strong style="color:var(--gold)">Why this matters at every exit:</strong><br>
+        <strong>Year 4 exit:</strong> Pension = $0. Civilian salary is my entire income. Degree matters most here.<br>
+        <strong>Year 8 exit:</strong> Pension = $0. Civilian salary determines lifestyle. Degree + clearance compound.<br>
+        <strong>Year 12 exit:</strong> Pension = $0 (need 20). Civilian + savings = my floor.<br>
+        <strong>Year 20 retire:</strong> Pension ~$3,500-5,000/mo PLUS civilian salary. Degree + experience = total comp $150k-$250k.<br>
+        <strong>No matter when I exit, my degree is what compounds.</strong>
       </div>
     </div>
   </div>
@@ -1286,6 +1324,10 @@ function defaultState(){
     // stats
     fitness:80, reputation:70, morale:80, health:'healthy',
     edu_credits:0, degree:'none', gibill:'intact',
+    // Education + civilian career planning
+    degree_program:'', // key from DEGREE_PROGRAMS
+    target_career:'', // key from CIVILIAN_CAREERS
+    certs:[], // ['Security+','PMP','CDL','CISSP','AWS-CCP']
     // quals & flags
     quals:[], // 'IRC','GRC','ARC','Diver','Airborne','MFF','SERE','Scout Sniper','MARSOC'
     has_clearance:false, marsoc_eligible:false,
@@ -1521,22 +1563,69 @@ const SCENES = {
   'school_choice':{
     stage:'First Unit',
     title:`Month 6 — Tuition Assistance: Do I Sign Up?`,
-    text:`The Education Center is in my battalion area. Tuition Assistance pays 100% of college tuition up to $4,500/yr, max 2 classes at a time. Free CLEP/DSST exams. Each class is ~3-12 hrs/week of work outside duty. <strong>This is the single best benefit I\'ll ignore if I\'m not careful.</strong>`,
+    text:`The Education Center is in my battalion area. Tuition Assistance pays 100% of college tuition up to $4,500/yr, max 2 classes at a time. Free CLEP/DSST exams. Each class is ~3-12 hrs/week of work outside duty. <strong>This is the single best benefit I\'ll ignore if I\'m not careful.</strong> Whatever I pick today, I\'ll also pick <em>what degree</em> I\'m working toward — because the path I pick now shapes my civilian salary at every exit point, not just retirement.`,
     choices:[
       {label:'Aggressive: 2 TA classes + CLEP every semester',
        desc:'~12-24 credits/yr. By 4 yrs I have an associate\'s. By 8 yrs I\'m close to a bachelor\'s.',
        tags:['ok:+24 credits/yr','warn:Less free time'],
        apply:g=>{g._school='aggressive';g.edu_credits+=4;g.tis_months+=2;g.morale-=3;},
-       next:'social_choice'},
+       next:'degree_program_pick'},
       {label:'Steady: 1 class per semester',
        desc:'~6 credits/yr. Sustainable through high op-tempo.',
        tags:['ok:Sustainable'],
        apply:g=>{g._school='steady';g.edu_credits+=2;g.tis_months+=2;},
-       next:'social_choice'},
+       next:'degree_program_pick'},
       {label:'Pause school — 100% focus on Marine performance',
-       desc:'No classes. All energy on PT and MOS. GI Bill saved for after.',
+       desc:'No classes for now. All energy on PT and MOS. GI Bill saved for after. (I can still pick a target degree on the 🎓 Education tab anytime.)',
        tags:['warn:No credit progress'],
-       apply:g=>{g._school='none';g.tis_months+=2;g.fitness=Math.min(100,g.fitness+3);},
+       apply:g=>{g._school='none';g.tis_months+=2;g.fitness=Math.min(100,g.fitness+3);g.degree_program='none';},
+       next:'social_choice'}
+    ]
+  },
+  'degree_program_pick':{
+    stage:'First Unit',
+    title:`Month 7 — What Am I Studying?`,
+    text:`The Education Center counselor asks me to declare a degree program so my TA classes count toward something real. <strong>This choice shapes my civilian salary at every exit point</strong> — year 4, year 8, year 12, year 20. I can change my mind later on the 🎓 Education tab, but starting now beats waiting.`,
+    choices:[
+      {label:'Cybersecurity / IT  →  $85–135k jobs after exit',
+       desc:'Best translation for clearance holders. Pairs with Security+ cert. Cyber/IT MOSs (06XX, 02XX) get a +$25k bridge bonus.',
+       tags:['ok:Highest ceiling','ok:Pairs with Secret clearance'],
+       apply:g=>{g.degree_program='cyber';g.target_career='cyber';g.tis_months+=1;g.event={type:'win',text:'Declared Cybersecurity. Every TA class now counts toward a degree that pays $85k-$135k civilian.'};},
+       next:'social_choice'},
+      {label:'Business / Project Mgmt  →  $75–110k jobs',
+       desc:'Management, ops, consulting. Sgt+ leadership experience makes this a natural fit. PMP cert adds +$18k.',
+       tags:['ok:Pairs with leadership','info:PMP boost'],
+       apply:g=>{g.degree_program='business';g.target_career='business';g.tis_months+=1;g.event={type:'win',text:'Declared Business. My infantry leadership = a real PM resume.'};},
+       next:'social_choice'},
+      {label:'Criminal Justice  →  Federal LEO ($70–110k)',
+       desc:'FBI/DEA/USSS/US Marshals. Veteran preference is real. Combat arms MOSs get +$15-25k bonus.',
+       tags:['ok:Veteran preference','info:Clearance helps'],
+       apply:g=>{g.degree_program='criminal_justice';g.target_career='criminal_justice';g.tis_months+=1;g.event={type:'win',text:'Declared Criminal Justice. Path opens to FBI, DEA, US Marshals, federal LEO.'};},
+       next:'social_choice'},
+      {label:'Homeland Security / Emergency Mgmt  →  $72–115k',
+       desc:'DHS, FEMA, defense contracting. Special ops background is a major qualifier (+$25-30k MOS bonus).',
+       tags:['ok:Big SOF bonus','ok:Gov + private'],
+       apply:g=>{g.degree_program='homeland_security';g.target_career='homeland_security';g.tis_months+=1;g.event={type:'win',text:'Declared Homeland Security. MARSOC/Recon background pays here.'};},
+       next:'social_choice'},
+      {label:'Engineering  →  $85–135k+ (highest long-term ceiling)',
+       desc:'Hardest schoolwork. Best long-term earning. PE license adds +$25k. Defense engineering with clearance = $130k+.',
+       tags:['ok:Highest ceiling','warn:Hardest classes'],
+       apply:g=>{g.degree_program='engineering';g.target_career='engineering';g.tis_months+=1;g.event={type:'win',text:'Declared Engineering. Toughest program — biggest payoff.'};},
+       next:'social_choice'},
+      {label:'Skilled Trade (HVAC / Electric / CDL)  →  $75–130k',
+       desc:'No bachelor needed. Trade school + license. Many vets build their own businesses. Quick income post-exit.',
+       tags:['ok:No bachelor needed','ok:Own business path'],
+       apply:g=>{g.degree_program='trade';g.target_career='trade';g.tis_months+=1;g.event={type:'win',text:'Declared Skilled Trade. Lower-credit path but high income via license + cert.'};},
+       next:'social_choice'},
+      {label:'Psychology / HR / Counseling  →  $60–120k',
+       desc:'HR, training, veteran counseling. Combat experience adds credibility for veteran services. Master\'s opens LCSW.',
+       tags:['ok:Veteran-services premium'],
+       apply:g=>{g.degree_program='psychology';g.target_career='psychology';g.tis_months+=1;g.event={type:'win',text:'Declared Psychology. Path opens to HR, training, vet counseling.'};},
+       next:'social_choice'},
+      {label:'Skip for now — figure it out later',
+       desc:'I\'ll burn TA credits without a target. Less efficient. Civilian salary stays in the no-degree band ($38-55k) until I commit.',
+       tags:['warn:Less efficient','warn:Lower civilian ceiling'],
+       apply:g=>{g.degree_program='none';g.tis_months+=1;},
        next:'social_choice'}
     ]
   },
@@ -2017,7 +2106,7 @@ const SCENES = {
   'mid_career_check':{
     stage:'Mid-Career',
     title:`Year 12 — Stay to 20 or Get Out?`,
-    text:`12 years in. Savings: <strong>{{savings}}</strong>. TSP: <strong>{{tsp}}</strong>. Rank: {{rank}}. <strong>The big decision:</strong> 8 more years for full pension (50% of high-3 base pay for life + TRICARE), or exit now with GI Bill + savings?`,
+    text:`12 years in. Savings: <strong>{{savings}}</strong>. TSP: <strong>{{tsp}}</strong>. Rank: {{rank}}. <strong>The big decision:</strong> 8 more years for full pension (50% of high-3 base pay for life + TRICARE), or exit now with GI Bill + savings?<br><br>{{civExitContext}}`,
     choices:[
       {label:'Stay to 20 — go for the pension',
        desc:'8 more years. Pension at 20: ~$3,500-$5,000/mo for life + TRICARE for life.',
@@ -2067,7 +2156,7 @@ const SCENES = {
   'early_exit':{
     stage:'Civilian Transition',
     title:`Civilian Life — Phase Two Begins`,
-    text:`Separated. Scorecard: savings, GI Bill, degree, qualifications, family stability. What do I do first?`,
+    text:`Separated. Scorecard: savings, GI Bill, degree, qualifications, family stability.<br><br>{{civExitContext}}<br><br>What do I do first?`,
     choices:[
       {label:'Post-9/11 GI Bill — finish bachelor\'s full-time',
        desc:'100% tuition + $1,000 books + housing allowance (BAH-equivalent). 36 months max.',
@@ -2299,6 +2388,17 @@ function renderDash(){
   document.getElementById('d-credits').textContent = G.edu_credits;
   document.getElementById('d-degree').textContent = G.degree==='none'?'In progress':G.degree;
   document.getElementById('d-gibill').textContent = G.gibill;
+  // Civilian career projection on dashboard
+  const progEl = document.getElementById('d-program');
+  const civEl = document.getElementById('d-civsalary');
+  if(progEl){
+    const dp = DEGREE_PROGRAMS[G.degree_program] || null;
+    progEl.textContent = dp ? dp.name : 'Not yet picked';
+  }
+  if(civEl){
+    const proj = civilianCareerProjection(G);
+    civEl.textContent = `$${(proj.salaryLow/1000).toFixed(0)}k–$${(proj.salaryHigh/1000).toFixed(0)}k`;
+  }
   const quals = document.getElementById('d-quals');
   if(G.quals.length===0) quals.innerHTML='<em style="font-size:var(--text-xs);color:var(--muted)">None yet — earn them by passing gates.</em>';
   else quals.innerHTML = G.quals.map(q=>`<span class="qual">${q}</span>`).join('');
@@ -2465,6 +2565,12 @@ function renderScene(){
     '{{marriageQContext}}': (()=>{
       if(G.married) return `I'm already married — that decision is behind me. The MARSOC pipeline ahead is real on family life, but my spouse and I have already navigated the early years. The bigger question now is performance and packet timing.`;
       return `If I've been dating seriously, this is the real moment. <strong>Getting married triggers BAH</strong> — housing allowance added to my pay (~${fmt(b.bah||BAH[G.rank]||0)}/mo at my rank). It also triggers a new household budget.`;
+    })(),
+    '{{civExitContext}}': (()=>{
+      const proj = civilianCareerProjection(G);
+      const pension = (yearsOfService(G)>=20) ? basePay(G.rank, G.tis_months)*0.50*12 : 0;
+      const total = proj.salaryMid + pension;
+      return `<strong>If I separate right now</strong> with my current degree progress (<em>${proj.levelLabel}</em> in ${proj.program}), my MOS, and ${G.has_clearance?'my Secret clearance':'no clearance yet'}: civilian first-year salary projects to <strong style="color:var(--success)">$${(proj.salaryLow/1000).toFixed(0)}k–$${(proj.salaryHigh/1000).toFixed(0)}k</strong>${pension?` + <strong>${fmt(pension)}/yr pension</strong> = <strong>${fmt(total)}/yr total compensation</strong>`:''}. Top jobs I'd qualify for: <em>${proj.topJobs.slice(0,3).join(', ')}</em>.`;
     })()
   };
   const sub = (str)=>{ if(!str) return str; let o=str; Object.entries(tokens).forEach(([k,v])=>{o=o.split(k).join(v);}); return o; };
@@ -2526,6 +2632,18 @@ function renderRetirementScorecard(){
       <div class="score-card"><div class="val">${G.kids}</div><div class="lbl">Kids</div></div>
       <div class="score-card"><div class="val">${G.quals.length}</div><div class="lbl">Quals earned</div></div>
     </div>
+    <!-- Civilian career projection card -->
+    ${(()=>{ const proj = civilianCareerProjection(G); const totalAnnual = proj.salaryMid + annualPension; return `
+    <div style="margin-top:var(--s5);padding:var(--s5);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md)">
+      <h4 style="font-size:var(--text-base);margin-bottom:.6rem">🎓 Civilian Career Outcome</h4>
+      <div style="font-size:var(--text-sm);line-height:1.7">
+        <div><strong>Studied:</strong> ${proj.program} (${proj.levelLabel})</div>
+        <div><strong>Civilian first-year salary:</strong> <span style="color:var(--success);font-family:var(--mono);font-weight:600">$${(proj.salaryLow/1000).toFixed(0)}k–$${(proj.salaryHigh/1000).toFixed(0)}k</span></div>
+        ${annualPension?`<div><strong>Military pension:</strong> <span style="color:var(--success);font-family:var(--mono);font-weight:600">${fmt(annualPension)}/yr</span></div>`:''}
+        <div style="margin-top:.4rem;padding-top:.4rem;border-top:1px solid var(--border)"><strong>Total annual compensation:</strong> <span style="color:var(--gold);font-family:var(--mono);font-weight:700;font-size:1.1em">${fmt(totalAnnual)}/yr</span></div>
+        <div style="margin-top:.6rem"><strong>Top jobs:</strong> ${proj.topJobs.join(', ')}</div>
+      </div>
+    </div>`; })()}
     <div style="margin-top:var(--s5);padding:var(--s4);background:var(--off);border-radius:var(--r-md)">
       <h4 style="font-size:var(--text-sm);margin-bottom:.5rem">Path I took</h4>
       <ol style="font-size:var(--text-xs);color:var(--muted);padding-left:1.2rem;line-height:1.7">
@@ -3076,6 +3194,196 @@ function renderPayTableFromData(){
 }
 
 /* ════════════════════════════════════════════════════════════
+   🎓  EDUCATION + CIVILIAN CAREER PATH
+   ═══════════════════════════════════════════════════════════ */
+// Each program: name, kind of jobs it opens, salary bands by completion level,
+// MOS-bridge bonuses, certifications that boost it, and clearance multiplier
+const DEGREE_PROGRAMS = {
+  cyber: {
+    name: 'Cybersecurity / IT',
+    description: 'Networks, security, software. Highest-paying civilian translation for clearance-holding vets.',
+    salaryBy: { none:[45000,60000], in_progress:[55000,75000], associate:[65000,90000], bachelor:[85000,135000], master:[115000,170000] },
+    mosBonus: { '0651':25000, '0231':18000, '0211':22000, '0372':20000, '0321':12000, '11B':8000, '18X':25000 },
+    clearanceBonus: 18000,
+    certs: { 'Security+':10000, 'CISSP':30000, 'AWS':15000, 'CCNA':12000 },
+    topJobs: ['Cybersecurity Analyst', 'SOC Analyst', 'Network Engineer', 'Defense Contractor (IT)', 'Cloud Engineer']
+  },
+  business: {
+    name: 'Business / Project Mgmt',
+    description: 'Management, ops, sales, consulting. PMP cert turbocharges this — pairs with leadership experience.',
+    salaryBy: { none:[42000,55000], in_progress:[50000,70000], associate:[60000,80000], bachelor:[75000,110000], master:[100000,160000] },
+    mosBonus: { '0369':15000, '0365':10000, '0372':15000, '0321':10000, '11B':6000, '18X':15000 },
+    clearanceBonus: 8000,
+    certs: { 'PMP':18000, 'Six Sigma':10000, 'MBA-prep':12000 },
+    topJobs: ['Project Manager', 'Operations Manager', 'Logistics Mgr', 'Consultant', 'Sales (defense/tech)']
+  },
+  criminal_justice: {
+    name: 'Criminal Justice / Law Enforcement',
+    description: 'FBI, DEA, Secret Service, US Marshals, federal LEO, local police. Veteran preference helps a lot.',
+    salaryBy: { none:[48000,65000], in_progress:[55000,72000], associate:[62000,82000], bachelor:[70000,110000], master:[85000,130000] },
+    mosBonus: { '5811':18000, '5821':22000, '0372':25000, '0321':15000, '11B':10000, '18X':25000 },
+    clearanceBonus: 12000,
+    certs: { 'FLETC-prep':8000, 'CCIE':5000 },
+    topJobs: ['Federal Agent (FBI/DEA/USSS)', 'US Marshal', 'Local PD', 'DSS Special Agent', 'Border Patrol']
+  },
+  homeland_security: {
+    name: 'Homeland Security / Emergency Mgmt',
+    description: 'DHS, FEMA, defense contractors, government affairs. Special operations background is a premium qualifier.',
+    salaryBy: { none:[45000,60000], in_progress:[52000,70000], associate:[60000,80000], bachelor:[72000,115000], master:[95000,150000] },
+    mosBonus: { '0372':30000, '0321':20000, '0231':18000, '5811':12000, '11B':10000, '18X':25000 },
+    clearanceBonus: 15000,
+    certs: { 'CEM':10000, 'CHEC':8000 },
+    topJobs: ['DHS Analyst', 'Emergency Manager', 'Defense Contractor', 'GS-13+ Federal', 'Private Security Director']
+  },
+  engineering: {
+    name: 'Engineering / Technical',
+    description: 'Civil, mech, electrical, software, systems. Best long-term earning ceiling; harder schoolwork.',
+    salaryBy: { none:[42000,55000], in_progress:[55000,75000], associate:[68000,90000], bachelor:[85000,135000], master:[110000,180000] },
+    mosBonus: { '0651':18000, '2336':22000, '0372':12000, '0321':8000, '11B':5000 },
+    clearanceBonus: 12000,
+    certs: { 'PE License':25000, 'Six Sigma':8000 },
+    topJobs: ['Defense Engineer', 'Systems Engineer', 'Civil Engineer', 'EOD Tech Consultant', 'R&D']
+  },
+  trade: {
+    name: 'Skilled Trade (HVAC / Electric / CDL)',
+    description: 'No bachelor needed. Trade school + license = $75-130k by year 5. Many vets build their own businesses.',
+    salaryBy: { none:[42000,55000], in_progress:[52000,72000], associate:[65000,95000], bachelor:[70000,100000], master:[75000,110000] },
+    mosBonus: { '11B':5000, '0331':3000, '0341':3000 },
+    clearanceBonus: 0,
+    certs: { 'CDL':10000, 'HVAC':12000, 'Master Electrician':25000, 'Plumber License':18000 },
+    topJobs: ['HVAC Tech / Owner', 'Electrician / Owner', 'Plumber / Owner', 'CDL Driver / Owner-op']
+  },
+  psychology: {
+    name: 'Psychology / Counseling / HR',
+    description: 'HR, training, counseling (master\'s required), consulting. Combat experience adds credibility for veteran-services.',
+    salaryBy: { none:[40000,52000], in_progress:[48000,62000], associate:[55000,72000], bachelor:[60000,90000], master:[75000,120000] },
+    mosBonus: { '0372':8000, '0321':5000, '0369':10000, '11B':5000 },
+    clearanceBonus: 5000,
+    certs: { 'SHRM-CP':10000, 'LCSW':25000 },
+    topJobs: ['HR Manager', 'Veteran Affairs Counselor', 'Training & Dev', 'EAP Counselor', 'Consultant']
+  },
+  none: {
+    name: '(No degree planned)',
+    description: 'No formal degree. Civilian options anchor on MOS translation + experience + certs only.',
+    salaryBy: { none:[38000,55000], in_progress:[38000,55000], associate:[38000,55000], bachelor:[38000,55000], master:[38000,55000] },
+    mosBonus: { '0372':15000, '0321':8000, '5811':10000, '11B':3000 },
+    clearanceBonus: 6000,
+    certs: { 'PMP':10000, 'Security+':6000, 'CDL':8000 },
+    topJobs: ['Defense contractor (MOS-based)', 'Federal LEO entry', 'Trades (no license)', 'Sales']
+  }
+};
+
+function degreeCompletionLevel(g){
+  const c = g.edu_credits || 0;
+  if(c >= 150 && g.degree==='master') return 'master';
+  if(c >= 120) return 'bachelor';
+  if(c >= 60)  return 'associate';
+  if(c >= 12)  return 'in_progress';
+  return 'none';
+}
+
+function renderEducationTab(){
+  const grid = document.getElementById('degree-grid');
+  const certGrid = document.getElementById('cert-grid');
+  if(!grid) return;
+  // Degree program cards
+  grid.innerHTML = Object.entries(DEGREE_PROGRAMS).map(([key,p])=>{
+    const sel = G.degree_program === key;
+    const [low, high] = p.salaryBy.bachelor;
+    return `<div class="cc-card ${sel?'sel':''}" style="text-align:left;padding:.7rem .9rem" onclick="setDegree('${key}')">
+      <h4 style="margin-bottom:.2rem">${sel?'✓ ':''}${p.name}</h4>
+      <p style="font-size:var(--text-xs);margin-bottom:.4rem">${p.description}</p>
+      <div style="font-size:.7rem;font-family:var(--mono);color:var(--gold)">Bachelor's salary range: $${(low/1000).toFixed(0)}k–$${(high/1000).toFixed(0)}k</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:.2rem">Jobs: ${p.topJobs.slice(0,3).join(' · ')}</div>
+    </div>`;
+  }).join('');
+  // Certifications for current degree program
+  const prog = DEGREE_PROGRAMS[G.degree_program || 'none'];
+  const certKeys = Object.keys(prog.certs);
+  if(certKeys.length === 0){
+    certGrid.innerHTML = `<div style="color:var(--muted);font-style:italic;font-size:var(--text-sm)">Pick a degree program above to see relevant certifications.</div>`;
+  } else {
+    certGrid.innerHTML = certKeys.map(cert => {
+      const have = (G.certs||[]).includes(cert);
+      const bonus = prog.certs[cert];
+      return `<label class="chk" style="cursor:pointer">
+        <input type="checkbox" ${have?'checked':''} onchange="toggleCert('${cert}')">
+        <span><strong>${cert}</strong> <span style="color:var(--gold);font-family:var(--mono);font-size:.75rem">+$${bonus.toLocaleString()}/yr</span></span>
+      </label>`;
+    }).join('');
+  }
+  // Civilian career projection panel
+  const proj = civilianCareerProjection(G);
+  const credits = G.edu_credits || 0;
+  const pctToBach = Math.min(100, Math.round((credits/120)*100));
+  document.getElementById('career-projection').innerHTML = `
+    <div style="margin-bottom:var(--s4)">
+      <div class="dash-row big" style="border-bottom:1px solid var(--border);padding-bottom:.6rem;margin-bottom:.6rem"><span>If I exit today...</span><strong style="color:var(--success);font-family:var(--mono)">$${(proj.salaryLow/1000).toFixed(0)}k–$${(proj.salaryHigh/1000).toFixed(0)}k/yr</strong></div>
+      <div class="dash-row"><span>Program:</span><strong>${proj.program}</strong></div>
+      <div class="dash-row"><span>Education level:</span><strong>${proj.levelLabel}</strong></div>
+      <div class="dash-row"><span>Credits earned:</span><strong>${credits}/120 (${pctToBach}%)</strong></div>
+      <div class="dash-bar"><div class="dash-bar-fill" style="width:${pctToBach}%;background:var(--gold)"></div></div>
+      <div class="dash-row" style="margin-top:.6rem"><span>Credits to bachelor's:</span><strong>${proj.creditsToGo}</strong></div>
+    </div>
+    <div style="padding:var(--s3);background:var(--surf2);border-radius:var(--r-md);font-size:var(--text-sm);margin-bottom:var(--s3)">
+      <strong style="display:block;margin-bottom:.4rem">Salary breakdown:</strong>
+      <div class="dash-row"><span>Base by degree level</span><strong>$${(proj.baseLow/1000).toFixed(0)}k–$${(proj.baseHigh/1000).toFixed(0)}k</strong></div>
+      ${proj.mosBonus?`<div class="dash-row pos"><span>MOS bridge bonus</span><strong>+$${proj.mosBonus.toLocaleString()}</strong></div>`:''}
+      ${proj.clearBonus?`<div class="dash-row pos"><span>Clearance premium</span><strong>+$${proj.clearBonus.toLocaleString()}</strong></div>`:''}
+      ${proj.certBonus?`<div class="dash-row pos"><span>Cert bonuses</span><strong>+$${proj.certBonus.toLocaleString()}</strong></div>`:''}
+      ${proj.yrsBonus?`<div class="dash-row pos"><span>Years of service premium</span><strong>+$${proj.yrsBonus.toLocaleString()}</strong></div>`:''}
+    </div>
+    <div style="font-size:var(--text-sm)">
+      <strong>Top jobs I'd qualify for:</strong>
+      <ul style="margin-top:.4rem;padding-left:1.2rem;color:var(--muted);line-height:1.7">
+        ${proj.topJobs.map(j=>`<li>${j}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+function setDegree(key){
+  G.degree_program = key;
+  renderEducationTab();
+  if(typeof renderDash==='function') renderDash();
+  autoSave();
+}
+function toggleCert(cert){
+  if(!G.certs) G.certs = [];
+  const i = G.certs.indexOf(cert);
+  if(i>=0) G.certs.splice(i,1);
+  else G.certs.push(cert);
+  renderEducationTab();
+  autoSave();
+}
+
+function civilianCareerProjection(g){
+  const program = DEGREE_PROGRAMS[g.degree_program || 'none'] || DEGREE_PROGRAMS.none;
+  const level = degreeCompletionLevel(g);
+  const [low, high] = program.salaryBy[level] || program.salaryBy.none;
+  // Bonuses
+  const mosKey = (g.mos||'').match(/^\d{4}|^\d{2}[A-Z]|^18X/)?.[0] || '';
+  const mosBonus = program.mosBonus[mosKey] || 0;
+  const clearBonus = g.has_clearance ? program.clearanceBonus : 0;
+  let certBonus = 0;
+  (g.certs||[]).forEach(c => { if(program.certs[c]) certBonus += program.certs[c]; });
+  // Years of service adjustment — every 2 yrs of service adds a small premium
+  const yrsBonus = Math.floor(yearsOfService(g)/2) * 2500;
+  const finalLow = low + mosBonus + clearBonus + certBonus + yrsBonus;
+  const finalHigh = high + mosBonus + clearBonus + certBonus + yrsBonus;
+  return {
+    program: program.name,
+    level, levelLabel: level === 'none' ? 'No degree yet' : level === 'in_progress' ? 'Degree in progress' : level.charAt(0).toUpperCase()+level.slice(1)+"'s",
+    baseLow: low, baseHigh: high,
+    mosBonus, clearBonus, certBonus, yrsBonus,
+    salaryLow: finalLow, salaryHigh: finalHigh,
+    salaryMid: Math.round((finalLow+finalHigh)/2),
+    topJobs: program.topJobs,
+    creditsToGo: Math.max(0, 120 - (g.edu_credits||0))
+  };
+}
+
+/* ════════════════════════════════════════════════════════════
    💵  BUDGET CUSTOMIZATION — editable line-item bills + goals
    ═══════════════════════════════════════════════════════════ */
 const BILL_CATEGORIES = {
@@ -3488,10 +3796,17 @@ LIFE
   Vehicle:        ${G.car}
   Phone:          ${G.has_phone?'Yes ('+fmt(G.phone_bill)+'/mo)':'No'}
 
-EDUCATION
+EDUCATION + CIVILIAN CAREER PROJECTION
   College credits: ${G.edu_credits}
-  Degree:          ${G.degree}
+  Degree level:    ${civilianCareerProjection(G).levelLabel}
+  Degree program:  ${(DEGREE_PROGRAMS[G.degree_program]||{}).name||'(not picked)'}
+  Certifications:  ${(G.certs||[]).join(', ')||'(none)'}
   GI Bill:         ${G.gibill}
+
+  CIVILIAN SALARY PROJECTION (if I exit today):
+    Range:          $${civilianCareerProjection(G).salaryLow.toLocaleString()}–$${civilianCareerProjection(G).salaryHigh.toLocaleString()}/yr
+    Top jobs:       ${civilianCareerProjection(G).topJobs.slice(0,3).join(', ')}
+    + Pension (if 20yr): ${(yearsOfService(G)>=20)?fmt(basePay(G.rank,G.tis_months)*0.50*12)+'/yr':'(need 20 yrs)'}
 
 QUALIFICATIONS EARNED
   ${G.quals.length?G.quals.join(', '):'(none yet)'}
@@ -3600,6 +3915,7 @@ function showSection(id, btn){
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='budget'){ renderBudgetTab(); }
   if(id==='invest'){ renderInvestmentsTab(); wireInvestmentListeners(); }
+  if(id==='edu'){ renderEducationTab(); }
   if(id==='paths'){ renderPathsList(); }
 }
 
