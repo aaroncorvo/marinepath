@@ -21,15 +21,20 @@
 
 [[redirects]]
   from = "/careers"
-  to = "/military-career-explorer.html"
+  to = "/index.html#bonuses"
   status = 200
 
 [[redirects]]
   from = "/bonuses"
-  to = "/military-career-explorer.html"
+  to = "/index.html#bonuses"
   status = 200
 
 [[redirects]]
   from = "/explorer"
-  to = "/military-career-explorer.html"
+  to = "/index.html#bonuses"
+  status = 200
+
+[[redirects]]
+  from = "/mos"
+  to = "/index.html#mos"
   status = 200

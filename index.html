@@ -312,7 +312,6 @@ tr:hover td{background:var(--off)}
     </div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center">
-    <a href="military-career-explorer.html" target="_blank" rel="noopener" class="acct-btn" style="text-decoration:none;color:var(--gold)" title="Open the Mission Ready bonus explorer in a new tab">💰 Bonus Explorer →</a>
     <button class="acct-btn" id="acctBtn" onclick="openAcctModal()">👤 Sign In</button>
     <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
   </div>
@@ -344,6 +343,7 @@ tr:hover td{background:var(--off)}
   <button class="tab" onclick="showSection('edu',this)">🎓 Education + Career</button>
   <button class="tab" onclick="showSection('paths',this)">📁 My Paths</button>
   <button class="tab" onclick="showSection('mos',this)">🔖 MOS</button>
+  <button class="tab" onclick="showSection('bonuses',this)">💰 Bonuses</button>
   <button class="tab" onclick="showSection('recon',this)">🌊 Recon</button>
   <button class="tab" onclick="showSection('marsoc',this)">⚡ Raiders</button>
   <button class="tab" onclick="showSection('life',this)">🏠 Life Forks</button>
@@ -816,6 +816,28 @@ tr:hover td{background:var(--off)}
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ==================== BONUSES ==================== -->
+<div id="bonuses" class="section">
+  <h2>💰 FY2026 Sign-On Bonuses — By Branch + MOS</h2>
+  <p style="margin-bottom:var(--s4)">Every branch + MOS combo and what they pay in FY2026. <strong>This is part of picking my contract</strong> — these dollars flow through my savings at the milestone scenes shown below. Maximum amounts assume stacking. Actual depends on enlistment length, ASVAB, and recruiter allocation.</p>
+
+  <div class="pills" style="margin-bottom:var(--s5)" id="bonusFilters">
+    <span class="pill" data-bf="all" style="cursor:pointer;border-color:var(--primary);color:var(--primary)">All Branches</span>
+    <span class="pill" data-bf="army" style="cursor:pointer">⚡ Army</span>
+    <span class="pill" data-bf="marines" style="cursor:pointer">🦅 Marines</span>
+    <span class="pill" data-bf="navy" style="cursor:pointer">⚓ Navy</span>
+    <span class="pill" data-bf="air_force" style="cursor:pointer">✈ Air Force</span>
+    <span class="pill" data-bf="coast_guard" style="cursor:pointer">🌊 Coast Guard</span>
+  </div>
+
+  <div id="bonusesGrid"></div>
+
+  <div style="margin-top:var(--s8)" class="card pad">
+    <h3 style="margin-bottom:var(--s3)">🧾 Stacking Strategy — Best Combos (FY2026)</h3>
+    <div class="three-col" style="gap:var(--s4)" id="bonusStrategy"></div>
   </div>
 </div>
 
@@ -4924,6 +4946,134 @@ function setStrategy(s){
 }
 
 /* ════════════════════════════════════════════════════════════
+   💰  BONUSES TAB — FY2026 sign-on amounts + stacking strategy
+   ═══════════════════════════════════════════════════════════ */
+let _bonusFilter = 'all';
+const BRANCH_DISPLAY = {
+  army:        { name:'U.S. Army',         color:'var(--success)', emoji:'⚡' },
+  marines:     { name:'U.S. Marine Corps', color:'var(--primary)', emoji:'🦅' },
+  usmc:        { name:'U.S. Marine Corps', color:'var(--primary)', emoji:'🦅' },
+  navy:        { name:'U.S. Navy',         color:'var(--blue)',    emoji:'⚓' },
+  air_force:   { name:'U.S. Air Force',    color:'var(--gold)',    emoji:'✈' },
+  coast_guard: { name:'U.S. Coast Guard',  color:'var(--orange)',  emoji:'🌊' }
+};
+
+function renderBonusesTab(){
+  const grid = document.getElementById('bonusesGrid');
+  const strat = document.getElementById('bonusStrategy');
+  if(!grid) return;
+
+  // Fallback if data didn't load — show informative empty state in theme
+  if(!DATA.bonuses || !DATA.bonuses.bonuses){
+    grid.innerHTML = `<div class="card pad" style="text-align:center;color:var(--muted)">
+      <em>Bonus data not loaded. Open the app via a local server (or after Netlify deploy) and the FY2026 bonus tables will appear here.</em>
+    </div>`;
+    return;
+  }
+
+  // Wire filter pill clicks (idempotent)
+  document.querySelectorAll('#bonusFilters .pill').forEach(p=>{
+    p.onclick = ()=>{
+      _bonusFilter = p.dataset.bf;
+      document.querySelectorAll('#bonusFilters .pill').forEach(x=>{
+        x.style.borderColor = '';
+        x.style.color = '';
+      });
+      p.style.borderColor = 'var(--primary)';
+      p.style.color = 'var(--primary)';
+      renderBonusesTab();
+    };
+  });
+
+  // Group by branch
+  const byBranch = {};
+  Object.entries(DATA.bonuses.bonuses).forEach(([key, b])=>{
+    if(_bonusFilter !== 'all' && b.branch !== _bonusFilter) return;
+    (byBranch[b.branch] = byBranch[b.branch] || []).push({ key, ...b });
+  });
+  // Order branches
+  const order = ['army','marines','usmc','navy','air_force','coast_guard'];
+  let html = '';
+  order.forEach(brKey=>{
+    const list = byBranch[brKey]; if(!list || !list.length) return;
+    const cfg = BRANCH_DISPLAY[brKey] || { name:brKey, color:'var(--text)', emoji:'•' };
+    // Sort: highest max_eb first
+    list.sort((a,b)=>(b.max_eb||0)-(a.max_eb||0));
+    html += `
+      <div style="margin-bottom:var(--s6)">
+        <div style="display:flex;align-items:center;gap:var(--s3);padding-bottom:var(--s3);margin-bottom:var(--s4);border-bottom:2px solid ${cfg.color}">
+          <div style="width:4px;height:32px;border-radius:2px;background:${cfg.color}"></div>
+          <div>
+            <div style="font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:${cfg.color}">${cfg.emoji} ${cfg.name}</div>
+            <div style="font-size:var(--text-xs);color:var(--muted);font-family:var(--mono)">${list.length} MOS · max ${fmt(Math.max(...list.map(x=>x.max_eb||0)))} EB</div>
+          </div>
+        </div>
+        <div class="three-col" style="gap:var(--s3)">
+          ${list.map(b=>{
+            const eb = b.max_eb||0;
+            const lrp = b.lrp_eligible||0;
+            const retSrb = b.retention_srb||0;
+            const retKick = b.retention_kicker_84mo||0;
+            const total = eb + lrp + retSrb + retKick;
+            const tier = eb >= 40000 ? 'ok' : eb >= 15000 ? 'info' : eb > 0 ? 'warn' : 'danger';
+            const tierLabel = eb >= 40000 ? 'High' : eb >= 15000 ? 'Mid' : eb > 0 ? 'Low' : 'None';
+            return `<div class="card pad-sm" style="border-left:3px solid ${cfg.color}">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
+                <div>
+                  <div style="font-family:var(--mono);font-size:var(--text-xs);color:${cfg.color};letter-spacing:.06em;font-weight:700">${b.mos}</div>
+                  <div style="font-weight:600;font-size:var(--text-sm);margin-top:.1rem">${b.title}</div>
+                </div>
+                <span class="choice-tag ${tier}" style="white-space:nowrap">${tierLabel}</span>
+              </div>
+              <div style="display:grid;gap:.3rem;font-size:var(--text-xs);font-family:var(--mono);margin-bottom:.5rem">
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Max EB:</span><strong style="color:${eb>0?'var(--success)':'var(--muted)'}">${eb?fmt(eb):'$0'}</strong></div>
+                ${lrp?`<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">+ LRP:</span><strong style="color:var(--gold)">${fmt(lrp)}</strong></div>`:''}
+                ${retSrb?`<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">+ Retention SRB:</span><strong style="color:var(--gold)">${fmt(retSrb)}</strong></div>`:''}
+                ${retKick?`<div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">+ Lat-move kicker:</span><strong style="color:var(--gold)">${fmt(retKick)}</strong></div>`:''}
+                ${total>eb?`<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:.25rem;margin-top:.15rem"><strong style="color:var(--text)">Career max:</strong><strong style="color:var(--primary)">${fmt(total)}</strong></div>`:''}
+              </div>
+              ${b.payment_milestones && b.payment_milestones.length ? `
+                <div style="margin-top:.5rem;padding-top:.4rem;border-top:1px solid var(--border)">
+                  <div style="font-size:.65rem;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Paid at</div>
+                  ${b.payment_milestones.map(m=>`<div style="font-size:var(--text-xs);color:var(--muted);display:flex;justify-content:space-between"><span>↳ ${m.milestone.replace(/_/g,' ')}</span><strong style="color:var(--success);font-family:var(--mono)">+${fmt(m.amount)}</strong></div>`).join('')}
+                </div>
+              ` : ''}
+              ${b.note ? `<div style="margin-top:.5rem;font-size:var(--text-xs);color:var(--muted);line-height:1.5;font-style:italic">${b.note}</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+  grid.innerHTML = html || `<div class="card pad" style="text-align:center;color:var(--muted)"><em>No MOSs match this filter.</em></div>`;
+
+  // Strategy notes
+  if(strat && DATA.bonuses.strategy_notes){
+    const n = DATA.bonuses.strategy_notes;
+    strat.innerHTML = `
+      <div class="card pad-sm">
+        <div class="label" style="margin-bottom:.5rem;color:var(--gold)">━ Best Stacking Combos ━</div>
+        <ul style="margin:0;padding-left:1rem;font-size:var(--text-xs);color:var(--muted);line-height:1.7">
+          ${n.stacking.map(s=>`<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="card pad-sm">
+        <div class="label" style="margin-bottom:.5rem;color:var(--gold)">━ When Bonuses Actually Pay ━</div>
+        <ul style="margin:0;padding-left:1rem;font-size:var(--text-xs);color:var(--muted);line-height:1.7">
+          ${n.payment_timing.map(s=>`<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="card pad-sm">
+        <div class="label" style="margin-bottom:.5rem;color:var(--gold)">━ Real Money Is in Retention ━</div>
+        <ul style="margin:0;padding-left:1rem;font-size:var(--text-xs);color:var(--muted);line-height:1.7">
+          ${n.retention_premiums.map(s=>`<li>${s}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
    📁  SAVED PATHS — multiple playthrough management
    ═══════════════════════════════════════════════════════════ */
 const PATHS_KEY = 'usmc_path_game_saves_v1';
@@ -5230,6 +5380,7 @@ function showSection(id, btn){
   if(id==='budget'){ renderBudgetTab(); }
   if(id==='invest'){ renderInvestmentsTab(); wireInvestmentListeners(); }
   if(id==='edu'){ renderEducationTab(); }
+  if(id==='bonuses'){ renderBonusesTab(); }
   if(id==='paths'){ renderPathsList(); }
 }
 
