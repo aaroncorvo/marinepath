@@ -7,22 +7,40 @@ This directory holds the structured data files that drive the interactive simula
 ```
 data/
 ├── README.md             ← you are here
-├── *.json                ← Marines (default branch; loaded by the sim today)
-└── army/                 ← Army research data (parallel structure)
+├── *.json                ← Marines (default; loaded by the sim today)
+├── army/                 ← Army research data
+│   ├── README.md
+│   ├── pay_2026.json
+│   ├── mos_complete.json
+│   ├── career_stages.json
+│   ├── timeline.json
+│   └── decision_tree.json
+├── navy/                 ← Navy SEAL / SWCC pipeline
+│   └── decision_tree.json
+├── air_force/            ← AFSWC: CCT / PJ / SR / TACP (2026 Zulu Course)
+│   └── decision_tree.json
+├── coast_guard/          ← CG: MSRT / TACLET / Special Missions Cmd
+│   └── decision_tree.json
+└── _shared/              ← Cross-branch reference data
     ├── README.md
-    ├── pay_2026.json
-    ├── mos_complete.json
-    ├── career_stages.json
-    ├── timeline.json
-    └── decision_tree.json
+    ├── all_branch_career_stages.json
+    └── cross_branch_comparison.json
 ```
 
-The Marines files at the root of `/data/` are the live data the simulator currently consumes. The `army/` subfolder holds parallel research files for when the simulator adds Army-track parity. To wire Army support, swap the fetch path based on `G.branch`:
+The Marines files at the root of `/data/` are the live data the simulator currently consumes. The branch subfolders hold parallel research files for when the simulator adds parity for other branches. To wire any branch, swap the fetch path based on `G.branch`:
 
 ```js
-const branch = G.branch === 'army' ? 'army/' : '';
-fetch(`data/${branch}pay_2026.json`)
+const branchPath = {
+  usmc:        '',
+  army:        'army/',
+  navy:        'navy/',
+  air_force:   'air_force/',
+  coast_guard: 'coast_guard/'
+}[G.branch] || '';
+fetch(`data/${branchPath}decision_tree.json`)
 ```
+
+The `_shared/` folder holds cross-branch reference material — pipeline-stage comparison tables, Tier 1 / Tier 2 SOF side-by-side, sniper school comparisons, special pays across branches — useful for an Army-vs-Navy-vs-Marines decision page.
 
 ## Marines files (target structure)
 
