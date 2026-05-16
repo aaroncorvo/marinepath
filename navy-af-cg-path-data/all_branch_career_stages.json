@@ -1,0 +1,340 @@
+{
+  "version": "2026",
+  "description": "School-by-school pipeline detail for all NSW/AFSOC/CG special operations paths",
+  "navy_seal_complete_pipeline": [
+    {
+      "stage": "Boot Camp",
+      "weeks": 8,
+      "location": "Great Lakes IL",
+      "rank_start": "E-1",
+      "pay_start": 2216.69
+    },
+    {
+      "stage": "NSW Prep School",
+      "weeks": 8,
+      "location": "Great Lakes IL",
+      "rank": "E-2",
+      "pay": 2487.69,
+      "attrition": "20% washed here"
+    },
+    {
+      "stage": "BUD/S Orientation",
+      "weeks": 3,
+      "location": "Coronado CA",
+      "pay": 2487.69
+    },
+    {
+      "stage": "BUD/S Phase 1 (Hell Week in Week 4)",
+      "weeks": 7,
+      "location": "Coronado CA",
+      "rank": "E-2/E-3",
+      "attrition": "67% of class"
+    },
+    {
+      "stage": "BUD/S Phase 2 \u2014 Combat Diving",
+      "weeks": 7,
+      "location": "Coronado CA",
+      "rank": "E-3",
+      "pay": 2636.1,
+      "attrition": "13%"
+    },
+    {
+      "stage": "BUD/S Phase 3 \u2014 Land Warfare",
+      "weeks": 7,
+      "location": "Coronado + San Clemente Island CA",
+      "attrition": "4%"
+    },
+    {
+      "stage": "Army Airborne School",
+      "weeks": 3,
+      "location": "Fort Moore GA",
+      "special_pay_added": "$150/mo jump"
+    },
+    {
+      "stage": "SEAL Qualification Training (SQT)",
+      "weeks": 26,
+      "location": "Coronado CA / Camp A.P. Hill VA",
+      "rank": "E-3/E-4",
+      "trident_at_graduation": true
+    },
+    {
+      "stage": "NSW Sniper Course (optional, post-1st deployment)",
+      "days": 80,
+      "location": "Dam Neck VA",
+      "rank": "E-5/E-6"
+    },
+    {
+      "stage": "DEVGRU Green Team (if selected after 5 yrs, 2 deployments)",
+      "months": 6,
+      "location": "Dam Neck VA",
+      "attrition": "50%"
+    }
+  ],
+  "navy_swcc_pipeline": [
+    {
+      "stage": "Boot Camp",
+      "weeks": 8,
+      "location": "Great Lakes IL"
+    },
+    {
+      "stage": "NSW Prep",
+      "weeks": 8,
+      "location": "Great Lakes IL"
+    },
+    {
+      "stage": "Basic Crewman Training (BCT)",
+      "weeks": 8,
+      "location": "Coronado CA"
+    },
+    {
+      "stage": "Crewman Qualification Training (CQT)",
+      "months": 5,
+      "location": "Stennis Space Center MS"
+    },
+    {
+      "stage": "NSW Orientation",
+      "weeks": 4,
+      "location": "Coronado CA"
+    }
+  ],
+  "af_cct_pipeline": [
+    {
+      "stage": "BMT",
+      "weeks": 7.5,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "SW Candidate Course (Prep)",
+      "weeks": 7,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Assessment and Selection (Phase 1 \u2014 2026)",
+      "weeks": 4,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Zulu Course \u2014 NEW 2026 (Phase 2)",
+      "weeks": 16,
+      "location": "Camp Bullis TX"
+    },
+    {
+      "stage": "Pre-Dive Course",
+      "weeks": 4,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Combat Dive Course",
+      "weeks": 5,
+      "location": "Panama City FL"
+    },
+    {
+      "stage": "Airborne School",
+      "weeks": 3,
+      "location": "Fort Moore GA"
+    },
+    {
+      "stage": "Military Free Fall (HALO/HAHO)",
+      "weeks": 4.5,
+      "location": "Yuma AZ"
+    },
+    {
+      "stage": "SERE",
+      "weeks": 3,
+      "location": "Fairchild AFB WA"
+    },
+    {
+      "stage": "Air Traffic Control School",
+      "weeks": 9,
+      "location": "Pope AAF NC"
+    },
+    {
+      "stage": "Combat Control Apprentice Course",
+      "weeks": 13,
+      "location": "Pope AAF NC"
+    },
+    {
+      "stage": "Special Tactics Training",
+      "months": 6,
+      "location": "Hurlburt Field FL"
+    }
+  ],
+  "af_pj_pipeline": [
+    {
+      "stage": "BMT",
+      "weeks": 7.5,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "SW Candidate Course",
+      "weeks": 7
+    },
+    {
+      "stage": "Assessment and Selection",
+      "weeks": 4
+    },
+    {
+      "stage": "Zulu Course \u2014 NEW 2026",
+      "weeks": 16
+    },
+    {
+      "stage": "Pre-Dive",
+      "weeks": 4,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Combat Dive",
+      "weeks": 5,
+      "location": "Panama City FL"
+    },
+    {
+      "stage": "Airborne School",
+      "weeks": 5,
+      "location": "Fort Moore GA"
+    },
+    {
+      "stage": "Military Free Fall",
+      "weeks": 4,
+      "location": "Yuma AZ"
+    },
+    {
+      "stage": "SERE",
+      "weeks": 3,
+      "location": "Fairchild AFB WA"
+    },
+    {
+      "stage": "Modernized Pararescue Provider Program (MP3) \u2014 NRP/Paramedic",
+      "weeks": 39,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Pararescue Apprentice Course",
+      "weeks": 22,
+      "location": "Kirtland AFB NM"
+    }
+  ],
+  "af_sr_pipeline": [
+    {
+      "stage": "BMT",
+      "weeks": 7.5
+    },
+    {
+      "stage": "SW Candidate Course",
+      "weeks": 7
+    },
+    {
+      "stage": "Assessment and Selection",
+      "weeks": 4
+    },
+    {
+      "stage": "Zulu Course \u2014 NEW 2026",
+      "weeks": 16
+    },
+    {
+      "stage": "Pre-Dive",
+      "weeks": 4
+    },
+    {
+      "stage": "Airborne School",
+      "weeks": 3
+    },
+    {
+      "stage": "Military Free Fall",
+      "weeks": 4.5
+    },
+    {
+      "stage": "SERE",
+      "weeks": 3
+    },
+    {
+      "stage": "SR Apprentice Course",
+      "months": 5,
+      "location": "Pope AAF NC"
+    },
+    {
+      "stage": "Special Tactics Training",
+      "months": 6,
+      "location": "Hurlburt Field FL"
+    }
+  ],
+  "af_tacp_pipeline": [
+    {
+      "stage": "BMT",
+      "weeks": 7.5
+    },
+    {
+      "stage": "SW Candidate Course",
+      "weeks": 7
+    },
+    {
+      "stage": "Assessment and Selection",
+      "weeks": 4
+    },
+    {
+      "stage": "Zulu Course \u2014 NEW 2026",
+      "weeks": 16
+    },
+    {
+      "stage": "TACP Apprentice Course",
+      "weeks": 21,
+      "location": "Lackland AFB TX"
+    },
+    {
+      "stage": "Airborne School",
+      "weeks": 3
+    },
+    {
+      "stage": "SERE",
+      "weeks": 3
+    },
+    {
+      "stage": "ICC Phase 1 Combat Field Skills",
+      "weeks": 16,
+      "location": "Camp Bullis TX"
+    },
+    {
+      "stage": "ICC Phase 2 Strike Phase (JTAC certification)",
+      "weeks": 5,
+      "location": "Nellis AFB NV"
+    }
+  ],
+  "cg_msrt_pipeline": [
+    {
+      "stage": "Boot Camp",
+      "weeks": 8,
+      "location": "Cape May NJ"
+    },
+    {
+      "stage": "A School \u2014 Maritime Enforcement Specialist (ME)",
+      "months": 3,
+      "location": "Yorktown VA"
+    },
+    {
+      "stage": "First operational tour as ME boarding officer",
+      "years": "3-4"
+    },
+    {
+      "stage": "Tactical Operator Screener (volunteer)",
+      "note": "Physical standards + water competency"
+    },
+    {
+      "stage": "MSRT Assessment and Selection",
+      "note": "Classified details; highly selective"
+    },
+    {
+      "stage": "Basic Tactical Operations Course (BTOC)",
+      "weeks": 8,
+      "days": 40,
+      "location": "Special Missions Training Center, Camp Lejeune NC"
+    },
+    {
+      "stage": "Advanced MSRT Training",
+      "months": 12,
+      "note": "Direct action sections, PMO teams, K9, vertical insertion"
+    },
+    {
+      "stage": "Operational MSRT assignment",
+      "location": "MSRT East (Virginia Beach/Chesapeake VA) or MSRT West (San Diego CA)"
+    }
+  ]
+}

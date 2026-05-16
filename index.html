@@ -1485,16 +1485,41 @@ const SCENES = {
   'soi_arrive':{
     stage:'School of Infantry',
     title:`School of Infantry — Infantry Rifleman Course (14 weeks)`,
-    text:`I report to SOI East (NC) or West (CA). 14 weeks of infantry tactics — the same course every 0311 takes. Even HZ Recon Marines complete this first (2026 pipeline change). Still in transient barracks. Still free housing/food. Banking ~$2,500/mo since expenses are basically zero.`,
+    text:`I report to SOI East (NC) or West (CA). 14 weeks of infantry tactics — same course every 0311 takes. Even HZ Recon Marines complete this first (2026 pipeline). Still in transient barracks, banking ~$2,500/mo. <strong>How hard do I push?</strong>`,
     choices:[
-      {label:'Send it — earn 0311 qualification',
-       desc:'14 weeks of infantry training. By the end I qualify as 0311 Rifleman.',
+      {label:'Honor graduate — top of the class',
+       desc:'Hardest push. Volunteer for every detail. Max rifle range. Mentor weaker students. Get noticed by instructors → strong rep card. Real injury risk.',
+       tags:['ok:Honor grad','ok:+Rep','warn:Injury risk'],
+       apply:g=>{
+         g.tis_months+=4;g.quals.push('0311 Rifleman');g.fitness=Math.min(100,g.fitness+8);
+         if(g.rank==='E-1')g.rank='E-2';
+         if(rng()<0.7){g.reputation+=10;g.path.push('SOI Honor Grad');g.event={type:'win',text:'🏅 Honor Graduate. Instructor letter in my record. Rep +10.'};}
+         else {g.path.push('SOI: top performer');g.event={type:'info',text:'Top performer. Not quite honor grad — somebody else got it. Still strong.'};g.reputation+=4;}
+         if(rng()<0.12){g.health='minor-injury';g.event={type:'warn',text:'Stress fracture late in IRC. Pushed through grad but my body remembers.'};g.fitness=Math.max(60,g.fitness-5);}
+       },
+       next:'first_unit_arrive'},
+      {label:'Solid middle — graduate clean',
+       desc:'Do what\'s asked. No injuries, no NJPs, no honor grad. Average rep — neither hero nor problem.',
+       tags:['ok:Healthy','info:Average rep'],
        apply:g=>{
          g.tis_months+=4;g.quals.push('0311 Rifleman');g.fitness=Math.min(100,g.fitness+5);
-         if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI/IRC graduate');
-         g.event={type:'win',text:'Qualified as 0311 Rifleman. I also auto-qualify for Lance Corporal at ~14 months TIS.'};
+         if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI: clean graduate');
+         g.event={type:'info',text:'Qualified 0311. Clean record. Auto-promote to LCpl at ~14mo TIS.'};
        },
-       next:'first_unit_arrive'}
+       next:'first_unit_arrive'},
+      {label:'Coast — minimum effort',
+       desc:'I do enough to pass. Skip extra details, sleep more, treat it like a checkbox. Costs me reputation later when packets are written.',
+       tags:['warn:-Rep','warn:Weaker Recon packet'],
+       apply:g=>{
+         g.tis_months+=4;g.quals.push('0311 Rifleman');
+         if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI: minimum effort');
+         g.reputation-=8;g.morale+=3;
+         g.event={type:'warn',text:'Graduated by the skin of my teeth. Instructors noticed. Recon packet will be harder to push through.'};
+       },
+       next:'first_unit_arrive'},
+      {label:'Hurt in field — recycled',
+       desc:'(forced bad-roll display — IRC injuries do happen)',
+       requires:()=>false, apply:()=>{}, next:'first_unit_arrive'}
     ]
   },
   // ════════ ACT 3 — FIRST UNIT LIFE ════════
@@ -1768,41 +1793,105 @@ const SCENES = {
   'dive_school':{
     stage:'Combatant Diver',
     title:`Combatant Diver Course — 8 weeks (Panama City, FL)`,
-    text:`Open-circuit SCUBA + closed-circuit rebreather. Highest attrition is "pool comp" — instructors mess with your gear underwater while you keep your composure. Pass = dive pay (+$340/mo) for the rest of my career.`,
+    text:`Open-circuit SCUBA + closed-circuit rebreather. Highest attrition is "pool comp" — instructors mess with your gear underwater while you keep your composure. Pass = dive pay (+$340/mo) for the rest of my career. <strong>Pool comp gets every candidate at some point — how do I handle it?</strong>`,
     choices:[
-      {label:'Pass dive school',
-       apply:g=>{g.tis_months+=2;g.quals.push('Combatant Diver');g.event={type:'win',text:'I am dive-qualified. Earning +$340/mo dive pay from now on.'};},
-       next:'airborne'}
+      {label:'Stay calm, slow breath — process the harassment',
+       desc:'Trust my training. Pass odds high. Best long-term mental skill.',
+       tags:['ok:Best odds','ok:+Mental toughness'],
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.85){g.quals.push('Combatant Diver');g.event={type:'win',text:'Passed dive school. +$340/mo dive pay.'};}
+         else {g.event={type:'warn',text:'Recycled at pool comp. Picked up the next class and graduated.'};g.tis_months+=2;g.quals.push('Combatant Diver');g.morale-=5;}
+       },
+       next:'airborne'},
+      {label:'Push hard, fight the harassment',
+       desc:'Adrenaline up, fight the instructors mentally. Risky — pool comp is designed to break this.',
+       tags:['warn:Lower odds','danger:Recycle risk'],
+       apply:g=>{
+         g.tis_months+=2;
+         const r = rng();
+         if(r<0.55){g.quals.push('Combatant Diver');g.event={type:'win',text:'Made it through dive school the hard way.'};g.reputation+=2;}
+         else if(r<0.85){g.tis_months+=3;g.quals.push('Combatant Diver');g.event={type:'warn',text:'Recycled twice. Eventually graduated.'};g.morale-=10;}
+         else {g.failed_stages.push('Combatant Diver');g.event={type:'bad',text:'Dropped from dive school. Reverted to GRC/ARC qual only. Hurts my MARSOC packet.'};g.reputation-=5;}
+       },
+       next:s=>s.failed_stages.includes('Combatant Diver')?'airborne':'airborne'}
     ]
   },
   'airborne':{
     stage:'Basic Airborne',
     title:`Basic Airborne — 3 weeks (Fort Liberty, NC)`,
-    text:`Ground Week, Tower Week, Jump Week. Army-run course. Five static-line jumps from a C-130. Earn jump wings + jump pay (+$150/mo for the rest of my career).`,
+    text:`Ground Week, Tower Week, Jump Week. Army-run course. Five static-line jumps from a C-130 to earn wings + $150/mo jump pay for life. <strong>Jump school injuries are real (PLFs gone wrong).</strong>`,
     choices:[
-      {label:'Get my wings',
-       apply:g=>{g.tis_months+=1;g.quals.push('Airborne');g.event={type:'win',text:'Five jumps complete. Jump wings earned. +$150/mo jump pay.'};},
+      {label:'Standard 5 jumps, perfect PLFs',
+       desc:'Textbook execution. Wings without incident.',
+       tags:['ok:Safe','ok:+Jump pay'],
+       apply:g=>{
+         g.tis_months+=1;
+         if(rng()<0.92){g.quals.push('Airborne');g.event={type:'win',text:'Five jumps complete. Jump wings earned. +$150/mo jump pay for life.'};}
+         else {g.health='minor-injury';g.event={type:'warn',text:'Sprained ankle on jump 4. Graduated but limped at wings ceremony.'};g.fitness=Math.max(60,g.fitness-3);g.quals.push('Airborne');}
+       },
+       next:'mff'},
+      {label:'Volunteer for additional jumps + Jumpmaster prep',
+       desc:'Extra jumps + Jumpmaster certification. Looks great on packet but more time + more injury exposure.',
+       tags:['ok:+Qual','ok:+Rep','warn:Higher injury risk'],
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.80){g.quals.push('Airborne','Jumpmaster-prep');g.reputation+=5;g.event={type:'win',text:'Wings earned + Jumpmaster paperwork in motion. Stronger record.'};}
+         else {g.health='minor-injury';g.fitness=Math.max(55,g.fitness-8);g.event={type:'bad',text:'Hard landing on extra jump. Blew out an ankle. Medical hold 2 weeks.'};g.tis_months+=1;g.quals.push('Airborne');}
+       },
        next:'mff'}
     ]
   },
   'mff':{
     stage:'Military Free Fall',
     title:`MFF / HALO School — 3 weeks (Yuma, AZ)`,
-    text:`High Altitude Low Opening jumps. Civilian skydiving on steroids. Some of the most fun training in the military. I exit a plane at 25,000 feet.`,
+    text:`High Altitude Low Opening jumps. I exit a plane at 25,000 feet. Civilian skydiving on steroids. <strong>Some of the most fun training in the military, but the academic side (oxygen physiology, navigation under canopy) trips people up.</strong>`,
     choices:[
-      {label:'Send it from 25k feet',
-       apply:g=>{g.tis_months+=1;g.quals.push('MFF');},
+      {label:'Study academics hard + nail every jump',
+       desc:'Focused effort on both physiology and execution. Reliable pass.',
+       tags:['ok:Best odds'],
+       apply:g=>{
+         g.tis_months+=1;
+         if(rng()<0.90){g.quals.push('MFF');g.event={type:'win',text:'MFF qualified. Beautiful jumps. Made it look easy.'};}
+         else {g.tis_months+=1;g.quals.push('MFF');g.event={type:'warn',text:'Recycled on academic phase. Picked it up the second time.'};}
+       },
+       next:'sere'},
+      {label:'Coast on natural skill — focus on fun jumps',
+       desc:'Burn through the schoolhouse on the strength of my physical jumps. Skip the studying. Risk academic failure.',
+       tags:['warn:Lower odds','danger:Recycle risk'],
+       apply:g=>{
+         g.tis_months+=1;
+         const r = rng();
+         if(r<0.55){g.quals.push('MFF');g.morale+=5;g.event={type:'info',text:'Skated through MFF on pure jump skill. Lucky.'};}
+         else if(r<0.85){g.tis_months+=2;g.quals.push('MFF');g.event={type:'warn',text:'Recycled twice. Graduated but rep took a hit.'};g.reputation-=4;}
+         else {g.failed_stages.push('MFF');g.event={type:'bad',text:'Failed MFF academics. Reverted to static-line only. Lower MARSOC packet score.'};g.reputation-=8;}
+       },
        next:'sere'}
     ]
   },
   'sere':{
     stage:'SERE',
     title:`SERE School — 3 weeks (Survival, Evasion, Resistance, Escape)`,
-    text:`Level C. The week-long resistance phase is famous and classified. I come out a different person.`,
+    text:`Level C. The week-long resistance phase is famous and classified. I come out a different person. <strong>The mental wear varies. Some graduates honor-grad as model resisters. Some carry the week home with them.</strong>`,
     choices:[
-      {label:'Complete SERE',
-       apply:g=>{g.tis_months+=1;g.quals.push('SERE');g.mos='0321 Recon Marine';g.has_clearance=true;g.event={type:'win',text:'🎖 MOS 0321 — Reconnaissance Marine. Full pipeline complete. Time to report to a Recon battalion.'};},
-       next:'recon_unit_arrive'}
+      {label:'Lock in mentally — handle the resistance phase',
+       desc:'Grit through. Don\'t take it personally. Apply the code of conduct. Average mental cost.',
+       tags:['ok:Pass','warn:-Morale'],
+       apply:g=>{g.tis_months+=1;g.quals.push('SERE');g.mos='0321 Recon Marine';g.has_clearance=true;g.morale-=10;g.event={type:'win',text:'🎖 MOS 0321 — Reconnaissance Marine. SERE complete. The week-long resistance phase is behind me.'};},
+       next:'recon_unit_arrive'},
+      {label:'Push for honor graduate',
+       desc:'Lead other students through. Best resister. Become the example. Highest rep payoff, but burnout risk.',
+       tags:['ok:+Rep big','ok:Leadership','warn:-Morale more'],
+       apply:g=>{
+         g.tis_months+=1;g.quals.push('SERE');g.mos='0321 Recon Marine';g.has_clearance=true;
+         g.morale-=15;
+         if(rng()<0.6){g.reputation+=12;g.path.push('SERE Honor Grad');g.event={type:'win',text:'🏅 SERE Honor Graduate. Letter in my record. Reputation +12.'};}
+         else {g.reputation+=6;g.event={type:'info',text:'Strong showing — didn\'t honor-grad but still top tier. +6 rep.'};}
+       },
+       next:'recon_unit_arrive'},
+      {label:'Heavy mental cost — drag week home',
+       desc:'(forced bad outcome — shown for awareness of real risk)',
+       requires:()=>false, apply:()=>{}, next:'recon_unit_arrive'}
     ]
   },
   'sniper_qualified':{
@@ -1831,17 +1920,39 @@ const SCENES = {
   'dating_question':{
     stage:'Relationships',
     title:`Relationship Pivot Point`,
-    text:`I\'m 21-22, deployed soon, away from home a lot. The relationships I start now shape the next decade. <strong>What\'s my approach?</strong>`,
+    text:`{{datingContext}}`,
     choices:[
+      // SINGLE branches
       {label:'Stay focused — no serious relationships until after deployment',
        desc:'Keep it simple. Focus on Recon, train, deploy, come home with money saved.',
        tags:['ok:Simpler life'],
+       requires:g=>!g.married,
        apply:g=>{g.tis_months+=3;g.savings+=2000;},
        next:'first_deployment_prep'},
       {label:'Date seriously — could lead to marriage',
        desc:'Real partners absolutely can handle this life — but only if it\'s real. BAH-marriage is a known trap.',
        tags:['info:Marriage possible'],
+       requires:g=>!g.married,
        apply:g=>{g.tis_months+=3;g.morale+=8;},
+       next:'first_deployment_prep'},
+      // MARRIED branches — set the tone for an incoming deployment
+      {label:'Sit down with spouse — set deployment expectations together',
+       desc:'Weekly video cadence, agreed financial guardrails, support network for spouse, communication plan. The healthy version.',
+       tags:['ok:Strong marriage','ok:+Morale'],
+       requires:g=>g.married,
+       apply:g=>{g.tis_months+=3;g.morale+=10;g.reputation+=2;g.event={type:'win',text:'Healthy deployment plan locked in with spouse. Real marriage skill.'};},
+       next:'first_deployment_prep'},
+      {label:'Burn the candle — work the unit, neglect home',
+       desc:'Most common Marine relationship killer. Marriage takes a hit during workup. Build resentment that lasts.',
+       tags:['danger:Marriage strain','warn:-Morale'],
+       requires:g=>g.married,
+       apply:g=>{g.tis_months+=3;g.morale-=8;g.reputation+=3;g.event={type:'bad',text:'Spouse feels the absence. Tension builds before I even ship.'};},
+       next:'first_deployment_prep'},
+      {label:'Power of Attorney + estate-plan paperwork done early',
+       desc:'POA, will, SGLI beneficiary review, joint accounts confirmed. Boring but lets us focus on each other, not paperwork.',
+       tags:['ok:Adult move','info:+Reputation'],
+       requires:g=>g.married,
+       apply:g=>{g.tis_months+=3;g.morale+=5;g.reputation+=3;g.event={type:'win',text:'POA + will + beneficiaries handled. Spouse can run the household without legal friction if anything happens.'};},
        next:'first_deployment_prep'}
     ]
   },
@@ -2003,15 +2114,73 @@ const SCENES = {
   },
   'promo_e4':{
     stage:'Promotion to Cpl',
-    title:`Promotion — Corporal (E-4)`,
-    text:`Promoted. Base pay {{base}}/mo. I\'m an NCO. Squad leadership.`,
-    choices:[{label:'Continue',apply:g=>{g.rank='E-4';g.tis_months+=6;},next:'promo_e5'}]
+    title:`E-4 Promotion Window`,
+    text:`I'm coming up on the cutting score. <strong>How do I want this to go?</strong> Meritorious = pinned early by command rec (huge rep). Composite-score = wait until I'm picked up by the algorithm. NJP risk = if I screw up at the barracks bar, I lose months.`,
+    choices:[
+      {label:'Push for meritorious promotion (Mer. Cpl Board)',
+       desc:'Command nominates me. Board interviews. Top performer. Pinned 6+ months early. +Rep, +Pay sooner.',
+       tags:['ok:+6mo early','ok:+Rep','warn:Board pressure'],
+       apply:g=>{
+         g.tis_months+=4;
+         if(rng() < 0.4 + (g.reputation-65)/200){
+           g.rank='E-4';g.reputation+=8;g.path.push('Meritorious Cpl');
+           g.event={type:'win',text:'🏅 Meritorious Cpl. Pinned early. Rep +8.'};
+         } else {
+           g.event={type:'info',text:'Didn\'t make meritorious cut. Composite-score promotion still on track.'};
+           g.tis_months+=4;g.rank='E-4';g.reputation+=2;
+         }
+       },
+       next:'promo_e5'},
+      {label:'Composite score — wait for cutting score',
+       desc:'Standard promotion. Pinned when I hit the score. Lower stress.',
+       tags:['ok:Standard','info:On schedule'],
+       apply:g=>{g.rank='E-4';g.tis_months+=6;g.reputation+=2;},
+       next:'promo_e5'},
+      {label:'Lazy at the barracks — risk an NJP',
+       desc:'Casual approach to garrison standards. DUI risk, fight risk, late-for-formation risk. If I get NJP\'d, lose months of TIS.',
+       tags:['danger:NJP risk','warn:Promotion delay'],
+       apply:g=>{
+         g.tis_months+=8;
+         if(rng()<0.25){
+           g.failed_stages.push('NJP - Cpl board');g.reputation-=15;g.rank='E-4';
+           g.event={type:'bad',text:'⚖️ NJP for late-for-formation x3. Promotion deferred 6 months. Recon packet now harder to push.'};
+         } else {
+           g.rank='E-4';g.event={type:'warn',text:'Coasted through. Pinned E-4 on schedule but no rep boost.'};
+         }
+       },
+       next:'promo_e5'}
+    ]
   },
   'promo_e5':{
     stage:'Promotion to Sgt',
-    title:`Promotion — Sergeant (E-5)`,
-    text:`Sergeant. Base pay {{base}}/mo. ~4-5 yrs TIS. MARSOC eligibility window is now open.`,
-    choices:[{label:'Continue to MARSOC prep',apply:g=>{g.rank='E-5';g.tis_months+=3;},next:'marsoc_prep'}]
+    title:`Sergeant Cutting Score`,
+    text:`Sgt is the first real NCO rank. Different responsibilities, more leadership, MARSOC eligibility opens. <strong>How do I approach this one?</strong>`,
+    choices:[
+      {label:'Pursue Meritorious Sgt — board package',
+       desc:'Submit packet. Letters of rec from CO and SgtMaj. Board interview. Pinned 6+ months early. Strongest MARSOC packet boost.',
+       tags:['ok:+6mo early','ok:Big rep boost','warn:Board pressure'],
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng() < 0.35 + (g.reputation-70)/200){
+           g.rank='E-5';g.reputation+=12;g.path.push('Meritorious Sgt');
+           g.event={type:'win',text:'🏅 Meritorious Sgt. Pinned ahead of cohort. MARSOC packet will be much stronger.'};
+         } else {
+           g.event={type:'info',text:'Didn\'t make Mer. Sgt. Composite score will pick me up shortly.'};
+           g.tis_months+=2;g.rank='E-5';g.reputation+=3;
+         }
+       },
+       next:'marsoc_prep'},
+      {label:'Composite-score promotion — standard timing',
+       desc:'Earn it through the cutting score. Pin when I hit it. Solid path.',
+       tags:['ok:Standard','info:On schedule'],
+       apply:g=>{g.rank='E-5';g.tis_months+=4;g.reputation+=4;},
+       next:'marsoc_prep'},
+      {label:'Pickup a B-billet (DI/MSG) instead of pushing for MARSOC',
+       desc:'Volunteer for a non-MARSOC special duty assignment. Promo accelerator, but I leave the Recon track behind.',
+       tags:['info:Different track','ok:Promo accelerator','warn:Skip MARSOC'],
+       apply:g=>{g.rank='E-5';g.tis_months+=3;g.reputation+=6;g.path.push('Voluntarily pursued B-billet');},
+       next:'marsoc_fallback'}
+    ]
   },
   'marsoc_prep':{
     stage:'MARSOC Prep',
@@ -2457,15 +2626,47 @@ function renderBudget(){
     ${b.hf_monthly?`<div class="budget-row"><span>→ Home fund <span style="color:var(--muted);font-size:.85em">(down payment / closing)</span></span><span class="budget-amt neg">−${fmt(b.hf_monthly)}</span></div>`:''}
     <div class="budget-row total"><span>Total Bills</span><span class="budget-amt neg"><strong>−${fmt(b.total_bills)}/mo</strong></span></div>
 
-    <div style="margin-top:1rem;padding:var(--s4);background:${b.net_to_savings>=0?'color-mix(in srgb,var(--success) 12%,transparent)':'color-mix(in srgb,var(--error) 12%,transparent)'};border-radius:var(--r-md);border:1px solid ${b.net_to_savings>=0?'var(--success)':'var(--error)'}">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong style="font-size:var(--text-base)">${b.net_to_savings>=0?'💰 To Savings / Investment':'⚠️ Negative Cash Flow'}</strong>
-        <strong style="font-size:var(--text-lg);font-family:var(--mono);color:${b.net_to_savings>=0?'var(--success)':'var(--error)'}">${b.net_to_savings>=0?'+':'−'}${fmt(Math.abs(b.net_to_savings))}/mo</strong>
-      </div>
-      <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">
-        Savings rate: <strong>${savingsRate}%</strong> of gross.
-        ${b.net_to_savings>=0 ? `At this rate I save <strong>${fmt(b.net_to_savings*12)}/yr</strong> on top of my <strong>${fmt(b.tsp_contrib*12)}/yr</strong> going into TSP.` : 'I\'m burning savings each month. Something has to change.'}
-      </div>
+    ${(()=>{
+      // Zero-based budgeting: every dollar should have a job
+      const directed = (G.ira_monthly||0) + (G.taxable_monthly||0) + (G.extra_savings_monthly||0);
+      const unallocated = b.net_to_savings - directed;
+      const fullyAllocated = Math.abs(unallocated) < 5;
+      const overAllocated = unallocated < -5;
+      if(fullyAllocated){
+        return `<div style="margin-top:1rem;padding:var(--s4);background:color-mix(in srgb,var(--success) 14%,transparent);border-radius:var(--r-md);border:2px solid var(--success)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="font-size:var(--text-base)">✅ Every Dollar Directed — Zero-Based Budget</strong>
+            <strong style="font-size:var(--text-lg);font-family:var(--mono);color:var(--success)">$0 left over</strong>
+          </div>
+          <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">
+            Savings rate: <strong>${savingsRate}%</strong>. I direct <strong>${fmt(directed*12)}/yr</strong> across IRA + index + savings, plus <strong>${fmt(b.tsp_contrib*12)}/yr</strong> to TSP, plus goal envelopes.
+          </div>
+        </div>`;
+      }
+      if(overAllocated){
+        return `<div style="margin-top:1rem;padding:var(--s4);background:color-mix(in srgb,var(--error) 14%,transparent);border-radius:var(--r-md);border:2px solid var(--error)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="font-size:var(--text-base)">⚠️ Over-allocated — Bills + investments exceed take-home</strong>
+            <strong style="font-size:var(--text-lg);font-family:var(--mono);color:var(--error)">${fmt(unallocated)}/mo</strong>
+          </div>
+          <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">
+            I'm directing more than I bring home. Reduce IRA/index/savings contributions below, or trim bills.
+          </div>
+        </div>`;
+      }
+      return `<div style="margin-top:1rem;padding:var(--s4);background:color-mix(in srgb,var(--warn) 14%,transparent);border-radius:var(--r-md);border:2px solid var(--warn)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--s4);flex-wrap:wrap">
+          <div>
+            <strong style="font-size:var(--text-base);color:var(--warn)">⚠️ ${fmt(unallocated)}/mo unallocated</strong>
+            <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.3rem">Zero-based budgeting: every dollar should have a job. Direct the rest to IRA / index funds / savings — or hit Auto-Allocate to follow the priority playbook.</div>
+          </div>
+          <button onclick="autoAllocate(${unallocated})" style="padding:.6rem 1rem;background:var(--warn);color:#000;border:none;border-radius:var(--r-full);font-family:var(--mono);font-size:var(--text-xs);cursor:pointer;font-weight:600">▶ Auto-Allocate ${fmt(unallocated)}</button>
+        </div>
+      </div>`;
+    })()}
+
+    <div style="margin-top:.75rem;padding:var(--s3);background:color-mix(in srgb,var(--blue) 10%,transparent);border-radius:var(--r-md);font-size:var(--text-xs);color:var(--muted)">
+      📊 <strong>Savings rate ${savingsRate}%</strong> of gross. Investments compound at <strong>${G.invest_strategy==='aggressive'?'10%':G.invest_strategy==='conservative'?'6%':'8%'}</strong> (${G.invest_strategy} strategy). Annual contribution power: <strong>${fmt(((G.ira_monthly||0)+(G.taxable_monthly||0)+(G.extra_savings_monthly||0)+b.tsp_contrib+(b.ef_monthly||0)+(b.hf_monthly||0))*12)}/yr</strong>.
     </div>
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
@@ -2493,25 +2694,30 @@ function renderBudget(){
         }).join('')}
       </div>
 
-      <div style="font-family:var(--mono);font-size:var(--text-xs);color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">━ Savings envelopes ━</div>
+      <div style="font-family:var(--mono);font-size:var(--text-xs);color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">━ Savings envelopes (assumed APR shown) ━</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem var(--s4);margin-bottom:var(--s4)">
-        ${[
-          {key:'emergency_fund_monthly', label:'→ Emergency fund', balance:G.emergency_fund||0, type:'bill'},
-          {key:'home_fund_monthly',      label:'→ Home down payment', balance:G.home_fund||0, type:'bill'},
-          {key:'ira_monthly',            label:'→ Roth IRA', balance:G.roth_ira||0, type:'invest', cap:583, capNote:'$583/mo max (2026 cap)'},
-          {key:'taxable_monthly',        label:'→ Index funds (taxable)', balance:G.taxable_invest||0, type:'invest'},
-          {key:'extra_savings_monthly',  label:'→ Extra HY savings', balance:0, type:'invest'}
-        ].map(row=>{
-          const v = row.type==='bill' ? billValue(G, row.key) : (G[row.key]||0);
-          const capAttr = row.cap ? `max="${row.cap}"` : '';
-          return `<label style="display:flex;flex-direction:column;gap:.2rem;font-size:var(--text-xs)">
-            <span style="display:flex;justify-content:space-between;align-items:center">
-              <span style="color:var(--text)">${row.label}</span>
-              <span style="font-family:var(--mono);color:var(--success);font-size:.7rem">${row.balance?'Bal: '+fmt(row.balance):''}</span>
-            </span>
-            <span style="display:flex;align-items:center;gap:.2rem">$<input type="number" min="0" step="25" ${capAttr} value="${v}" onchange="adjustBudget('${row.type}','${row.key}',this.value)" style="width:90px;padding:.3rem .4rem;background:var(--surf2);border:1px solid var(--gold);border-radius:.3rem;color:var(--text);font:inherit;font-family:var(--mono);text-align:right">/mo${row.cap?' <span style="font-size:.65rem;color:var(--muted)">'+row.capNote+'</span>':''}</span>
-          </label>`;
-        }).join('')}
+        ${(()=>{
+          const stratRate = STRATEGY_RETURNS[G.invest_strategy||'balanced'] || STRATEGY_RETURNS.balanced;
+          return [
+            {key:'emergency_fund_monthly', label:'→ Emergency fund', balance:G.emergency_fund||0, type:'bill', apr:stratRate.savings, aprNote:'4% HY savings'},
+            {key:'home_fund_monthly',      label:'→ Home down payment', balance:G.home_fund||0, type:'bill', apr:stratRate.savings, aprNote:'4% HY savings'},
+            {key:'ira_monthly',            label:'→ Roth IRA (tax-free)', balance:G.roth_ira||0, type:'invest', cap:583, capNote:'$583/mo max (2026 cap)', apr:stratRate.ira, aprNote:(stratRate.ira*100).toFixed(0)+'% market avg'},
+            {key:'taxable_monthly',        label:'→ Index funds (taxable)', balance:G.taxable_invest||0, type:'invest', apr:stratRate.taxable, aprNote:(stratRate.taxable*100).toFixed(0)+'% market avg'},
+            {key:'extra_savings_monthly',  label:'→ Extra HY savings', balance:0, type:'invest', apr:stratRate.savings, aprNote:'4% HY savings'}
+          ].map(row=>{
+            const v = row.type==='bill' ? billValue(G, row.key) : (G[row.key]||0);
+            const capAttr = row.cap ? `max="${row.cap}"` : '';
+            // Monthly interest growth on current balance + this month's contribution
+            const monthlyGrowth = row.balance * (row.apr/12);
+            return `<label style="display:flex;flex-direction:column;gap:.2rem;font-size:var(--text-xs)">
+              <span style="display:flex;justify-content:space-between;align-items:center">
+                <span style="color:var(--text)">${row.label}</span>
+                <span style="font-family:var(--mono);color:var(--success);font-size:.7rem">${row.balance?'Bal: '+fmt(row.balance):''}${monthlyGrowth>0.5?' (+'+fmt(monthlyGrowth)+'/mo)':''}</span>
+              </span>
+              <span style="display:flex;align-items:center;gap:.2rem;flex-wrap:wrap">$<input type="number" min="0" step="25" ${capAttr} value="${v}" onchange="adjustBudget('${row.type}','${row.key}',this.value)" style="width:90px;padding:.3rem .4rem;background:var(--surf2);border:1px solid var(--gold);border-radius:.3rem;color:var(--text);font:inherit;font-family:var(--mono);text-align:right">/mo <span style="font-size:.65rem;color:var(--gold);font-family:var(--mono)">${row.aprNote}</span></span>
+            </label>`;
+          }).join('');
+        })()}
       </div>
 
       <!-- 📈 LIVE IMPACT AT AGE 60 -->
@@ -2629,6 +2835,10 @@ function renderScene(){
     '{{marriageQContext}}': (()=>{
       if(G.married) return `I'm already married — that decision is behind me. The MARSOC pipeline ahead is real on family life, but my spouse and I have already navigated the early years. The bigger question now is performance and packet timing.`;
       return `If I've been dating seriously, this is the real moment. <strong>Getting married triggers BAH</strong> — housing allowance added to my pay (~${fmt(b.bah||BAH[G.rank]||0)}/mo at my rank). It also triggers a new household budget.`;
+    })(),
+    '{{datingContext}}': (()=>{
+      if(G.married) return `I'm already married. The pre-deployment question isn't whether to date — it's <strong>how to show up as a husband</strong> with a major training cycle and combat deployment coming. The choices I make here echo through the whole marriage.`;
+      return `I'm 21-22, deployed soon, away from home a lot. The relationships I start now shape the next decade. <strong>What's my approach?</strong>`;
     })(),
     '{{civExitContext}}': (()=>{
       const proj = civilianCareerProjection(G);
@@ -3529,6 +3739,39 @@ function renderBudgetLiveSummary(){
       <div><strong>Home fund balance:</strong> <span style="font-family:var(--mono);color:var(--success)">${fmt(G.home_fund||0)}</span></div>
     </div>
   `;
+}
+
+// Auto-allocate leftover unallocated cash following priority playbook:
+// 1) Emergency fund first (up to 3-mo expenses target)
+// 2) Then max Roth IRA ($583/mo cap)
+// 3) Then index funds (taxable)
+function autoAllocate(amount){
+  amount = Math.max(0, parseFloat(amount)||0);
+  if(amount < 5) return;
+  if(!G.bills_custom) G.bills_custom = {};
+  const b = calcBudget(G);
+  // Priority 1: top off Emergency fund toward 3-mo expenses target
+  const efTarget = b.total_bills * 3;
+  const efGap = Math.max(0, efTarget - (G.emergency_fund||0));
+  const efBoost = Math.min(amount, efGap, 500); // cap at $500/mo additional
+  if(efBoost > 5){
+    G.bills_custom.emergency_fund_monthly = (billValue(G,'emergency_fund_monthly')||0) + efBoost;
+    amount -= efBoost;
+  }
+  // Priority 2: max Roth IRA
+  const iraRoom = Math.max(0, 583 - (G.ira_monthly||0));
+  const iraBoost = Math.min(amount, iraRoom);
+  if(iraBoost > 5){
+    G.ira_monthly = (G.ira_monthly||0) + iraBoost;
+    amount -= iraBoost;
+  }
+  // Priority 3: rest to index funds
+  if(amount > 5){
+    G.taxable_monthly = (G.taxable_monthly||0) + amount;
+  }
+  if(typeof renderBudget==='function') renderBudget();
+  if(typeof renderDash==='function') renderDash();
+  autoSave();
 }
 
 // Single live-edit handler for the Quick Adjust section in the Monthly Budget panel

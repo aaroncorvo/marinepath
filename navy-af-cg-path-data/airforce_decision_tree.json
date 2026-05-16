@@ -1,0 +1,357 @@
+{
+  "branch": "United States Air Force",
+  "version": "2026",
+  "first_person": true,
+  "overview": "I want to serve in the Air Force with a path toward special operations. The Air Force Special Warfare (AFSWC) community has four enlisted paths: Combat Controller (CCT), Pararescue (PJ), Special Reconnaissance (SR), and Tactical Air Control Party (TACP). All are AFSOC / SOCOM-aligned and all embed with other SOF units across branches.",
+  "pipeline_update_2026": "The Air Force Special Warfare Training Wing launched Pipeline Optimization in May 2026. A new 16-week 'Zulu Course' on combat shooting, movement, and small-unit communication is now Phase 2 for all AFSWC candidates, inserted after the 4-week Assessment and Selection Course. The redesigned A&S is now Phase 1.",
+  "primary_paths": [
+    "Combat Controller (CCT)",
+    "Pararescue (PJ)",
+    "Special Reconnaissance (SR)",
+    "Tactical Air Control Party (TACP)"
+  ],
+  "entry_requirements_all_paths": {
+    "age": "17-42",
+    "citizenship": "U.S. Citizen",
+    "asvab_general": "G score 49 or higher",
+    "physical_screening_test": {
+      "swim_500m_underwear": "25 meters underwater",
+      "swim_500m_surface": "500 meters (breast, side, freestyle)",
+      "run_1_5mi": "Pass \u2014 competitive times vary by path",
+      "pullups_2min": "Required",
+      "situps_2min": "Required",
+      "pushups_2min": "Required"
+    },
+    "vision": "Normal color vision and depth perception",
+    "additional": "Qualify for marine diving duty AND parachute duty (medical standards)",
+    "personality_assessment": "TAPAS (Tailored Adaptive Personality Assessment System) score \u2014 minimum varies by path (30 for CCT/TACP/SR, 60 for PJ)"
+  },
+  "shared_pipeline_phases": [
+    {
+      "id": "bmt",
+      "label": "Basic Military Training (BMT)",
+      "location": "Lackland AFB (JBSA), San Antonio, TX",
+      "duration_weeks": 7.5,
+      "elapsed_months_start": 0,
+      "elapsed_months_end": 2,
+      "rank": "E-1 Airman Basic",
+      "base_pay_2026": 2216.69,
+      "description": "All Air Force enlisted members begin with 7.5 weeks of BMT. I learn Air Force structure, core values, and physical conditioning foundations."
+    },
+    {
+      "id": "sw_candidate_course",
+      "label": "Special Warfare Candidate Course (SW Prep)",
+      "location": "Lackland AFB, San Antonio, TX",
+      "duration_weeks": 7,
+      "elapsed_months_start": 2,
+      "elapsed_months_end": 4,
+      "rank": "E-2 Airman",
+      "base_pay_2026": 2487.69,
+      "description": "7-week intense preparation: running, rucking, swimming, strength and conditioning. I learn the history of Air Force Special Warfare and take the Initial Fitness Test (IFT) to determine if I advance to pipeline training.",
+      "next_pass": "assessment_and_selection",
+      "next_fail": "af_reclass"
+    },
+    {
+      "id": "assessment_and_selection",
+      "label": "Special Warfare Assessment and Selection Course (Phase 1 \u2014 2026 redesign)",
+      "location": "Lackland AFB, San Antonio, TX",
+      "duration_weeks": 4,
+      "elapsed_months_start": 4,
+      "elapsed_months_end": 5,
+      "rank": "E-2",
+      "description": "Four weeks of maximum-intensity assessment: obstacle courses, pool exercises, rucking, and constant evaluation of mental toughness and leadership potential. This is the gate. High attrition.",
+      "next_pass": "zulu_course",
+      "next_fail": "af_reclass"
+    },
+    {
+      "id": "zulu_course",
+      "label": "Zulu Course \u2014 NEW 2026 Tactical Field Course (Phase 2)",
+      "location": "Camp Bullis, TX",
+      "duration_weeks": 16,
+      "elapsed_months_start": 5,
+      "elapsed_months_end": 9,
+      "rank": "E-2 to E-3",
+      "base_pay_2026_e3": 2636.1,
+      "description": "NEW as of November 2025. All AFSWC candidates attend this 16-week tactical field course before branching to specialty-specific training. Covers: shooting (marksmanship fundamentals and advanced CQB), moving under fire, small-unit communication, land navigation, and basic combat skills. Designed so every candidate arrives at specialty school with solid warrior foundation.",
+      "launched": "November 2025 per Air Force Special Warfare Training Wing Pipeline Optimization initiative",
+      "next": "specialty_specific_training"
+    }
+  ],
+  "specialty_paths": {
+    "CCT": {
+      "id": "cct_path",
+      "label": "Combat Controller (CCT) \u2014 AFSC 1Z2X1",
+      "description": "CCTs are the Air Force's air-to-ground integration specialists. They insert with ground SOF forces, provide terminal attack control for airstrikes, establish and control airfields in austere environments, and call in precision air support. All CCTs are FAA-certified air traffic controllers AND combat operators. CCTs deploy exclusively to AFSOC Special Tactics Squadrons (STS) and embed with SEALs, SF, and Rangers.",
+      "unique_skill": "FAA-certified Air Traffic Controller qualification on top of full SOF combat skill set",
+      "post_zulu_pipeline": [
+        {
+          "stage": "Special Warfare Pre-Dive Course",
+          "weeks": 4,
+          "location": "Lackland AFB, TX"
+        },
+        {
+          "stage": "Special Warfare Combat Dive Course",
+          "weeks": 5,
+          "location": "Panama City, FL"
+        },
+        {
+          "stage": "Airborne School",
+          "weeks": 3,
+          "location": "Fort Moore, GA"
+        },
+        {
+          "stage": "Military Free Fall Course (HALO/HAHO)",
+          "weeks": 4.5,
+          "location": "Yuma Proving Ground, AZ"
+        },
+        {
+          "stage": "SERE Training",
+          "weeks": 3,
+          "location": "Fairchild AFB, WA"
+        },
+        {
+          "stage": "Air Traffic Control School",
+          "weeks": 9,
+          "location": "Pope Army Airfield, NC"
+        },
+        {
+          "stage": "Combat Control Apprentice Course",
+          "weeks": 13,
+          "location": "Pope Army Airfield, NC"
+        },
+        {
+          "stage": "Special Tactics Training",
+          "months": 6,
+          "location": "Hurlburt Field, FL",
+          "note": "Longest segment \u2014 advanced weapons, demolitions, ATV ops, 5-level upgrade"
+        }
+      ],
+      "total_pipeline_after_bmt_months": 24,
+      "assignment": "Special Tactics Squadrons (AFSOC) \u2014 embedded with SEAL Teams, SF Groups, Ranger Battalions",
+      "career_ceiling": "Senior CCTs become Special Tactics Team Sergeants or Commission as Special Tactics Officers (STOs)",
+      "tier1_path": "CCTs can support and eventually be screened for classified Tier 1 support assignments (CAG, DEVGRU) as tactical air control attachments"
+    },
+    "PJ": {
+      "id": "pj_path",
+      "label": "Pararescue (PJ) \u2014 AFSC 1T2X1",
+      "description": "PJs are the Air Force's combat search and rescue operators and personnel recovery specialists. Known as 'Guardian Angels,' they combine paramedic-level medical training with full SOF combat skills. PJs can be assigned to either ACC Rescue Squadrons (conventional) or AFSOC Special Tactics Squadrons (SOF). PJs treat and evacuate downed pilots and isolated personnel from behind enemy lines.",
+      "unique_skill": "Nationally Registered Paramedic (NRP) qualification \u2014 the most medically trained of all AFSWC operators",
+      "post_zulu_pipeline": [
+        {
+          "stage": "Special Warfare Pre-Dive Course",
+          "weeks": 4,
+          "location": "Lackland AFB, TX"
+        },
+        {
+          "stage": "Special Warfare Combat Dive Course",
+          "weeks": 5,
+          "location": "Panama City, FL"
+        },
+        {
+          "stage": "Airborne School",
+          "weeks": 5,
+          "location": "Fort Moore, GA"
+        },
+        {
+          "stage": "Military Free Fall Course",
+          "weeks": 4,
+          "location": "Yuma, AZ / Jamul, CA"
+        },
+        {
+          "stage": "SERE Training",
+          "weeks": 3,
+          "location": "Fairchild AFB, WA"
+        },
+        {
+          "stage": "Modernized Pararescue Provider Program (MP3)",
+          "weeks": 39,
+          "location": "Lackland AFB, TX",
+          "note": "Produces Nationally Registered EMT, Nationally Registered Paramedic (NRP), combat medical skills, TCCC-CP, prolonged care, K9 TCCC, CBRN"
+        },
+        {
+          "stage": "Pararescue Apprentice Course",
+          "weeks": 22,
+          "location": "Kirtland AFB, NM"
+        }
+      ],
+      "total_pipeline_after_bmt_months": 30,
+      "assignment_options": [
+        "AFSOC Special Tactics Squadron (SOF assignment \u2014 embeds with SEAL Teams, SF, Rangers)",
+        "ACC Rescue Squadron (combat rescue operations \u2014 more flying unit, less ground SOF)"
+      ],
+      "career_ceiling": "Senior PJs become Special Tactics Team Sergeants or transition to Combat Rescue Officers"
+    },
+    "SR": {
+      "id": "sr_path",
+      "label": "Special Reconnaissance (SR) \u2014 AFSC 1Z4X1",
+      "description": "SR is the newest AFSWC AFSC, redesignated from Special Operations Weather Team (SOWT) in 2019. SR operators provide environmental and pattern-of-life reconnaissance, clandestine intelligence collection, and battle space awareness. They operate deep behind enemy lines, often alone or in small teams, providing strategic reconnaissance for senior commanders.",
+      "unique_skill": "Advanced intelligence collection and environmental reconnaissance \u2014 works across all domains including denied access areas",
+      "post_zulu_pipeline": [
+        {
+          "stage": "Special Warfare Pre-Dive Course",
+          "weeks": 4,
+          "location": "Lackland AFB, TX"
+        },
+        {
+          "stage": "Airborne School",
+          "weeks": 3,
+          "location": "Fort Moore, GA"
+        },
+        {
+          "stage": "Military Free Fall Course",
+          "weeks": 4.5,
+          "location": "Yuma Proving Ground, AZ"
+        },
+        {
+          "stage": "SERE Training",
+          "weeks": 3,
+          "location": "Fairchild AFB, WA"
+        },
+        {
+          "stage": "Special Reconnaissance Apprentice Course",
+          "months": 5,
+          "location": "Pope Army Airfield, NC"
+        },
+        {
+          "stage": "Special Tactics Training",
+          "months": 6,
+          "location": "Hurlburt Field, FL"
+        }
+      ],
+      "total_pipeline_months": 18,
+      "note": "SR pipeline closely mirrors CCT through most common courses. SR-specific recon and intel collection training occurs at Keesler AFB, MS (8 weeks) and Pope AAF.",
+      "assignment": "Special Tactics Squadrons and joint SOF assignments"
+    },
+    "TACP": {
+      "id": "tacp_path",
+      "label": "Tactical Air Control Party (TACP) \u2014 AFSC 1Z3X1",
+      "description": "TACPs are experts in coordinating ground weapons systems and precision airstrikes. They embed with Army and Marine Corps ground units as Joint Terminal Attack Controllers (JTACs). TACP specialists in AFSOC Special Tactics Squadrons receive additional training including military freefall and attach to SOF units from all branches as precision strike experts.",
+      "unique_skill": "JTAC qualification \u2014 the most widely deployable of AFSWC operators; works across all ground units from conventional to Tier 1",
+      "post_zulu_pipeline": [
+        {
+          "stage": "TACP Apprentice Course",
+          "weeks": 21,
+          "location": "Lackland AFB, TX",
+          "note": "Radio comms, small unit tactics, close air support basics"
+        },
+        {
+          "stage": "Airborne School",
+          "weeks": 3,
+          "location": "Fort Moore, GA"
+        },
+        {
+          "stage": "SERE Training",
+          "weeks": 3,
+          "location": "Fairchild AFB, WA"
+        },
+        {
+          "stage": "Initial Certification Course Phase 1 \u2014 Combat Field Skills",
+          "weeks": 16,
+          "location": "Camp Bullis, TX"
+        },
+        {
+          "stage": "Initial Certification Course Phase 2 \u2014 Strike Phase",
+          "weeks": 5,
+          "location": "Nellis AFB, NV",
+          "note": "Live CAS scenarios; JTAC certification"
+        }
+      ],
+      "total_pipeline_after_bmt_months": 18,
+      "afsoc_upgrade_path": "TACPs already serving can apply to AFSOC Special Tactics to receive freefall training and embed with SOF units. Must already be a qualified TACP within USAF.",
+      "assignment": "Army Divisions (conventional) or AFSOC Special Tactics Squadrons (SOF)"
+    }
+  },
+  "career_progression": {
+    "senior_operator": {
+      "rank": "E-7 to E-9",
+      "base_pay_range_2026": "$4,456 to $8,105/month",
+      "roles": [
+        "Special Tactics Team Sergeant (most senior enlisted role in STS)",
+        "Operations Superintendent",
+        "BFT / Pipeline Instructor",
+        "Joint SOF Advisor"
+      ]
+    },
+    "warrant_officer_path": "Limited in USAF; senior CCT/PJ/SR can commission as Special Tactics Officers (STOs) through OCS",
+    "bbillet_options": [
+      "Pipeline Instructor (A&S, Dive, Apprentice courses)",
+      "Recruiting Duty",
+      "Pentagon / SOCOM Staff",
+      "Joint SOF Exchange (with Army SF, SEAL Teams, MARSOC)"
+    ]
+  },
+  "pay_2026": {
+    "note": "2026 basic pay \u2014 same DoD-wide pay table. 3.8% increase from 2025.",
+    "enlisted_monthly": {
+      "E1_under4mo": 2216.69,
+      "E2": 2487.69,
+      "E3": 2636.1,
+      "E4_2yr": 2924.4,
+      "E5_4yr": 3316.8,
+      "E6_6yr": 3823.67,
+      "E7_6yr": 4456.21,
+      "E8_8yr": 5240.36,
+      "E9_10yr": 6910.15
+    },
+    "special_pays": {
+      "jump_static_line": 150,
+      "jump_HALO_MFF": 225,
+      "dive_combat": 150,
+      "hostile_fire": 225,
+      "family_separation": 250,
+      "combat_zone_tax_exclusion": true
+    }
+  },
+  "af_reclass": {
+    "label": "Air Force Reclass \u2014 Did Not Complete AFSWC Pipeline",
+    "description": "If I do not complete Assessment and Selection or fail the IFT, I reclass to a different Air Force AFSC.",
+    "options": [
+      {
+        "afsc": "Security Forces (3P0X1)",
+        "description": "Air Force military police / base defense. Closest to combat arms in conventional AF.",
+        "note": "Path to deploy with SOF or join AFSFC (Security Forces Center) tactical units"
+      },
+      {
+        "afsc": "Tactical Air Control Party (TACP) conventional",
+        "description": "Embed with Army as JTAC \u2014 less intense pipeline than AFSOC track"
+      },
+      {
+        "afsc": "Cryptologic Language Analyst (1A8/1N0)",
+        "description": "Intelligence and signals; works with SOF support"
+      },
+      {
+        "afsc": "Airfield Operations (1C7)",
+        "description": "If I have air traffic controller skills from partial CCT training"
+      },
+      {
+        "afsc": "Any AF AFSC",
+        "description": "170+ AFSCs available across maintenance, logistics, medical, cyber, space, and more"
+      }
+    ]
+  },
+  "life_layer": {
+    "college": {
+      "TA": "$4,500/yr \u2014 use during garrison, base assignments between deployments",
+      "CLEP_DANTES": "Free credit-by-exam on active duty",
+      "CCAF_degree": "Community College of the Air Force provides associate degrees aligned with AFSC \u2014 automatic enrollment, free",
+      "GI_Bill": "36 months post-service"
+    },
+    "housing": {
+      "BMT_through_pipeline": "Barracks \u2014 mandatory",
+      "first_assignment": "Dorms (single) or BAH off-base / on-base family housing (married)",
+      "typical_AFSOC_bases": [
+        "Hurlburt Field FL",
+        "Cannon AFB NM",
+        "Davis-Monthan AFB AZ",
+        "Kadena AB Japan (STS)"
+      ]
+    },
+    "financial_rules": [
+      "Pipeline is 18-30 months \u2014 delay major purchases until assigned to operational unit",
+      "CCAF degree is free \u2014 start Day 1",
+      "TSP from Day 1 \u2014 BRS government match requires at least 5% contribution",
+      "VA Loan when ready to buy \u2014 no down payment, no PMI",
+      "Combat zone tax exclusion applies in designated zones"
+    ]
+  }
+}

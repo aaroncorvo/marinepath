@@ -1,0 +1,325 @@
+{
+  "branch": "United States Coast Guard",
+  "version": "2026",
+  "first_person": true,
+  "overview": "I want to serve in the Coast Guard with a path toward its most elite tactical and special operations units. The Coast Guard is establishing a new Special Missions Command (SMC) commissioning around October 1, 2026, which will unify all Deployable Specialized Forces (DSF) under one command. The Coast Guard's special operations equivalent units include: MSRT (Maritime Security Response Team \u2014 closest to Tier 2 SOF), TACLET (Tactical Law Enforcement Teams), MSST (Maritime Safety and Security Teams), Port Security Units (PSU), and Regional Dive Lockers.",
+  "special_missions_command_2026": {
+    "establishing_date": "On or around October 1, 2026",
+    "commanded_by": "Rear Admiral",
+    "units_under_command": [
+      "Maritime Security Response Teams (MSRT) \u2014 counter-terrorism, hostage rescue, maritime direct action",
+      "Tactical Law Enforcement Teams (TACLET) \u2014 counter-trafficking, maritime law enforcement worldwide",
+      "Maritime Safety and Security Teams (MSST) \u2014 port and waterway rapid deployment",
+      "Port Security Units (PSU) \u2014 expeditionary shoreside and waterborne security",
+      "Regional Dive Lockers \u2014 underwater hull inspection, port security, navigation aids",
+      "National Strike Force \u2014 HAZMAT, CBRN incident response, federal support"
+    ],
+    "mission_expansion": "Growing role in counter-trafficking, counter-terrorism, and joint military operations alongside DoD SOF"
+  },
+  "coastguard_overview": {
+    "note": "The Coast Guard is NOT a typical military branch for someone seeking direct combat MOS or special operations as a primary career entry. It is a law enforcement and maritime safety service that ALSO has elite tactical units. The path to those elite units requires FIRST serving as an operational Coast Guardsman and building experience before volunteering.",
+    "enlistment_rates": "Over 20 enlisted ratings (similar to Navy ratings). Entry is competitive \u2014 the Coast Guard has the smallest enlisted force of all branches (~36,000 active duty).",
+    "direct_action_capability": "MSRT is the Coast Guard's closest unit to direct action \u2014 trained for maritime counter-terrorism, hostage rescue, and high-risk interdictions. TACLET conducts counter-narco operations globally."
+  },
+  "entry_requirements": {
+    "age": "17-31 for active duty enlistment",
+    "citizenship": "U.S. Citizen",
+    "asvab_minimum": "AFQT score of 40 or higher",
+    "vision": "Correctable to 20/20",
+    "background": "Clean criminal record; no serious drug history",
+    "note": "Coast Guard is the most selective enlisted service by ASVAB standards in practice \u2014 small force, high standards"
+  },
+  "path_nodes": [
+    {
+      "id": "cg_boot_camp",
+      "label": "Coast Guard Boot Camp",
+      "location": "Cape May, NJ",
+      "duration_weeks": 8,
+      "elapsed_months_start": 0,
+      "elapsed_months_end": 2,
+      "rank": "E-1 Seaman Recruit",
+      "base_pay_2026": 2216.69,
+      "description": "Eight weeks of military training, seamanship fundamentals, swimming qualification, firefighting, damage control, and law enforcement basics. All Coast Guardsmen complete this regardless of specialty.",
+      "life_layer": {
+        "housing": "Barracks \u2014 mandatory",
+        "college": "None yet",
+        "financial": "Save every dollar. CG is a smaller service \u2014 competition for elite billets is significant."
+      },
+      "next": "a_school_or_undesignated"
+    },
+    {
+      "id": "a_school_or_undesignated",
+      "label": "A School (Rating Training) or Undesignated Seaman",
+      "duration_months": 3,
+      "elapsed_months_start": 2,
+      "elapsed_months_end": 5,
+      "rank": "E-2 to E-3",
+      "base_pay_range_2026": "$2,487 to $2,636/month",
+      "description": "I either attend A School for a specific rating or go to a cutter/station as an undesignated seaman. Key ratings that lead to elite billets: Maritime Enforcement Specialist (ME), Boatswain's Mate (BM), Aviation Survival Technician (AST), or Operations Specialist (OS).",
+      "ratings_leading_to_elite_units": [
+        {
+          "rating": "Maritime Enforcement Specialist (ME)",
+          "description": "Primary law enforcement rating. Best direct path to MSRT, TACLET, MSST. ME specialists perform boardings, interdictions, counter-narco.",
+          "recommended": true
+        },
+        {
+          "rating": "Boatswain's Mate (BM)",
+          "description": "Boat handling and seamanship. Good path to Port Security Units and MSST."
+        },
+        {
+          "rating": "Aviation Survival Technician (AST)",
+          "description": "Rescue swimmer + aviation crewmember. Coast Guard equivalent of Navy rescue swimmer \u2014 responds to maritime distress, performs water rescues."
+        },
+        {
+          "rating": "Operations Specialist (OS)",
+          "description": "Command center / sensor operator. Supports operations but less direct tactical path."
+        }
+      ],
+      "next": "first_operational_tour"
+    },
+    {
+      "id": "first_operational_tour",
+      "label": "First Operational Tour \u2014 Cutter, Station, or Sector",
+      "duration_months": 36,
+      "elapsed_months_start": 5,
+      "elapsed_months_end": 41,
+      "rank": "E-3 to E-4",
+      "base_pay_range_2026": "$2,636 to $2,924/month",
+      "description": "I serve on a cutter, small boat station, or sector as my first operational assignment. This is where I build the foundational experience that qualifies me to volunteer for elite units. I need to excel here \u2014 promotion, qualification records, and leadership evaluations determine my path.",
+      "qualification_goals": [
+        "Boarding Officer / Boarding Team Member (ME rating)",
+        "Small Boat Coxswain qualifications",
+        "Law enforcement certifications",
+        "Physical readiness \u2014 maintain elite-level fitness even before being assigned to elite units"
+      ],
+      "life_layer": {
+        "housing": "Barracks or BAH off-base. CG duty stations range widely: Hawaii, Alaska, CONUS coasts, Gulf Coast.",
+        "college": "TA available ($4,500/yr) \u2014 strong CG culture supports college while serving. CG Institute provides distance learning.",
+        "financial": "BAH + BAS covers basics. Build emergency fund before requesting elite unit assignment.",
+        "marriage": "Possible during first tour \u2014 CG tempo is high-paced but more predictable than SEAL/MARSOC. Family life is more manageable at most billets."
+      },
+      "decision_gate": {
+        "question": "After 3-4 years of operational experience, do I want to pursue elite unit assignment?",
+        "options": [
+          {
+            "choice": "Volunteer for MSRT (most elite \u2014 maritime counter-terrorism)",
+            "next": "msrt_path",
+            "requires": "Active duty petty officer, ME or BM recommended, exceptional record, volunteer"
+          },
+          {
+            "choice": "Volunteer for TACLET (counter-narco, global law enforcement)",
+            "next": "taclet_path"
+          },
+          {
+            "choice": "Volunteer for MSST (port and waterway rapid response)",
+            "next": "msst_path"
+          },
+          {
+            "choice": "Pursue Dive Locker assignment",
+            "next": "dive_locker_path"
+          },
+          {
+            "choice": "Stay operational \u2014 advance toward senior leadership",
+            "next": "cg_senior_nco"
+          }
+        ]
+      }
+    },
+    {
+      "id": "msrt_path",
+      "label": "Maritime Security Response Team (MSRT) \u2014 Most Elite CG Unit",
+      "overview": "MSRT is the Coast Guard's first responder to maritime terrorism and high-risk threats. It is the closest CG unit to special operations direct action. MSRT has Direct Action Sections, Precision Marksman-Observer Teams, and Tactical Delivery Teams. Organized as MSRT East (Virginia Beach/Chesapeake, VA) and MSRT West (San Diego area). ~300 operators total across both teams.",
+      "mission": [
+        "Maritime counter-terrorism",
+        "Hostage rescue on vessels",
+        "High-risk vessel boardings",
+        "Explosive device interdiction",
+        "Joint operations with SOCOM partners"
+      ],
+      "selection_process": [
+        {
+          "step": 1,
+          "label": "Tactical Operator (TO) Screener",
+          "description": "First formal step. Physical fitness standards: minimum 50 push-ups, 50 sit-ups, sub-10:00 1.5-mile run. Additional water competency tests. Must volunteer and pass TO Screener to advance.",
+          "note": "Recruiter advice: Be a boarding officer for several years and stay in exceptional shape before applying"
+        },
+        {
+          "step": 2,
+          "label": "Assessment and Selection",
+          "description": "More intensive physical and psychological screening. Evaluates combat aptitude, water skills, and team fit. Selectivity is high for a CG unit.",
+          "note": "Details of A&S are not fully public; classified operational security"
+        },
+        {
+          "step": 3,
+          "label": "Basic Tactical Operations Course (BTOC)",
+          "location": "Special Missions Training Center, Camp Lejeune, NC",
+          "duration_weeks": 8,
+          "duration_days": 40,
+          "description": "Intensive 8-week course preparing me for high-risk interdiction in maritime environments. Covers: Advanced Combat Marksmanship, Close Quarters Combat (CQC), Progressive Breaching. Must score 80%+ on written exams and GO on all GO/NO-GO criteria. Designated High Risk Training.",
+          "note": "Conducted alongside TACLET and MSST personnel"
+        },
+        {
+          "step": 4,
+          "label": "Advanced MSRT Training Pipeline",
+          "duration_months": 12,
+          "description": "Advanced skills: tactical boat operations, vertical insertion (helicopter fast rope), precision marksmanship, K9 integration, explosive detection, medical support. Full pipeline takes approximately 18 months from start of selection to operational qualification.",
+          "total_pipeline_from_selection_months": 18
+        }
+      ],
+      "interoperability": "MSRT doctrine, tactics, and armament are closely aligned with SOCOM. Constant joint training with DoD SOF and federal law enforcement partners.",
+      "special_capabilities": [
+        "Direct action sections (assault)",
+        "Precision Marksman-Observer Teams (sniper/overwatch)",
+        "Tactical Delivery Teams (covert insertion)",
+        "K9 explosive detection units",
+        "Helicopter fast-rope and rappel insertion"
+      ],
+      "life_layer": {
+        "housing": "On-base or BAH near Virginia Beach VA or San Diego CA",
+        "college": "TA available \u2014 tempo is high but more predictable schedule than SEAL Teams; 1-2 classes per semester possible",
+        "financial": "No large special duty bonus like NSW, but steady E-5/E-6 pay plus any dive/specialty pay applicable"
+      }
+    },
+    {
+      "id": "taclet_path",
+      "label": "Tactical Law Enforcement Teams (TACLET)",
+      "overview": "TACLETs deploy globally to conduct maritime law enforcement operations, specifically counter-trafficking and targeting criminal networks using maritime transit zones. TACLET operators board foreign vessels on the high seas, interdict drug shipments, and work with allied navies.",
+      "locations": [
+        "TACLET Atlantic \u2014 Key West, FL",
+        "TACLET Pacific \u2014 San Diego, CA"
+      ],
+      "pipeline": [
+        {
+          "stage": "Basic Tactical Operations Course (BTOC)",
+          "weeks": 8,
+          "location": "Camp Lejeune, NC"
+        },
+        {
+          "stage": "Law enforcement boarding qualifications",
+          "note": "Extension of ME rating skills"
+        },
+        {
+          "stage": "Advanced interdiction training",
+          "note": "Specific to counter-narco and counter-trafficking"
+        }
+      ],
+      "deployment_profile": "Deploy aboard U.S. Navy vessels, other federal vessels, and partner nation ships worldwide. High overseas tempo. Encounters with drug cartels and transnational criminal organizations.",
+      "note": "Not direct-action military operations, but highly dangerous law enforcement work in austere environments"
+    },
+    {
+      "id": "msst_path",
+      "label": "Maritime Safety and Security Teams (MSST)",
+      "overview": "MSSTs are rapidly deployable boat teams providing port, waterway, and coastal security. They respond to maritime crime, sabotage, and terrorist activity. More accessible than MSRT but still elite relative to regular CG.",
+      "pipeline": [
+        {
+          "stage": "BTOC",
+          "weeks": 8,
+          "location": "Camp Lejeune, NC"
+        },
+        {
+          "stage": "Advanced Tactical Boat Operations training"
+        }
+      ],
+      "deployment": "Deploy to high-risk ports, major events (Super Bowl, summits), and post-disaster security operations"
+    },
+    {
+      "id": "dive_locker_path",
+      "label": "Regional Dive Locker",
+      "overview": "CG dive lockers provide underwater capabilities: port security, hull inspections, navigation aids maintenance, and polar region operations. Path requires dive qualifications and specific assignments.",
+      "dive_qualification": "Coast Guard Diver program \u2014 requires passing physical and dive medical standards",
+      "locations": [
+        "Various CONUS and OCONUS locations including Alaska and Hawaii"
+      ]
+    },
+    {
+      "id": "ast_path",
+      "label": "Aviation Survival Technician (AST) \u2014 CG Rescue Swimmer",
+      "overview": "ASTs are the Coast Guard's rescue swimmers and aviation survival technicians. They deploy by helicopter to rescue people in distress at sea \u2014 one of the most demanding jobs in the Coast Guard.",
+      "pipeline": [
+        {
+          "stage": "Boot Camp",
+          "weeks": 8,
+          "location": "Cape May, NJ"
+        },
+        {
+          "stage": "EMT-Basic",
+          "weeks": 4
+        },
+        {
+          "stage": "AST 'A' School",
+          "weeks": 24,
+          "location": "Elizabeth City, NC",
+          "note": "Includes rescue swimming, underwater egress, aviation survival, medical training"
+        }
+      ],
+      "physical_demands": "Must be able to swim 200 meters in under 5 minutes, tread water for 5 minutes, and perform continuous water rescue operations",
+      "note": "ASTs are NOT special operations operators, but their job is extremely demanding and dangerous \u2014 ocean rescues in storm conditions are routine"
+    },
+    {
+      "id": "cg_senior_nco",
+      "label": "Senior Coast Guard NCO / Chief Petty Officer",
+      "elapsed_months_start": 96,
+      "elapsed_months_end": 240,
+      "rank_typical": "E-7 to E-9",
+      "base_pay_range_2026": "$4,456 to $8,105/month",
+      "description": "I advance through the CG NCO ranks to Chief, Senior Chief, or Master Chief. Leadership billets, senior instructor, command master chief, or SMC leadership roles.",
+      "retirement_at_20": {
+        "pension": "Same DoD formula: 2.5% \u00d7 years served \u00d7 average highest 36 months pay",
+        "TRICARE": true,
+        "VA_benefits": true,
+        "note": "CG retirement is on par with all other military branches"
+      }
+    }
+  ],
+  "honest_assessment": {
+    "label": "Honest Assessment: Coast Guard vs Other Branches for Special Operations",
+    "note": "If my PRIMARY goal is special operations, direct action, and the most intense SOF path, the Marine Corps (MARSOC/Raiders), Navy (SEALs), or Army (SF/Rangers) are better suited. The Coast Guard's MSRT is elite but its mission is predominantly counter-terrorism and maritime law enforcement \u2014 not direct action warfare.",
+    "who_the_cg_is_right_for": [
+      "I want maritime special operations with a law enforcement and homeland security focus",
+      "I want overseas counter-narco and counter-trafficking operations",
+      "I want a smaller, more tight-knit service where promotion opportunities are real",
+      "I am interested in maritime rescue operations alongside possible tactical assignments",
+      "I want a SOF-adjacent career without the extreme SOF pipeline attrition rates"
+    ],
+    "reality_check": "MSRT is to the Coast Guard what MARSOC Raiders are to the Marines \u2014 the top of the house \u2014 but the mission sets are fundamentally different. MSRT does not conduct warfare; it conducts law enforcement in the most dangerous maritime environments."
+  },
+  "pay_2026": {
+    "note": "CG uses same DoD pay table as all other branches \u2014 3.8% increase 2026",
+    "enlisted_monthly": {
+      "E1_under4mo": 2216.69,
+      "E2": 2487.69,
+      "E3": 2636.1,
+      "E4_2yr": 2924.4,
+      "E5_4yr": 3316.8,
+      "E6_6yr": 3823.67,
+      "E7_6yr": 4456.21,
+      "E8_8yr": 5240.36,
+      "E9_10yr": 6910.15
+    },
+    "special_pays": {
+      "dive_pay": "$150/month (basic diver)",
+      "hostile_fire": "$225/month when applicable",
+      "family_separation": "$250/month",
+      "note": "CG does not have the large NSW/SOF incentive pays of Navy SEALs or MARSOC. Career is mission-driven, not bonus-driven."
+    }
+  },
+  "life_layer": {
+    "college": {
+      "TA": "$4,500/yr \u2014 CG strongly encourages college; CG Institute provides distance learning",
+      "CLEP_DANTES": "Free credit-by-exam",
+      "GI_Bill": "36 months post-service",
+      "note": "CG has historically had strong college participation rates among enlisted members"
+    },
+    "overseas_duty": {
+      "options": [
+        "TACLET deployments (global \u2014 no fixed overseas bases but deploy worldwide on ships)",
+        "MSRT deployments (global response",
+        "Integrated Support Command overseas billets",
+        "PATFORSWA \u2014 Coast Guard forces in Arabian Gulf (Bahrain)"
+      ]
+    },
+    "marriage_family": {
+      "note": "CG duty stations are often in desirable coastal areas. Family life is generally more stable than NSW or MARSOC, but MSRT/TACLET have high operational tempo and travel."
+    }
+  }
+}
