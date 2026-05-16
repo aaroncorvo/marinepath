@@ -1366,6 +1366,21 @@ const SCENES = {
        tags:['info:Different branch','ok:Ranger-guaranteed'],
        apply:g=>{g.branch='army';g.mos='11B (Option 40)';g.path.push('Enlisted: Army Option 40');},
        next:'meps'},
+      {label:'Navy — SEAL Challenge Contract (NSW)',
+       desc:'6-year contract with guaranteed BUD/S attempt. NSW prep + BUD/S (~24 wks) + SQT (~26 wks). Highest-attrition SOF pipeline (~75% drop). Pass = SEAL trident, $1,000/mo SODI.',
+       tags:['info:Navy','warn:6-yr commit','danger:~75% BUD/S drop'],
+       apply:g=>{g.branch='navy';g.mos='SO (SEAL Candidate)';g.path.push('Enlisted: Navy SEAL Challenge');},
+       next:'meps'},
+      {label:'Air Force — Special Warfare (CCT / PJ / SR / TACP)',
+       desc:'6-year contract. AF BMT → SW prep → Zulu Course (2026 unified pipeline) → specialty school. Combat Controller, Pararescue, Special Recon, or TACP.',
+       tags:['info:Air Force','warn:6-yr commit','ok:2026 unified pipeline'],
+       apply:g=>{g.branch='air_force';g.mos='1Z (SW Candidate)';g.path.push('Enlisted: AF Special Warfare');},
+       next:'meps'},
+      {label:'Coast Guard — Maritime Enforcement / MSRT track',
+       desc:'4-year contract. CG basic → A-school → operational tour → MSRT/TACLET/Diver tryouts. New Special Missions Command stood up Oct 2026.',
+       tags:['info:Coast Guard','ok:Domestic SOF','info:New SMC 2026'],
+       apply:g=>{g.branch='coast_guard';g.mos='ME (Maritime Enforcement)';g.path.push('Enlisted: Coast Guard ME');},
+       next:'meps'},
       {label:'Delay 1 year — Junior college first',
        desc:'Bank 30 credits, raise GT score, save $2k. Then enlist with stronger academics.',
        tags:['ok:+30 credits','ok:+5 rep','warn:1-yr delay'],
@@ -1378,9 +1393,276 @@ const SCENES = {
     title:'MEPS — Medical, Paperwork, Oath',
     text:`Two days at the Military Entrance Processing Station. Physical, paperwork, ASVAB review. I take the Oath of Enlistment. Ship date is set 4 weeks out. <strong>I get paid starting the day I ship</strong> — E-1 base pay: $2,217/mo. No expenses yet; this is the first real money I\'ll see.`,
     choices:[
-      {label:'Ship to Parris Island / San Diego',
+      {label:'Ship to boot camp',
        apply:g=>{g.tis_months+=1;g.savings=Math.max(g.savings,1500);},
-       next:'boot_arrive'}
+       next:s=>{
+         if(s.branch==='navy') return 'navy_boot';
+         if(s.branch==='air_force') return 'af_bmt';
+         if(s.branch==='coast_guard') return 'cg_boot';
+         return 'boot_arrive';
+       }}
+    ]
+  },
+  // ════════ NAVY PIPELINE ════════
+  'navy_boot':{
+    stage:'Navy Boot Camp',
+    title:`Navy Boot Camp — 8 weeks (Great Lakes, IL)`,
+    text:`Navy boot is shorter than Marine boot but mentally tough in its own way. I\'m on the SEAL Challenge contract, which means I head to NSW prep right after. Free housing/food, banking ~$2,200/mo as an E-1.`,
+    choices:[
+      {label:'Lock in — top recruit',
+       desc:'Crush PT, max swim qual, push for honor recruit. Higher rep going into NSW prep.',
+       tags:['ok:+Rep','ok:Honor recruit possible'],
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+8);g.reputation+=6;if(rng()<0.85)g.rank='E-2';g.path.push('Navy Boot: top recruit');},
+       next:'nsw_prep'},
+      {label:'Graduate clean',
+       desc:'Solid pass, no drama. Healthy and ready for NSW prep.',
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+4);g.path.push('Navy Boot: clean grad');},
+       next:'nsw_prep'}
+    ]
+  },
+  'nsw_prep':{
+    stage:'NSW Prep',
+    title:`NSW Prep — 8 weeks (Great Lakes → Coronado)`,
+    text:`Naval Special Warfare Preparatory School. Swim, run, calisthenics, mental conditioning. Designed to get me ready for BUD/S — and to wash out anyone who can\'t hack it before they even check in.`,
+    choices:[
+      {label:'Send it — full effort through NSW prep',
+       apply:g=>{
+         g.tis_months+=2;g.fitness=Math.min(100,g.fitness+8);
+         if(rng()<0.85) g.event={type:'win',text:'Cleared NSW Prep. Reporting to BUD/S in Coronado.'};
+         else { g.event={type:'bad',text:'Washed at NSW Prep. Reclassed to standard Navy MOS.'}; g.failed_stages.push('NSW Prep'); g.mos='Standard Navy rate'; }
+       },
+       next:s=>s.failed_stages.includes('NSW Prep')?'navy_fleet_fallback':'bud_s_phase1'}
+    ]
+  },
+  'bud_s_phase1':{
+    stage:'BUD/S Phase 1',
+    title:`BUD/S Phase 1 — 7 weeks · "First Phase" (Coronado, CA)`,
+    text:`Physical conditioning + the famous <strong>Hell Week</strong> (5.5 days of continuous training, ~4 hrs sleep total). Roughly half of every class quits during Hell Week. The bell is right there.`,
+    choices:[
+      {label:'Refuse to quit — survive Hell Week',
+       desc:'Mental over physical. Pass odds based on fitness + reputation.',
+       tags:['danger:~50% drop','ok:Path to trident'],
+       apply:g=>{g.tis_months+=2;},
+       next:s=>{
+         const p = 0.35 + (s.fitness-75)/200 + (s.reputation-65)/300;
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Survived Hell Week. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}%.) Phase 2 next.`};return 'bud_s_phase23';}
+         s.failed_stages.push('Hell Week');s.event={type:'bad',text:`Rang the bell during Hell Week. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}%.) Reclassed to fleet.`};
+         return 'navy_fleet_fallback';
+       }},
+      {label:'Volunteer to roll back if hurt — preserve attempt',
+       desc:'Rollback to next class if injury hits. Keeps the dream alive but adds 6+ months.',
+       tags:['warn:+6 mo'],
+       apply:g=>{g.tis_months+=4;g.fitness=Math.min(100,g.fitness+3);},
+       next:'bud_s_phase1'}
+    ]
+  },
+  'bud_s_phase23':{
+    stage:'BUD/S Phase 2 + 3',
+    title:`BUD/S Phase 2 (Dive) + Phase 3 (Land Warfare) — 14 weeks`,
+    text:`Phase 2: Combat diving (pool comp, similar to Marine dive school). Phase 3: Land warfare on San Clemente Island. Final test: more attrition for academic failures + safety violations.`,
+    choices:[
+      {label:'Push through both phases',
+       apply:g=>{
+         g.tis_months+=4;
+         const r = rng();
+         if(r<0.80){g.event={type:'win',text:'Graduated BUD/S. Trident is close.'};return;}
+         else if(r<0.92){g.tis_months+=3;g.event={type:'warn',text:'Recycled in dive phase. Picked up next class.'};return;}
+         g.failed_stages.push('BUD/S Phase 2/3');g.event={type:'bad',text:'Dropped after Hell Week. Reclassed.'};
+       },
+       next:s=>s.failed_stages.includes('BUD/S Phase 2/3')?'navy_fleet_fallback':'navy_sqt'}
+    ]
+  },
+  'navy_sqt':{
+    stage:'SQT',
+    title:`SEAL Qualification Training (SQT) — 26 weeks (Coronado)`,
+    text:`After BUD/S, SQT teaches the trade: weapons, tactics, comms, parachute (Basic Airborne at Fort Liberty embedded in here), close-quarters battle, SERE. <strong>Pass = SEAL trident.</strong>`,
+    choices:[
+      {label:'Earn the trident',
+       apply:g=>{
+         g.tis_months+=6;g.quals.push('BUD/S','SQT','Airborne','SERE');g.has_clearance=true;g.mos='SO1 (SEAL)';
+         g.event={type:'win',text:'🎖 SEAL trident pinned. Reporting to a SEAL Team. +$1,000/mo SODI starts.'};
+       },
+       next:'navy_seal_team'}
+    ]
+  },
+  'navy_seal_team':{
+    stage:'SEAL Team',
+    title:`First SEAL Team — Operational`,
+    text:`Assigned to a SEAL Team. 18-month workup/deployment cycles. SODI ($1,000/mo) + dive ($340) + jump ($150) = significant pay boost. <strong>I\'m at the elite level my Marine Recon counterpart took longer to reach — but the hours and pace are even more punishing.</strong>`,
+    choices:[
+      {label:'Operate 5 years (years 2–7 TIS)',
+       desc:'Multiple deployments. Promotion to E-5/E-6. DEVGRU (Tier 1) attempt possible at year 5+.',
+       apply:g=>{g.tis_months+=60;g.rank='E-6';g.deployments+=4;g.reputation+=15;g.morale-=8;g.savings+=25000;g.path.push('Active SEAL operator');g.event={type:'win',text:'5 years operational. Made E-6. Body shows the wear. Career as hoped.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  'navy_fleet_fallback':{
+    stage:'Standard Navy',
+    title:`Reclassed to Standard Navy`,
+    text:`The dream didn\'t pan out. I revert to a standard Navy rate (typically Gunner\'s Mate, Operations Specialist, IT, or HM Corpsman). Still an honorable career — and still on a path to mid-career decisions.`,
+    choices:[
+      {label:'Press on as fleet sailor',
+       apply:g=>{g.mos='Standard Navy rate';g.tis_months+=24;g.rank='E-4';g.deployments+=1;},
+       next:'mid_career_check'}
+    ]
+  },
+  // ════════ AIR FORCE PIPELINE ════════
+  'af_bmt':{
+    stage:'AF Basic Training',
+    title:`AF Basic Military Training — 7.5 weeks (Lackland AFB, TX)`,
+    text:`AF BMT is shorter and less brutal than Marine/Navy boot. Don\'t mistake that for easy. SW Candidates have to keep PT scores top-tier from Day 1 — washing prep pipeline starts here.`,
+    choices:[
+      {label:'Honor flight — top recruit',
+       desc:'High PT scores, leadership behaviors, max rifle qual. Best setup for Zulu Course.',
+       tags:['ok:+Rep','ok:Top recruit'],
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+8);g.reputation+=6;if(rng()<0.8)g.rank='E-2';g.path.push('AF BMT: Honor Flight');},
+       next:'af_sw_prep'},
+      {label:'Solid pass',
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+4);g.path.push('AF BMT: clean grad');},
+       next:'af_sw_prep'}
+    ]
+  },
+  'af_sw_prep':{
+    stage:'AF SW Prep',
+    title:`Special Warfare Preparatory Course — 8 weeks (Lackland)`,
+    text:`Preparation for Assessment & Selection. Tons of swim, ruck, calisthenics. About 40% wash before they get to A&S.`,
+    choices:[
+      {label:'Push through SW Prep',
+       apply:g=>{
+         g.tis_months+=2;g.fitness=Math.min(100,g.fitness+8);
+         if(rng()<0.65)g.event={type:'win',text:'Cleared SW Prep. Heading to Assessment & Selection.'};
+         else {g.failed_stages.push('SW Prep');g.event={type:'bad',text:'Washed at SW Prep. Reclassed to standard AF AFSC.'};g.mos='Standard AF AFSC';}
+       },
+       next:s=>s.failed_stages.includes('SW Prep')?'af_fleet_fallback':'af_zulu'}
+    ]
+  },
+  'af_zulu':{
+    stage:'Zulu Course',
+    title:`Zulu Course — Unified Selection (2026 update)`,
+    text:`Common selection for all 4 SW specialties (CCT / PJ / SR / TACP). 8 weeks. Hell Week analogue + academics + leadership. About 50% washout. <strong>Pass and I select my specialty pipeline.</strong>`,
+    choices:[
+      {label:'Send it — full effort through Zulu',
+       apply:g=>{g.tis_months+=2;},
+       next:s=>{
+         const p = 0.40 + (s.fitness-75)/200 + (s.reputation-65)/300;
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Cleared Zulu Course. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}%.) Specialty pipeline next.`};return 'af_specialty';}
+         s.failed_stages.push('Zulu Course');s.event={type:'bad',text:`Washed at Zulu. Reclassed to standard AF.`};
+         return 'af_fleet_fallback';
+       }}
+    ]
+  },
+  'af_specialty':{
+    stage:'AF Specialty Pipeline',
+    title:`Specialty Pipeline — Pick My Track`,
+    text:`Cleared Zulu. Now I select one of 4 AFSWC paths. Each has its own follow-on pipeline (6 months to 2+ years).`,
+    choices:[
+      {label:'Combat Controller (CCT) — air traffic + special ops',
+       desc:'~2-yr pipeline: combat control school, jumpmaster, freefall, dive, SERE. Most prestigious AFSWC track.',
+       tags:['ok:Air-ground integration','danger:Longest pipeline'],
+       apply:g=>{g.tis_months+=18;g.quals.push('CCT','Airborne','MFF','SERE');g.has_clearance=true;g.mos='1Z3 Combat Controller';g.event={type:'win',text:'🎖 Combat Controller qualified. Most coveted AFSWC path.'};},
+       next:'afsoc_unit'},
+      {label:'Pararescue (PJ) — combat search-and-rescue',
+       desc:'~2-yr pipeline: paramedic, dive, jump, SERE, mountain rescue. The "That Others May Live" mission.',
+       tags:['ok:Medical + ops','warn:Long pipeline'],
+       apply:g=>{g.tis_months+=18;g.quals.push('PJ','Airborne','MFF','SERE','Combatant Diver','EMT-P');g.has_clearance=true;g.mos='1T2 Pararescue';g.event={type:'win',text:'🎖 PJ qualified. Combat medic + jumper.'};},
+       next:'afsoc_unit'},
+      {label:'Special Reconnaissance (SR) — intel + comms',
+       desc:'~1.5-yr pipeline: linguistics, recon, jump, SERE. Renamed from SOWT in 2019.',
+       tags:['ok:Tech-heavy','info:Smaller community'],
+       apply:g=>{g.tis_months+=14;g.quals.push('SR','Airborne','SERE');g.has_clearance=true;g.mos='1Z4 Special Recon';g.event={type:'win',text:'🎖 Special Recon qualified.'};},
+       next:'afsoc_unit'},
+      {label:'TACP — Tactical Air Control Party',
+       desc:'~1-yr pipeline: embedded with Army units, calls in close-air support. Ground combat focused.',
+       tags:['ok:Shorter pipeline','info:Ground-heavy'],
+       apply:g=>{g.tis_months+=10;g.quals.push('TACP','Airborne');g.has_clearance=true;g.mos='1Z3 TACP';g.event={type:'win',text:'🎖 TACP qualified. Embedded with Army units.'};},
+       next:'afsoc_unit'}
+    ]
+  },
+  'afsoc_unit':{
+    stage:'AFSOC Unit',
+    title:`AFSOC Unit — Operational`,
+    text:`Assigned to an Air Force Special Operations Command unit. Deployments rotate. SODI + jump + (dive if PJ/CCT) special pays kick in.`,
+    choices:[
+      {label:'Operate 4–5 years',
+       apply:g=>{g.tis_months+=54;g.rank='E-6';g.deployments+=3;g.reputation+=12;g.morale-=6;g.savings+=22000;g.path.push('Active AFSOC operator');g.event={type:'win',text:'4-5 years operational. Made E-6. AFSOC patch on my flight suit.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  'af_fleet_fallback':{
+    stage:'Standard Air Force',
+    title:`Reclassed to Standard AF AFSC`,
+    text:`SW path didn\'t happen. I reclass to a standard Air Force AFSC (often security forces, intel, aviation maintenance, or cyber). Still solid careers — AF quality of life is generally the best in DoD.`,
+    choices:[
+      {label:'Press on as standard AF',
+       apply:g=>{g.mos='Standard AF AFSC';g.tis_months+=24;g.rank='E-4';g.deployments+=1;},
+       next:'mid_career_check'}
+    ]
+  },
+  // ════════ COAST GUARD PIPELINE ════════
+  'cg_boot':{
+    stage:'CG Basic Training',
+    title:`Coast Guard Basic Training — 8 weeks (Cape May, NJ)`,
+    text:`CG boot is short but intense — heavy on swimming, seamanship, and military bearing. Smallest service so the culture is tight-knit.`,
+    choices:[
+      {label:'Honor recruit',
+       desc:'Max PT and swim quals. Strong start toward MSRT or A-school selection.',
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+6);g.reputation+=5;if(rng()<0.8)g.rank='E-2';g.path.push('CG Boot: Honor Recruit');},
+       next:'cg_a_school'},
+      {label:'Solid grad',
+       apply:g=>{g.tis_months+=2;g.fitness=Math.min(100,g.fitness+3);g.path.push('CG Boot: clean grad');},
+       next:'cg_a_school'}
+    ]
+  },
+  'cg_a_school':{
+    stage:'CG A-School',
+    title:`A-School — Maritime Enforcement Specialist (ME)`,
+    text:`12-week A-school at Charleston. Boarding ops, law enforcement, weapons, vessel inspection. Graduates serve afloat on cutters before being eligible for MSRT/TACLET tryouts.`,
+    choices:[
+      {label:'Graduate ME A-School + first cutter tour',
+       apply:g=>{g.tis_months+=18;g.mos='ME (Maritime Enforcement)';g.quals.push('Boarding Officer');g.deployments+=1;g.rank='E-4';g.path.push('CG ME → cutter tour');},
+       next:'cg_msrt_tryout'}
+    ]
+  },
+  'cg_msrt_tryout':{
+    stage:'MSRT Tryout',
+    title:`Maritime Security Response Team — Tryout`,
+    text:`MSRT is CG\'s premier tactical unit — counter-terrorism, high-risk boarding, advanced interdiction. Eligible after 2-3 yrs at sea. New <strong>Special Missions Command</strong> stood up Oct 2026, expanding MSRT/TACLET roles. Selection rate ~30%.`,
+    choices:[
+      {label:'Attempt MSRT selection',
+       apply:g=>{g.tis_months+=2;},
+       next:s=>{
+         const p = 0.35 + (s.fitness-75)/200 + (s.reputation-65)/300;
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Selected for MSRT. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}%.)`};return 'cg_msrt_unit';}
+         s.failed_stages.push('MSRT Selection');s.event={type:'bad',text:`Not selected. Returning to fleet operations.`};
+         return 'cg_fleet_unit';
+       }},
+      {label:'Skip MSRT — pursue Aviation Survival Tech (AST) path instead',
+       desc:'Rescue swimmer / Coast Guard helicopter rescue. Different elite path. Hard pipeline but unique mission.',
+       apply:g=>{g.tis_months+=12;g.mos='AST (Rescue Swimmer)';g.quals.push('AST','Rescue Swimmer');g.event={type:'win',text:'AST qualified. Helo rescue swimmer.'};},
+       next:'cg_fleet_unit'}
+    ]
+  },
+  'cg_msrt_unit':{
+    stage:'MSRT Unit',
+    title:`MSRT — Operational Tactical Team`,
+    text:`Assigned to an MSRT. Counter-terrorism, high-risk boardings, VIP protection in maritime environments. New Special Missions Command means more career growth path than ever for CG SOF.`,
+    choices:[
+      {label:'Operate 4 years',
+       apply:g=>{g.tis_months+=48;g.rank='E-6';g.deployments+=2;g.reputation+=10;g.savings+=15000;g.path.push('Active CG MSRT operator');g.event={type:'win',text:'4 years MSRT. SMC-aligned. Solid career trajectory.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  'cg_fleet_unit':{
+    stage:'CG Fleet Unit',
+    title:`Standard CG Operational`,
+    text:`Standard CG career on cutters, stations, sectors. Lower op-tempo than the other branches\' SOF, more stable home life, real domestic mission impact.`,
+    choices:[
+      {label:'Build a stable CG career',
+       apply:g=>{g.tis_months+=36;g.rank='E-5';g.deployments+=1;g.savings+=10000;g.path.push('CG standard career');},
+       next:'mid_career_check'}
     ]
   },
   'boot_arrive':{
@@ -3200,8 +3482,9 @@ let DATA = { pay:null, mos:null, stages:null, timeline:null, tree:null, loaded:f
 
 async function loadGameData(){
   const files = ['pay_2026','mos_complete','career_stages','timeline','decision_tree'];
-  // Branch-aware: Army players get data/army/*.json, everyone else data/*.json (Marines)
-  const branchPath = (G.branch === 'army') ? 'data/army' : 'data';
+  // Branch-aware: each branch has its own folder; fall back to Marines (data/) for files a branch doesn't have yet
+  const branchMap = { usmc:'data', army:'data/army', navy:'data/navy', air_force:'data/air_force', coast_guard:'data/coast_guard' };
+  const branchPath = branchMap[G.branch] || 'data';
   const tryFetch = async (name)=>{
     try{
       const r = await fetch(`${branchPath}/${name}.json`, {cache:'no-cache'});
