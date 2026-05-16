@@ -2075,6 +2075,8 @@ const SCENES = {
       {label:'Finance a $42,000 lifted Tacoma at 14% APR',
        desc:'$0 down, 84-month loan. Monthly: $760 payment + $200 ins + $250 gas = <strong>$1,210/mo</strong>. The "E-4 Mafia" special. Crushes savings rate for 7 years.',
        tags:['danger:$760/mo payment','danger:7-yr loan'],
+       // Block if it would push the player into negative cash flow
+       requires:g=>{ const b = calcBudget(g); return (b.net_to_savings - 1210) > -100; },
        apply:g=>{g.car='financed';g.car_value=42000;g.car_payment=760;g.debt+=42000;g.tis_months+=1;g.morale+=10;g.reputation-=2;g.event={type:'warn',text:'Drove off the lot in a $42k truck. Felt incredible. The dealer cheered. The cost compounds for 84 months.'};},
        next:'school_choice'}
     ]
@@ -2489,6 +2491,8 @@ const SCENES = {
       {label:'Upgrade — buy a $60k Jeep, jewelry, vacation',
        desc:'$18k vanishes. Felt amazing for 3 weeks. Now I have a depreciating asset and no emergency fund.',
        tags:['danger:All $ gone'],
+       // Block if savings or post-purchase cashflow would crater
+       requires:g=>{ if(g.savings < 15000) return false; const b=calcBudget(g); return (b.net_to_savings - 820) > -100; },
        apply:g=>{g.savings=Math.max(0,g.savings-15000);g.car='upgrade';g.car_value=60000;g.debt+=30000;g.car_payment=820;g.morale+=15;g.event={type:'bad',text:'Upgraded. Jeep is gorgeous. So is the new $820/mo payment.'};g.tis_months+=1;},
        next:'car_upgrade_temptation'}
     ]
@@ -2561,7 +2565,12 @@ const SCENES = {
     choices:[
       {label:'Yes — start trying now',
        desc:'Kids reshape my MARSOC calculus around deployments and tempo.',
-       apply:g=>{g.kids+=1;g.tis_months+=12;g.morale+=10;g.event={type:'info',text:'New kid. +$600/mo in expenses. Worth it. MARSOC tempo just got harder.'};},
+       apply:g=>{
+         g.kids+=1;g.tis_months+=12;g.morale+=10;
+         // First kid = trigger benefits-decision moment
+         if(g.kids===1) g.event={type:'info',text:'Welcomed a kid. <strong>Benefits trigger:</strong> add SGLI dependent coverage ($5.50/mo for $100k), enroll in TRICARE Prime (free for active duty family), and bump TSP contribution to absorb the pay change. Free cash flow just got tighter — direct it before continuing.'};
+         else g.event={type:'info',text:'New kid. +$600/mo in expenses. Worth it. MARSOC tempo just got harder.'};
+       },
        next:'va_house_question'},
       {label:'Wait — MARSOC first, kids after',
        apply:g=>{g.tis_months+=6;},
@@ -3353,22 +3362,49 @@ function renderBudget(){
 }
 
 // Order matters — this is the linear story progression
-const TREE_STAGES = [
-  'Enlistment','MEPS','Boot Camp','School of Infantry',
-  'First Unit','Year 1 Recap',
-  'Recon Volunteer','RSAT','Ground Recon Course','Amphibious Recon Course',
-  'Combatant Diver','Basic Airborne','Military Free Fall','SERE',
-  'First Recon Battalion','Relationships','Pre-Deployment','First Deployment','Post-Deployment',
-  'Mid-Tour Life','Marriage Decision','Married Year 1','Kids Decision','VA Home Loan',
-  'Sniper Choice','Promotion to Sgt','MARSOC Prep','A&S Phase I','A&S Phase II','ITC','Marine Raider',
-  'Mid-Career','Degree Completion','Last Tour','Civilian Transition','Retirement'
-];
+// Stages by track — pick the right list dynamically so officers, branches, and Marines all see the right path
+const STAGE_SETS = {
+  setup_prefix: ['Character Setup','Enlistment','MEPS'],
+  shared_tail:  ['Spouse Profile','Newly Married','Housing','Mid-Career','Degree Completion','Last Tour','Civilian Transition','Retirement'],
+  marine_enlisted: [
+    'Boot Camp','School of Infantry','First Unit','Year 1 Recap',
+    'Recon Volunteer','RSAT','Ground Reconnaissance Course','Amphibious Reconnaissance Course',
+    'Combatant Diver','Basic Airborne','Military Free Fall','SERE',
+    'First Recon Battalion','Relationships','Pre-Deployment','First Deployment','Post-Deployment',
+    'Mid-Tour Life','Marriage Decision','Kids Decision','VA Home Loan',
+    'Sniper Choice','Promotion to Cpl','Promotion to Sgt','MARSOC Prep','A&S Phase I','A&S Phase II','ITC','Marine Raider',
+    'SSgt Board','GySgt Board','MSgt/1stSgt Board','Post-MARSOC'
+  ],
+  marine_officer: [
+    'OCS','TBS','TBS MOS Pick','IOC','First Platoon Command','Recon Officer Track','MARSOC SOO Decision','A&S Phase II','ITC','Officer Mid-Career'
+  ],
+  navy: ['Navy Boot Camp','NSW Prep','BUD/S Phase 1','BUD/S Phase 2 + 3','SQT','SEAL Team','Standard Navy'],
+  air_force: ['AF Basic Training','AF SW Prep','Zulu Course','AF Specialty Pipeline','AFSOC Unit','Standard Air Force'],
+  coast_guard: ['CG Basic Training','CG A-School','MSRT Tryout','MSRT Unit','CG Fleet Unit'],
+  army: ['Boot Camp','RASP / Ranger Selection','75th Ranger Regiment','Army Infantry (post-RASP fail)']
+};
+
+function getTreeStages(g){
+  const prefix = STAGE_SETS.setup_prefix;
+  const tail = STAGE_SETS.shared_tail;
+  let middle;
+  if(g.is_officer) middle = STAGE_SETS.marine_officer;
+  else if(g.branch === 'navy') middle = STAGE_SETS.navy;
+  else if(g.branch === 'air_force') middle = STAGE_SETS.air_force;
+  else if(g.branch === 'coast_guard') middle = STAGE_SETS.coast_guard;
+  else if(g.branch === 'army') middle = STAGE_SETS.army;
+  else middle = STAGE_SETS.marine_enlisted;
+  return [...prefix, ...middle, ...tail];
+}
+
 function renderTree(){
-  const cur = SCENES[G.stage]?.stage || (G.stage==='setup' ? 'Character Setup' : '—');
+  const cur = SCENES[G.stage]?.stage || (G.stage==='setup' ? 'Character Setup' : G.stage==='spouse_profile' ? 'Spouse Profile' : '—');
   const visitedStages = new Set(G_HISTORY.map(h=>h.scene_stage).filter(Boolean));
+  // Also add current stage's predecessors via path
+  const stages = getTreeStages(G);
   const stagesContainer = document.getElementById('treeStages');
   if(stagesContainer){
-    stagesContainer.innerHTML = TREE_STAGES.map(s=>{
+    stagesContainer.innerHTML = stages.map(s=>{
       let cls = 'tree-stage';
       if(visitedStages.has(s)) cls += ' done';
       if(s===cur) cls += ' current';
@@ -3474,14 +3510,41 @@ function renderScene(){
     eventHtml = `<div class="event-banner ${G.event.type}">${sub(G.event.text)}</div>`;
     G.event=null;
   }
-  // build choices
+
+  // ── MONEY GATE: every dollar must be directed before moving forward (when earning real pay) ──
+  const directed = (G.ira_monthly||0) + (G.taxable_monthly||0) + (G.extra_savings_monthly||0);
+  const unallocated = b.net_to_savings - directed;
+  // Only gate scenes after the player is earning real pay (skip boot/training scenes with no income discretion)
+  const isEarningStage = b.bp >= 2400 && !['setup','spouse_profile','start','meps','boot_arrive','boot_grad','navy_boot','af_bmt','cg_boot','ocs'].includes(G.stage);
+  const moneyGateBlock = isEarningStage && unallocated > 100;
+  const negativeBlock = isEarningStage && b.net_to_savings < -50;
+  let gateBanner = '';
+  if(moneyGateBlock){
+    gateBanner = `<div style="padding:var(--s4);margin-bottom:var(--s4);background:color-mix(in srgb,var(--warn) 18%,transparent);border:2px solid var(--warn);border-radius:var(--r-md);display:flex;justify-content:space-between;align-items:center;gap:var(--s4);flex-wrap:wrap">
+      <div>
+        <strong style="color:var(--warn);font-size:var(--text-base)">🛑 ${fmt(unallocated)}/mo unallocated</strong>
+        <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.3rem">Zero-based budget: direct every dollar before continuing. Choices are disabled until allocation is complete.</div>
+      </div>
+      <button onclick="autoAllocate(${unallocated})" style="padding:.7rem 1.2rem;background:var(--warn);color:#000;border:none;border-radius:var(--r-full);font-family:var(--mono);font-size:var(--text-sm);cursor:pointer;font-weight:600">▶ Auto-Allocate $${Math.round(unallocated)}</button>
+    </div>`;
+  } else if(negativeBlock){
+    gateBanner = `<div style="padding:var(--s4);margin-bottom:var(--s4);background:color-mix(in srgb,var(--error) 18%,transparent);border:2px solid var(--error);border-radius:var(--r-md)">
+      <strong style="color:var(--error);font-size:var(--text-base)">🛑 Negative cash flow: ${fmt(Math.abs(b.net_to_savings))}/mo in the red</strong>
+      <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.3rem">My bills + envelopes exceed my take-home. I can't move forward until I trim expenses (💵 Budget tab) or reduce envelope contributions. Choices are disabled.</div>
+    </div>`;
+  }
+
+  // build choices — disable when money gate is active
   const choicesHtml = s.choices.map((c,i)=>{
     if(c.requires && !c.requires(G)) return '';
     const tags = (c.tags||[]).map(t=>{
       const [type,...rest]=t.split(':'); const text=rest.join(':');
       return `<span class="choice-tag ${type}">${sub(text)}</span>`;
     }).join('');
-    return `<button class="choice" onclick="chooseChoice(${i})">
+    // Per-choice money check: if this option's apply would crater the budget badly, mark it
+    const disabled = (moneyGateBlock || negativeBlock) ? 'disabled' : '';
+    const dimStyle = disabled ? 'opacity:.45;cursor:not-allowed' : '';
+    return `<button class="choice" ${disabled} onclick="${disabled?'':`chooseChoice(${i})`}" style="${dimStyle}">
       <div class="choice-label"><span>${sub(c.label)}</span></div>
       ${c.desc?`<div class="choice-desc">${sub(c.desc)}</div>`:''}
       <div>${tags}</div>
@@ -3493,6 +3556,7 @@ function renderScene(){
     <div class="scene-title">${sub(s.title)}</div>
     ${eventHtml}
     <div class="scene-text">${sub(s.text)}</div>
+    ${gateBanner}
     <div class="choices">${choicesHtml}</div>
   `;
   // retirement scorecard at end
@@ -4513,8 +4577,11 @@ function autoAllocate(amount){
   if(amount > 5){
     G.taxable_monthly = (G.taxable_monthly||0) + amount;
   }
-  if(typeof renderBudget==='function') renderBudget();
-  if(typeof renderDash==='function') renderDash();
+  if(typeof renderScene==='function' && !['setup','spouse_profile'].includes(G.stage)) renderScene();
+  else {
+    if(typeof renderBudget==='function') renderBudget();
+    if(typeof renderDash==='function') renderDash();
+  }
   autoSave();
 }
 
@@ -4529,8 +4596,12 @@ function adjustBudget(type, key, val){
     if(key === 'ira_monthly') G[key] = Math.min(v, 583);
     else G[key] = v;
   }
-  if(typeof renderBudget==='function') renderBudget();
-  if(typeof renderDash==='function') renderDash();
+  // Full re-render so the money gate banner + scene choices update in real time
+  if(typeof renderScene==='function' && !['setup','spouse_profile'].includes(G.stage)) renderScene();
+  else {
+    if(typeof renderBudget==='function') renderBudget();
+    if(typeof renderDash==='function') renderDash();
+  }
   if(typeof renderInvestmentsTab==='function' && document.getElementById('invest')?.classList.contains('active')) renderInvestmentsTab();
   autoSave();
 }
