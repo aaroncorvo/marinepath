@@ -1249,8 +1249,17 @@ const PAY = {
   'E-8':{8:7908,10:8009,12:8240,14:8493,16:8756,18:9007,20:9197},
   'E-9':{10:9405,12:9621,14:9892,16:10202,18:10522,20:10818}
 };
-const RANK_ORDER=['E-1','E-2','E-3','E-4','E-5','E-6','E-7','E-8','E-9'];
-const RANK_TITLE={'E-1':'Pvt','E-2':'PFC','E-3':'LCpl','E-4':'Cpl','E-5':'Sgt','E-6':'SSgt','E-7':'GySgt','E-8':'1stSgt/MSgt','E-9':'SgtMaj/MGySgt'};
+const RANK_ORDER=['E-1','E-2','E-3','E-4','E-5','E-6','E-7','E-8','E-9','O-1','O-2','O-3','O-4','O-5','O-6'];
+const RANK_TITLE={'E-1':'Pvt','E-2':'PFC','E-3':'LCpl','E-4':'Cpl','E-5':'Sgt','E-6':'SSgt','E-7':'GySgt','E-8':'1stSgt/MSgt','E-9':'SgtMaj/MGySgt','O-1':'2ndLt','O-2':'1stLt','O-3':'Capt','O-4':'Maj','O-5':'LtCol','O-6':'Col'};
+// Officer pay tiers (2026 approximations, monthly base pay)
+Object.assign(PAY, {
+  'O-1':{0:3747,2:3899,4:4718},
+  'O-2':{2:4326,4:5521,6:6019},
+  'O-3':{2:5006,4:6153,6:6690,8:7022,10:7830},
+  'O-4':{6:6755,8:7477,10:7980,14:9103,18:10008},
+  'O-5':{10:8615,12:9156,14:9542,18:10803,22:12038},
+  'O-6':{14:10498,18:11896,22:12840,26:13478}
+});
 
 // BAH (rough 2026 with-dependents average; without ≈ 75%). Real BAH varies wildly by zip.
 const BAH={'E-1':1450,'E-2':1500,'E-3':1620,'E-4':1780,'E-5':2050,'E-6':2280,'E-7':2480,'E-8':2700,'E-9':2900};
@@ -1422,11 +1431,182 @@ const SCENES = {
       {label:'Ship to boot camp',
        apply:g=>{g.tis_months+=1;g.savings=Math.max(g.savings,1500);},
        next:s=>{
+         // Officers skip enlisted boot — route per commissioning source
+         if(s.is_officer){
+           if(s.commission_source==='OCS') return 'ocs';
+           // Academy + ROTC already commissioned during 4 yrs of school — go straight to TBS
+           s.rank='O-1';
+           return 'tbs';
+         }
          if(s.branch==='navy') return 'navy_boot';
          if(s.branch==='air_force') return 'af_bmt';
          if(s.branch==='coast_guard') return 'cg_boot';
          return 'boot_arrive';
        }}
+    ]
+  },
+  // ════════ OFFICER PIPELINE — Marine OCS → TBS → IOC → Command → Recon Officer → MARSOC SOO 0370 ════════
+  'ocs':{
+    stage:'OCS',
+    title:`Officer Candidate School (OCS) — 10 weeks (Quantico, VA)`,
+    text:`I report to OCS as an Officer Candidate. Paid as E-5 during OCS (~$3,300/mo) since I already have a bachelor's. <strong>OCS is an EVALUATION, not a graduation</strong> — about 25% don't make it through. If I pass, I commission as 2ndLt (O-1) and report to TBS. <strong>What's my approach?</strong>`,
+    choices:[
+      {label:'Send it — top of the class',
+       desc:'Push to be one of the top candidates. Honor grad = first pick of MOS at TBS, plus instructor letters. Higher injury risk during the gauntlets.',
+       tags:['ok:Honor candidate','ok:+Rep','warn:Injury risk'],
+       apply:g=>{
+         g.tis_months+=3;g.fitness=Math.min(100,g.fitness+8);
+         const p = 0.85 + (g.fitness-75)/300;
+         if(rng()<p){g.rank='O-1';g.reputation+=12;g.path.push('OCS Honor Candidate → commissioned 2ndLt');g.event={type:'win',text:'🎖 Commissioned 2ndLt as honor candidate. O-1 pay starts (~$3,750/mo).'};}
+         else {g.failed_stages.push('OCS');g.event={type:'bad',text:'Did not graduate OCS. Reverted to enlisted contract or out.'};g.is_officer=false;}
+       },
+       next:s=>s.failed_stages.includes('OCS')?'no_recon_pivot':'tbs'},
+      {label:'Solid pass — graduate clean',
+       desc:'Do everything right. Pass without drama. Average commission. Safer odds.',
+       tags:['ok:Safe pass','info:Average rep'],
+       apply:g=>{
+         g.tis_months+=3;g.fitness=Math.min(100,g.fitness+5);
+         if(rng()<0.92){g.rank='O-1';g.reputation+=4;g.path.push('OCS graduate → commissioned 2ndLt');g.event={type:'win',text:'🎖 Commissioned 2ndLt. O-1 pay (~$3,750/mo) starts.'};}
+         else {g.failed_stages.push('OCS');g.event={type:'bad',text:'Did not graduate OCS. Reverted to civilian.'};g.is_officer=false;}
+       },
+       next:s=>s.failed_stages.includes('OCS')?'no_recon_pivot':'tbs'}
+    ]
+  },
+  'tbs':{
+    stage:'TBS',
+    title:`The Basic School (TBS) — 6 months (Quantico, VA)`,
+    text:`Every Marine officer attends TBS as a 2ndLt — regardless of commissioning source. 6 months of infantry tactics, leadership, weapons. <strong>My class ranking at the end determines my MOS pick.</strong> Top of the class gets first dibs on Infantry/Aviation/JAG. Bottom of the class takes what's left.`,
+    choices:[
+      {label:'Compete for top class ranking',
+       desc:'Study, lead, perform at every evaluation. Top 10% = pick any MOS. Strong rep card.',
+       tags:['ok:Top MOS pick','ok:+Rep','warn:Brutal hours'],
+       apply:g=>{
+         g.tis_months+=6;g.fitness=Math.min(100,g.fitness+6);g.reputation+=8;
+         const p = 0.30 + (g.reputation-70)/300;
+         g._tbs_top = rng()<p;
+         if(g._tbs_top){g.event={type:'win',text:'🏅 Top 10% at TBS. I can pick any MOS — Infantry on the table.'};}
+         else {g.event={type:'info',text:'Solid middle of class. Infantry still likely available.'};}
+       },
+       next:'tbs_mos_pick'},
+      {label:'Solid middle — graduate clean',
+       desc:'Pass without going for top spot. MOS pick will be standard middle-of-class.',
+       tags:['ok:Sustainable'],
+       apply:g=>{g.tis_months+=6;g.fitness=Math.min(100,g.fitness+3);g.event={type:'info',text:'Middle of class. MOS pick will be limited.'};},
+       next:'tbs_mos_pick'}
+    ]
+  },
+  'tbs_mos_pick':{
+    stage:'TBS MOS Pick',
+    title:`MOS Selection — End of TBS`,
+    text:`Class ranking is in. The MOS pick. <strong>This is the single biggest career decision I'll make as an officer.</strong> Infantry opens Recon Officer + MARSOC SOO 0370. Other MOSs lead to different specialties.`,
+    choices:[
+      {label:'Infantry Officer (0302) — path to Recon + MARSOC',
+       desc:'Most competitive pick. 14 wks Infantry Officer Course (IOC) next. Then platoon command. Opens 0203 Ground Intel Officer or Recon Officer screening, and eventually MARSOC SOO 0370.',
+       tags:['ok:Recon + MARSOC path','ok:Most prestigious'],
+       apply:g=>{g.mos='0302 Infantry Officer';g.tis_months+=1;g.path.push('TBS → 0302 Infantry Officer');g.event={type:'win',text:'Picked 0302 Infantry. IOC next.'};},
+       next:'ioc'},
+      {label:'Ground Intelligence Officer (0203)',
+       desc:'Intel specialty. Faster track to operational planning. Pairs well with Cyber/Intel degree. Different MARSOC path (SOO via intel side).',
+       tags:['ok:Intel pivot','ok:+Civilian translation'],
+       apply:g=>{g.mos='0203 Ground Intel Officer';g.has_clearance=true;g.tis_months+=4;g.path.push('TBS → 0203 Intel Officer');g.event={type:'info',text:'Picked 0203 Intel. School next, then operational unit.'};},
+       next:'officer_first_command'},
+      {label:'Logistics / Aviation Maintenance / Comms / Adjutant',
+       desc:'"Combat Service Support" tracks. Less direct combat role. Better quality of life, stronger civilian translation (logistics, project mgmt, IT).',
+       tags:['ok:Civilian-translatable','info:Less combat'],
+       apply:g=>{g.mos='Officer (CSS track)';g.tis_months+=4;g.path.push('TBS → CSS officer');},
+       next:'officer_first_command'},
+      {label:'Aviation (Pilot)',
+       desc:'Flight school next (Pensacola). 18-24 mo pipeline. Then flying community (helo, fighter, KC-130). Long ADSO (8+ yrs flying obligation).',
+       tags:['ok:Pilot wings','warn:8-yr ADSO','warn:Longest pipeline'],
+       apply:g=>{g.mos='Marine Pilot';g.tis_months+=20;g.rank='O-2';g.quals.push('Pilot Wings');g.path.push('TBS → Pilot');g.event={type:'win',text:'Picked Aviation. Wings of Gold incoming after Pensacola.'};},
+       next:'officer_first_command'}
+    ]
+  },
+  'ioc':{
+    stage:'IOC',
+    title:`Infantry Officer Course (IOC) — 14 weeks (Quantico)`,
+    text:`The hardest USMC officer school. ~30% attrition. Combat patrolling, live-fire ranges, rigorous evaluations. Pass = qualified Infantry Platoon Commander. <strong>Recon and MARSOC tracks both require this first.</strong>`,
+    choices:[
+      {label:'Send it — full effort through IOC',
+       apply:g=>{
+         g.tis_months+=3;
+         const p = 0.70 + (g.fitness-75)/300 + (g.reputation-70)/300;
+         const r = rng();
+         if(r<p){g.event={type:'win',text:'Completed IOC. Qualified Infantry Platoon Commander. Reporting to first unit.'};g.quals.push('IOC');g.fitness=Math.min(100,g.fitness+5);}
+         else {g.failed_stages.push('IOC');g.event={type:'bad',text:'Did not finish IOC. Reverted to CSS officer track.'};g.mos='Officer (CSS - post-IOC drop)';}
+       },
+       next:'officer_first_command'}
+    ]
+  },
+  'officer_first_command':{
+    stage:'First Platoon Command',
+    title:`First Unit — Platoon Commander`,
+    text:`I'm a Marine officer reporting to my first unit. <strong>Pay: ${'{{base}}'}/mo + BAH + BAS</strong> (officers always get BAH starting Day 1, even if single — automatic). 2-3 year platoon command. Lead 40+ Marines. This shapes my whole career.`,
+    choices:[
+      {label:'Crush platoon command — earn the team\'s respect',
+       desc:'Lead from the front. Take my Marines\' welfare seriously. Strong fit-reps. Sets up MARSOC eligibility window perfectly.',
+       tags:['ok:+Big rep','ok:MARSOC packet'],
+       apply:g=>{g.tis_months+=24;g.rank='O-2';g.deployments+=1;g.reputation+=15;g.morale-=5;g.path.push('Strong PC tour');g.event={type:'win',text:'Strong platoon command tour. +1 deployment. 1stLt pinned.'};},
+       next:s=>s.mos==='0302 Infantry Officer'?'officer_recon_track':'officer_career_continue'},
+      {label:'Coast through — average performance',
+       desc:'Show up, hit the marks, don\'t lead. Average fit-reps. MARSOC packet weak.',
+       tags:['warn:Weak rep','warn:Hurts MARSOC odds'],
+       apply:g=>{g.tis_months+=24;g.rank='O-2';g.reputation-=5;g.event={type:'warn',text:'Average tour. Promoted on schedule but fit-reps are weak.'};},
+       next:'officer_career_continue'}
+    ]
+  },
+  'officer_recon_track':{
+    stage:'Recon Officer Track',
+    title:`Recon Officer Pipeline — 5 weeks screen + 9 weeks course`,
+    text:`Recon Officers are screened and selected from Infantry Officers. Pre-Recon course (5 wks) tests fitness, swim, mental fortitude. Pass → Reconnaissance Officer Course (9 wks) covering patrolling, recon planning, scout/swimming.`,
+    choices:[
+      {label:'Attempt the Recon Officer pipeline',
+       apply:g=>{g.tis_months+=4;},
+       next:s=>{
+         const p = 0.55 + (s.fitness-75)/250 + (s.reputation-70)/250;
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Passed Recon Officer pipeline. (Odds ~${Math.round(p*100)}%.) MOS 0207 Recon Officer. Command of a Recon platoon awaits.`};s.quals.push('Recon Officer');s.mos='0207 Recon Officer';s.has_clearance=true;return 'officer_marsoc_decision';}
+         s.failed_stages.push('Recon Officer pipeline');s.event={type:'bad',text:`Didn't pass Recon Officer screen. Back to infantry battalion as company commander.`};
+         return 'officer_career_continue';
+       }}
+    ]
+  },
+  'officer_marsoc_decision':{
+    stage:'MARSOC SOO Decision',
+    title:`MARSOC Special Operations Officer (SOO 0370) — Same Selection`,
+    text:`Officers apply for MARSOC the same way enlisted Raiders do. 3-week A&S Phase I + classified Phase II + 9-month ITC. <strong>Officers earn MOS 0370 — Special Operations Officer.</strong> If selected, I command a 14-person MSOT.`,
+    choices:[
+      {label:'Submit MARSOC packet — A&S attempt',
+       apply:g=>{g.tis_months+=2;},
+       next:s=>{
+         const p = marsocChance(s);
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Passed A&S Phase I. (Odds ~${Math.round(p*100)}%.) Phase II next.`};return 'marsoc_phase2';}
+         s.failed_stages.push('A&S Phase I (Officer)');s.event={type:'bad',text:`Didn't make A&S. Stay as 0207 Recon Officer.`};
+         return 'officer_career_continue';
+       }},
+      {label:'Skip MARSOC — stay Recon Officer, command Recon company',
+       desc:'Continue as 0207 Recon Officer. Command a Recon company instead. Still elite, less brutal selection.',
+       tags:['ok:Stable elite track','ok:Less drop risk'],
+       apply:g=>{g.tis_months+=18;g.rank='O-3';g.reputation+=10;g.deployments+=2;g.event={type:'win',text:'Captain (O-3) + Recon Company Commander. Solid path.'};},
+       next:'officer_career_continue'}
+    ]
+  },
+  'officer_career_continue':{
+    stage:'Officer Mid-Career',
+    title:`Captain (O-3) Years — Career Definition Window`,
+    text:`I'm O-3 Captain now. Pay ${'{{base}}'}/mo + BAH + BAS = serious money. Officer promotions are board-based and competitive: most O-3s eventually retire as O-4 (Major), top performers make O-5 (LtCol), exceptional make O-6 (Col). <strong>Stay to 20 for pension, or transition to high-paying defense contractor?</strong>`,
+    choices:[
+      {label:'Press to Major (O-4) and beyond — full career',
+       desc:'Career officer track. Major-Lt Col-Col. Full 20-year pension is much bigger as an officer (~$5,500-8,000/mo vs E-7\'s ~$3,500).',
+       tags:['ok:Officer pension','ok:Top of career'],
+       apply:g=>{g.tis_months+=72;g.rank='O-4';g.reputation+=8;g.deployments+=2;g.savings+=40000;g.path.push('Officer career: O-4 Major');g.event={type:'win',text:'Promoted to Major. On track for full officer retirement.'};},
+       next:'mid_career_check'},
+      {label:'Exit at 8-10 yrs — defense contractor / federal SES',
+       desc:'Officer + degree + clearance + leadership experience = $150-250k civilian. Often better than staying for the smaller-than-expected pension.',
+       tags:['ok:$150-250k civ','warn:Skip pension'],
+       apply:g=>{g.tis_months+=24;g.path.push('Officer exit at 8-10 yrs → defense contractor');g.event={type:'info',text:'Decided to exit. Defense contracting world pays well for officers with clearance.'};},
+       next:'early_exit'}
     ]
   },
   // ════════ NAVY PIPELINE ════════
