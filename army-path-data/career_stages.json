@@ -1,0 +1,280 @@
+{
+  "source": "goarmy.com, army.mil, specialforces.americanspecialops.com, operationmilitarykids.org 2026, shadowspear.com, dfas.mil",
+  "last_updated": "May 2026",
+  "stages": [
+    {
+      "id": "OSUT",
+      "title": "Infantry One Station Unit Training (OSUT)",
+      "weeks": 22,
+      "months": 5.5,
+      "location": "Fort Moore (formerly Fort Benning) GA",
+      "rank_entry": "E-1 Pvt",
+      "rank_exit": "E-2 PFC",
+      "pay_entry": 2216.69,
+      "pay_exit": 2261.0,
+      "phases": [
+        {
+          "phase": "BCT (Weeks 1-10)",
+          "content": "Physical conditioning, ACFT baseline, weapons familiarization (M4, M249, M240B), land navigation basics, first aid, Army values, discipline, barracks inspections"
+        },
+        {
+          "phase": "AIT (Weeks 11-22)",
+          "content": "Infantry-specific: small unit tactics, squad/platoon live fire, anti-armor (Javelin), night operations, field training exercises, M4 expert qualification required"
+        }
+      ],
+      "note_11X_vs_11B": "11X is the entry code. During OSUT, Army classifies: ~85% become 11B (Infantryman), ~15% become 11C (Indirect Fire Infantryman \u2014 81mm mortar). Soldier has limited say.",
+      "note_11C_future": "Recruiter reports suggest 11C may eventually be phased into vehicle-mounted systems. Currently still active MOS."
+    },
+    {
+      "id": "AIRBORNE",
+      "title": "Basic Airborne Course (BAC) \u2014 Jump School",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Fort Moore GA \u2014 1st Bn (Airborne), 507th Infantry",
+      "rank": "E-2 PFC",
+      "pay": 2261.0,
+      "age_max": 36,
+      "phases": [
+        {
+          "week": 1,
+          "name": "Ground Week",
+          "content": "PLF (Parachute Landing Fall) drills, mock door, 34-ft tower, physical fitness test (APFT: 60 pts per event age 17-21 standard)"
+        },
+        {
+          "week": 2,
+          "name": "Tower Week",
+          "content": "Swing Landing Trainer (SLT) qualification, 250-ft free tower, mass exit from 34-ft tower, canopy manipulation"
+        },
+        {
+          "week": 3,
+          "name": "Jump Week",
+          "content": "5 qualifying static-line jumps from C-130/C-17 at 1,250 ft AGL. Includes one night jump. Earn airborne wings on 5th jump."
+        }
+      ],
+      "pay_add": "Jump pay: $150/mo while assigned to airborne billet or in jump status"
+    },
+    {
+      "id": "SFPC",
+      "title": "Special Forces Preparation Course (SFPC)",
+      "weeks": 6,
+      "months": 1.5,
+      "location": "Fort Liberty (formerly Fort Bragg) NC",
+      "rank": "E-2 to E-3",
+      "for_who": "18X contracts only (before SFAS)",
+      "purpose": "Physical and mental ramp-up to SFAS standards. Failing to meet standards by end of SFPC = removed from 18X pipeline.",
+      "min_to_advance_to_sfas": {
+        "push_ups": "57",
+        "sit_ups": "66",
+        "2mile_run": "14:24",
+        "pull_ups": "6",
+        "5mile_run": "40:00",
+        "12mile_ruck_65lbs": "3hrs (15min/mile)"
+      },
+      "competitive_standards": {
+        "sit_ups": "80",
+        "2mile_run": "12:30",
+        "pull_ups": "20",
+        "5mile_run": "35:00"
+      }
+    },
+    {
+      "id": "SFAS",
+      "title": "Special Forces Assessment and Selection (SFAS)",
+      "weeks_old": 3,
+      "weeks_new_2026": 5,
+      "location": "Fort Liberty NC",
+      "rank_eligible": "E-2 to E-7 (18X enter as E-2/E-3; in-service applicants E-4 to E-7)",
+      "pass_rate": "~20-30% of all entrants receive Q Course seats",
+      "frequency": "4 cycles/year, ~300 per class",
+      "2026_changes": "Extended from 24 to 35 days. Team Week now 8 days. Land nav +72-96 hrs with 3 STAR attempts. Unknown run/ruck events up to 40% longer. Weekly peer evaluations \u2014 lowest-rated candidate cut weekly.",
+      "key_events": [
+        "Gate Week \u2014 graded unknown ruck marches with increasing weight",
+        "Land Navigation \u2014 solo map and compass only, cross-country, 72-96 hrs total",
+        "Team Week (8 days) \u2014 SF mission task sets in small teams",
+        "Weekly peer evaluations",
+        "Psychological evaluation",
+        "Swim assessment: 50m in boots and BDU + 11-min water tread + 4-min flotation"
+      ],
+      "physical_minimums": {
+        "apft_total": "206",
+        "apft_per_event": "60 (17-21 age standard)",
+        "swim": "50m in boots and BDU"
+      },
+      "administrative_requirements": [
+        "US citizen non-waiverable",
+        "Airborne qualified",
+        "Secret clearance eligible",
+        "GT 100+ (in-service) / GT 110+ (18X preferred)",
+        "High school diploma or GED",
+        "No NJP / disciplinary issues",
+        "E-4 to E-7 for in-service; 18X contract for direct-entry"
+      ]
+    },
+    {
+      "id": "SFQC",
+      "title": "Special Forces Qualification Course (Q Course) \u2014 Full Pipeline",
+      "total_weeks_range": "53-94",
+      "note": "Duration depends heavily on MOS track (18D is longest at 50+ wks for MOS phase alone) and language training length",
+      "phases": [
+        {
+          "phase": "Individual Skills (SFOC)",
+          "weeks": 13,
+          "content": "Tactical Skills, small unit tactics, SF Tactics, SERE intro, language/culture intro, in-process at Fort Liberty"
+        },
+        {
+          "phase": "MOS Qualification",
+          "weeks_range": "15-50",
+          "breakdown": {
+            "18B_weapons_sgt": {
+              "weeks": 15,
+              "content": "All infantry/crew-served/foreign weapons, anti-armor, improvised weapons"
+            },
+            "18C_engineer_sgt": {
+              "weeks": 15,
+              "content": "Demolitions, construction, breaching, IED defeat, bridge building"
+            },
+            "18D_medical_sgt": {
+              "weeks": 50,
+              "content": "Physician assistant-level medical training. SOCM. Combat trauma, surgery, dental, vet. Most respected/longest MOS in SF."
+            },
+            "18E_comms_sgt": {
+              "weeks": 15,
+              "content": "SATCOM, HF, VHF, crypto, PACE planning. Best civilian bridge of any SF MOS."
+            },
+            "18F_intel_sgt": {
+              "weeks": 15,
+              "note": "Available only after holding another 18-series MOS"
+            }
+          }
+        },
+        {
+          "phase": "Language Training",
+          "weeks": "16-24",
+          "content": "Assigned by DLAB score and SF Group regional alignment. Higher DLAB opens more options."
+        },
+        {
+          "phase": "Robin Sage (Collective Training)",
+          "weeks": 4,
+          "content": "Unconventional Warfare culmination exercise. Real civilians as role players. Multiple NC counties. Realistic behind-lines ODA mission. Pass = Green Beret."
+        }
+      ]
+    },
+    {
+      "id": "RASP1",
+      "title": "Ranger Assessment and Selection Program 1 (RASP 1)",
+      "weeks": 8,
+      "months": 2,
+      "location": "Fort Moore GA",
+      "graduation_rate": "~30%",
+      "rank_eligible": "E-1 through E-5",
+      "prerequisite_fitness": {
+        "push_ups_2min": "53",
+        "sit_ups_2min": "63",
+        "2mile_run": "14:30",
+        "pull_ups": "4",
+        "6mile_ruck_35lb": "under 90 min"
+      },
+      "additional_requirements": [
+        "GT 107+",
+        "APFT 240+ (80 per event)",
+        "Airborne qualified",
+        "Secret clearance eligible",
+        "MOS in 75th Ranger Regiment TO&E"
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "weeks": "1-4",
+          "content": "Physical and psychological evaluation, road marches, land nav, combatives, medical first responder, Ranger history. Key events: 12-mile ruck march w/35lb pack, 15-meter swim in full uniform."
+        },
+        {
+          "phase": 2,
+          "weeks": "5-8",
+          "content": "Ranger skills: direct action, small boat ops, special operations tasks, crew-served weapons, Ranger-specific TTPs. Key events: 5-mile run in 40 min, 12-mile road march."
+        }
+      ],
+      "note": "RASP 1 = enlisted E1-E5. RASP 2 = NCOs E6+ and officers."
+    },
+    {
+      "id": "RANGER_SCHOOL",
+      "title": "US Army Ranger School",
+      "days": 61,
+      "weeks": 8.75,
+      "phases": [
+        {
+          "name": "Benning Phase",
+          "location": "Fort Moore GA",
+          "days": "1-19",
+          "content": "RAP week (physical screening: push-ups, sit-ups, pull-ups, 5-mile run, water survival, combat water survival). Patrol planning and execution, raids, ambushes, squad tactics."
+        },
+        {
+          "name": "Mountain Phase",
+          "location": "Camp Frank D. Merrill, Dahlonega GA",
+          "days": "20-38",
+          "content": "Mountain patrolling, rappelling, mountaineering, cold weather survival, leadership under sustained sleep/food deprivation."
+        },
+        {
+          "name": "Swamp Phase",
+          "location": "Eglin AFB FL",
+          "days": "39-61",
+          "content": "Jungle/swamp patrolling, boat operations, water crossings, final graded leadership positions."
+        }
+      ],
+      "graduation_rate_first_attempt": "~49%",
+      "note": "Ranger School = Ranger TAB (leadership school, open to any MOS). Ranger Regiment = Ranger SCROLL (unit, requires RASP). Different credentials. Most Regiment Rangers eventually attend Ranger School and earn both."
+    },
+    {
+      "id": "ARMY_SNIPER_SCHOOL",
+      "title": "US Army Sniper School",
+      "days": 29,
+      "weeks": 5,
+      "location": "Fort Moore GA \u2014 Harmony Church area",
+      "attrition": "~50%",
+      "prerequisites": [
+        "MOS 11B, 11M, 19D, or CMF 18",
+        "Expert M4/M16A2 qual within 6 months",
+        "GT 100+",
+        "Corrected vision 20/20",
+        "Normal red/green color vision",
+        "APFT 70%+ per event",
+        "Pass psychological evaluation (MMPI/CPI)",
+        "Commander recommendation",
+        "Ghillie suit constructed before arrival",
+        "Min 1 year retainability"
+      ],
+      "content": "Marksmanship training 300m to 1500m, stalking and ghillie concealment, range estimation, sniper team planning and employment, observation and surveillance, ballistics data books.",
+      "weapons_used": [
+        "M2010 Enhanced Sniper Rifle (.300 Win Mag)",
+        "M110 SASS (7.62mm semi-auto)",
+        "M107 (.50 cal anti-materiel)"
+      ]
+    },
+    {
+      "id": "DELTA_SELECTION",
+      "title": "Delta Force / 1st SFOD-D Selection + OTC",
+      "selection_duration_weeks": "3-4",
+      "otc_duration_months": 6,
+      "rank_required": "E-5 (Sgt) through E-8 (MSG)",
+      "frequency": "Twice per year (spring and fall)",
+      "pass_rate": "<10%",
+      "requirements": [
+        "US citizen",
+        "GT 110+",
+        "4+ years service",
+        "2 years remaining",
+        "Airborne qualified",
+        "E-5 to E-8",
+        "No recurring disciplinary issues",
+        "Pass 5-event PFT in BDUs: run-dodge-jump, inverted crawl, push-ups, sit-ups, 2-mile run"
+      ],
+      "selection_events": [
+        "Progressively longer/heavier solo ruck marches in Appalachian Mountains",
+        "No announced time limits or distances",
+        "No feedback or encouragement",
+        "The Long Walk \u2014 final event: ~40-mile ruck with 45-lb pack, mountainous terrain"
+      ],
+      "otc_content": "6-month Operator Training Course. Advanced CQB (close quarters battle), vehicle assault, HALO, hostage rescue, advanced demolitions, foreign language, targeting, intelligence collection.",
+      "note": "Failure in OTC (non-integrity) still allows candidates to attend Q Course for 18-series MOS."
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "source": "goarmy.com, operationmilitarykids.org 2026, mosdb.com, army.mil",
+  "last_updated": "May 2026",
+  "infantry_and_sof": {
+    "11B": {
+      "title": "Infantryman",
+      "asvab": "CO 87",
+      "enlistable": true,
+      "notes": "Primary infantry MOS. 22-wk OSUT Fort Moore. Foundation for Ranger, SF, Delta, Sniper."
+    },
+    "11C": {
+      "title": "Indirect Fire Infantryman (Mortarman)",
+      "asvab": "CO 87",
+      "enlistable": true,
+      "notes": "81mm mortar. Assigned during OSUT classification (~15% of 11X). May be phased to vehicle-mounted systems."
+    },
+    "11Z": {
+      "title": "Infantry Senior Sergeant",
+      "asvab": "N/A",
+      "enlistable": false,
+      "notes": "MSG/SGM designation for senior 11-series NCOs."
+    },
+    "18B": {
+      "title": "Special Forces Weapons Sergeant",
+      "asvab": "GT 110",
+      "enlistable": false,
+      "notes": "All infantry/crew-served/foreign weapons. SFAS + 15-wk MOS phase. Direct action specialist."
+    },
+    "18C": {
+      "title": "Special Forces Engineer Sergeant",
+      "asvab": "GT 110",
+      "enlistable": false,
+      "notes": "Demo, construction, breaching. SFAS + 15-wk MOS phase."
+    },
+    "18D": {
+      "title": "Special Forces Medical Sergeant",
+      "asvab": "GT 110",
+      "enlistable": false,
+      "notes": "LONGEST SF track. 50-wk MOS phase. PA-level training. Most respected MOS in SF. Strong civilian bridge."
+    },
+    "18E": {
+      "title": "Special Forces Communications Sergeant",
+      "asvab": "GT 110",
+      "enlistable": false,
+      "notes": "SATCOM, HF, VHF, crypto. SFAS + 15-wk MOS phase. Best civilian IT/comms bridge."
+    },
+    "18F": {
+      "title": "Special Forces Intelligence Sergeant",
+      "asvab": "GT 110",
+      "enlistable": false,
+      "notes": "Available only after holding another 18-series MOS. Intel collection and analysis."
+    },
+    "18X": {
+      "title": "Special Forces Candidate (enlistment option)",
+      "asvab": "GT 110",
+      "enlistable": true,
+      "notes": "Not a permanent MOS. Entry pathway. Guarantees SFAS attempt. If pipeline fails: Army assigns MOS by needs (could be any support MOS). HIGH RISK."
+    }
+  },
+  "ranger_sof_adjacent": {
+    "Option_40": {
+      "title": "Option 40 Contract Addendum (not an MOS)",
+      "notes": "Added to 11B/11C OSUT contract. Guarantees RASP 1 seat after Airborne. Only ~8% of Option 40 contracts result in Ranger Bn assignment. MUCH lower risk than 18X because floor is still 11B."
+    },
+    "RASP_1_graduate": {
+      "title": "75th Ranger Regiment Scroll holder",
+      "notes": "Not a separate MOS. 11B/11C in the Regiment. Earn Ranger tab via Ranger School. Delta Force draws heavily from 75th."
+    }
+  },
+  "lateral_move_targets": {
+    "68W": {
+      "title": "Combat Medic",
+      "asvab": "ST 101",
+      "school_weeks": 16,
+      "notes": "Best MOS for healthcare civilian bridge. EMT-Basic certification on graduation."
+    },
+    "35F": {
+      "title": "Intelligence Analyst",
+      "asvab": "ST 101",
+      "school_weeks": 18,
+      "notes": "Strong bridge to federal law enforcement, CIA, NSA, defense contractors."
+    },
+    "89D": {
+      "title": "EOD Technician",
+      "asvab": "ST 109",
+      "school_weeks": 44,
+      "notes": "Highest civilian salary bridge of any enlisted Army MOS. DOE, FBI, private sector."
+    },
+    "25B": {
+      "title": "IT Specialist",
+      "asvab": "ST 95",
+      "school_weeks": 20,
+      "notes": "CompTIA cert pathway. Strong civilian IT market."
+    },
+    "160SOAR": {
+      "title": "Night Stalkers (160th Special Operations Aviation Regiment)",
+      "notes": "Open to rated and non-rated soldiers. Assessment and selection (SOAAS) required. Helicopter support for all US SOF."
+    },
+    "PSYOP_37F": {
+      "title": "Psychological Operations Specialist",
+      "asvab": "ST 101 + GT 107",
+      "school_weeks": 16,
+      "notes": "SOF designation. Less physically extreme selection than SF. Deployable with theater SOC."
+    },
+    "CA_38B": {
+      "title": "Civil Affairs Specialist",
+      "asvab": "GT 100",
+      "school_weeks": 17,
+      "notes": "SOF designation. Works with civilian populations in COIN, stability ops. Strong civilian transition."
+    }
+  }
+}

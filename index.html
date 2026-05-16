@@ -176,6 +176,49 @@ tr:hover td{background:var(--off)}
 .dlog-choice{color:var(--text);line-height:1.4;font-size:var(--text-xs)}
 .dlog-revert{margin-top:.4rem;padding:.25rem .5rem;border:1px solid var(--border);background:var(--bg);color:var(--muted);border-radius:var(--r-full);font-family:var(--mono);font-size:.65rem;cursor:pointer;transition:all .12s}
 .dlog-revert:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+/* ─── Investments tab ─── */
+.invest-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--s5);margin-top:var(--s4)}
+.alloc-row{display:grid;grid-template-columns:160px 1fr 110px 80px;gap:.75rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:var(--text-sm)}
+.alloc-row:last-child{border-bottom:none}
+.alloc-label{font-weight:600}
+.alloc-label .hint{display:block;font-size:.7rem;color:var(--muted);font-weight:400;font-family:var(--mono);margin-top:.1rem}
+.alloc-bar{position:relative;height:8px;background:var(--off);border-radius:var(--r-full);overflow:hidden}
+.alloc-bar-fill{position:absolute;top:0;left:0;height:100%;border-radius:var(--r-full);transition:width .3s}
+.alloc-input{width:100px;padding:.4rem .5rem;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font:inherit;font-family:var(--mono);text-align:right}
+.alloc-cap{font-size:.7rem;color:var(--muted);font-family:var(--mono);text-align:right}
+.strategy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:var(--s3)}
+.strategy-card{padding:.7rem;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);cursor:pointer;text-align:center;font-size:var(--text-sm);transition:all .15s}
+.strategy-card:hover,.strategy-card.sel{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,transparent)}
+.strategy-card .pct{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:.2rem}
+.proj-bar{height:24px;background:var(--off);border-radius:var(--r-md);position:relative;overflow:hidden;margin-bottom:.4rem}
+.proj-fill{position:absolute;top:0;left:0;height:100%;display:flex;align-items:center;padding-left:.6rem;color:#fff;font-family:var(--mono);font-size:var(--text-xs);font-weight:600;border-radius:var(--r-md)}
+.proj-total{padding:var(--s4);background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid var(--gold);border-radius:var(--r-md);text-align:center;margin-top:var(--s3)}
+.proj-total .num{font-size:var(--text-2xl);font-weight:700;color:var(--gold);font-family:var(--mono);line-height:1.1}
+.proj-total .lbl{font-size:var(--text-xs);color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+/* ─── My Paths tab ─── */
+.path-card{padding:var(--s4);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:var(--s3);position:relative}
+.path-card h4{font-size:var(--text-base);margin-bottom:.3rem}
+.path-card .meta{font-family:var(--mono);font-size:var(--text-xs);color:var(--muted);margin-bottom:.5rem}
+.path-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin:.5rem 0;font-size:var(--text-xs)}
+.path-stat{padding:.4rem .6rem;background:var(--bg);border-radius:var(--r-md);border:1px solid var(--border)}
+.path-stat .v{font-family:var(--mono);font-weight:600;color:var(--primary)}
+.path-stat .l{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.path-actions{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.path-actions button{padding:.4rem .8rem;border:1px solid var(--border);background:var(--surf);color:var(--text);border-radius:var(--r-full);font-family:var(--mono);font-size:.7rem;cursor:pointer}
+.path-actions button:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.path-actions button.danger:hover{background:var(--error);border-color:var(--error)}
+/* ─── Account widget ─── */
+.acct-btn{padding:.5rem .9rem;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:var(--r-full);font:inherit;font-family:var(--mono);font-size:var(--text-xs);cursor:pointer;letter-spacing:.04em}
+.acct-btn:hover{background:var(--gold);color:#000}
+.acct-btn.signed{border-color:var(--success);color:var(--success)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;padding:var(--s4)}
+.modal-bg.show{display:flex}
+.modal{background:var(--surf);border:1px solid var(--gold);border-radius:var(--r-xl);max-width:480px;width:100%;padding:var(--s6);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h3{margin-bottom:.5rem}
+.modal input{width:100%;padding:.7rem .9rem;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font:inherit;margin-top:.5rem}
+.modal .actions{display:flex;gap:.5rem;margin-top:var(--s4);justify-content:flex-end}
+.modal button{padding:.6rem 1.2rem;border:1px solid var(--border);background:var(--surf2);color:var(--text);border-radius:var(--r-full);font:inherit;cursor:pointer}
+.modal button.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
 /* Scene area */
 .scene{padding:var(--s5);background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);margin-bottom:var(--s4)}
 .scene-stage{font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
@@ -244,6 +287,8 @@ tr:hover td{background:var(--off)}
 @media(max-width:900px){.hero-grid,.two-col,.three-col,.aside-main{grid-template-columns:1fr}.timeline{padding:var(--s5) var(--s4) var(--s5) 3rem}.timeline::before{left:16px}.tnode::before{left:-1.8rem}}
 @media(max-width:600px){.tabs{gap:.25rem}.tab{padding:.5rem .75rem;font-size:.75rem}.topbar{flex-wrap:wrap}}
 </style>
+<!-- Netlify Identity widget — gracefully no-op if Identity is not enabled in Netlify dashboard -->
+<script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -266,20 +311,42 @@ tr:hover td{background:var(--off)}
       <div class="site-sub">My 20-Year Path · Infantry → Recon → Sniper → Raider → Retirement</div>
     </div>
   </div>
-  <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <button class="acct-btn" id="acctBtn" onclick="openAcctModal()">👤 Sign In</button>
+    <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
+  </div>
+</div>
+
+<!-- Account modal -->
+<div class="modal-bg" id="acctModal" onclick="if(event.target===this)closeAcctModal()">
+  <div class="modal">
+    <h3>👤 Save Progress + Email Results</h3>
+    <p style="color:var(--muted);font-size:var(--text-sm);margin-bottom:.5rem">
+      Add my name + email to associate saved paths with me, and enable emailing my career report.
+      <strong>Stored locally for now</strong> — once Netlify Identity is enabled, this will sync to the cloud automatically.
+    </p>
+    <label style="display:block;margin-top:.6rem;font-size:var(--text-sm);color:var(--muted)">Name<input type="text" id="acctName" placeholder="Your name"></label>
+    <label style="display:block;margin-top:.6rem;font-size:var(--text-sm);color:var(--muted)">Email<input type="email" id="acctEmail" placeholder="you@example.com"></label>
+    <div class="actions">
+      <button onclick="closeAcctModal()">Cancel</button>
+      <button class="primary" onclick="saveAcct()">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs" role="tablist">
-  <button class="tab active" onclick="showSection('overview',this)">📍 My Path Overview</button>
+  <button class="tab active" onclick="showSection('overview',this)">📍 Overview</button>
   <button class="tab" onclick="showSection('play',this)">🎮 Play My Path</button>
-  <button class="tab" onclick="showSection('mos',this)">🔖 MOS Deep Dive</button>
-  <button class="tab" onclick="showSection('recon',this)">🌊 Path to Recon</button>
-  <button class="tab" onclick="showSection('marsoc',this)">⚡ Path to Raiders</button>
+  <button class="tab" onclick="showSection('invest',this)">💼 Investments</button>
+  <button class="tab" onclick="showSection('paths',this)">📁 My Paths</button>
+  <button class="tab" onclick="showSection('mos',this)">🔖 MOS</button>
+  <button class="tab" onclick="showSection('recon',this)">🌊 Recon</button>
+  <button class="tab" onclick="showSection('marsoc',this)">⚡ Raiders</button>
   <button class="tab" onclick="showSection('life',this)">🏠 Life Forks</button>
-  <button class="tab" onclick="showSection('pay',this)">💰 Rank & Pay</button>
-  <button class="tab" onclick="showSection('school',this)">🎓 School While In</button>
-  <button class="tab" onclick="showSection('decisions',this)">🧭 Decision Toolkit</button>
+  <button class="tab" onclick="showSection('pay',this)">💰 Pay</button>
+  <button class="tab" onclick="showSection('school',this)">🎓 School</button>
+  <button class="tab" onclick="showSection('decisions',this)">🧭 Toolkit</button>
 </div>
 
 <!-- ==================== OVERVIEW ==================== -->
@@ -500,6 +567,108 @@ tr:hover td{background:var(--off)}
         <div class="dash-row"><span>On track?</span><strong id="d-ontrack">Too early</strong></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ==================== INVESTMENTS ==================== -->
+<div id="invest" class="section">
+  <h2>💼 My Investment Plan</h2>
+  <p style="margin-bottom:var(--s4)">This is where I turn my paycheck into a future. Set monthly allocations across TSP, Roth IRA, and a taxable brokerage account (index/mutual funds). Every dollar invested before age 25 compounds into <strong>$15+ at retirement</strong> at typical market returns. Update as I play — the projection updates live.</p>
+
+  <div class="invest-grid">
+    <div class="card pad">
+      <h3>Monthly Allocations</h3>
+      <p style="font-size:var(--text-sm);margin-bottom:var(--s4)">Current monthly take-home cash flow available: <strong id="inv-cashflow">—</strong></p>
+
+      <div class="alloc-row">
+        <div class="alloc-label">TSP <span class="hint">Roth or Traditional · DoD matches up to 5% after 2 yrs</span></div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="inv-tsp-bar" style="background:var(--primary)"></div></div>
+        <input type="number" class="alloc-input" id="inv-tsp" min="0" max="100" step="1" value="5">
+        <div class="alloc-cap">% of base</div>
+      </div>
+
+      <div class="alloc-row">
+        <div class="alloc-label">Roth IRA <span class="hint">$7,000/yr cap (2026) = $583/mo · grows tax-free</span></div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="inv-ira-bar" style="background:var(--gold)"></div></div>
+        <input type="number" class="alloc-input" id="inv-ira" min="0" max="583" step="25" value="0">
+        <div class="alloc-cap">$/mo</div>
+      </div>
+
+      <div class="alloc-row">
+        <div class="alloc-label">Index funds (taxable) <span class="hint">VTI, VTSAX, S&amp;P 500 · no cap, taxed on gains</span></div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="inv-tax-bar" style="background:var(--success)"></div></div>
+        <input type="number" class="alloc-input" id="inv-tax" min="0" max="5000" step="50" value="0">
+        <div class="alloc-cap">$/mo</div>
+      </div>
+
+      <div class="alloc-row">
+        <div class="alloc-label">High-yield savings <span class="hint">Emergency fund · ~4% APY · liquid</span></div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="inv-sav-bar" style="background:var(--blue)"></div></div>
+        <input type="number" class="alloc-input" id="inv-sav" min="0" max="5000" step="50" value="0">
+        <div class="alloc-cap">$/mo</div>
+      </div>
+
+      <div style="margin-top:var(--s5)">
+        <div class="label" style="margin-bottom:.5rem">Asset Allocation Strategy</div>
+        <div class="strategy-grid">
+          <div class="strategy-card" data-strat="conservative" onclick="setStrategy('conservative')">
+            <div><strong>Conservative</strong></div>
+            <div class="pct">60% bonds · 40% stocks</div>
+            <div class="pct">~6% avg return</div>
+          </div>
+          <div class="strategy-card sel" data-strat="balanced" onclick="setStrategy('balanced')">
+            <div><strong>Balanced</strong></div>
+            <div class="pct">80% stocks · 20% bonds</div>
+            <div class="pct">~8% avg return</div>
+          </div>
+          <div class="strategy-card" data-strat="aggressive" onclick="setStrategy('aggressive')">
+            <div><strong>Aggressive</strong></div>
+            <div class="pct">100% stocks (VTI)</div>
+            <div class="pct">~10% avg return</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px solid var(--primary);border-radius:var(--r-md);font-size:var(--text-sm)">
+        <strong>Real talk:</strong> Max Roth IRA every year. The $7,000 limit in 2026 grows to $200k+ by retirement if invested at 22. Use TSP for the DoD 5% match (free money). Index funds in taxable for everything above that. Bonds for liquidity, not growth.
+      </div>
+    </div>
+
+    <div class="card pad">
+      <h3>📈 Projection at Age 60</h3>
+      <p style="font-size:var(--text-sm);margin-bottom:var(--s4)">If I keep these allocations through my career, here's what compounds to age 60 at my chosen strategy's return rate. All figures in <em>today's dollars</em> (inflation-adjusted at 3%).</p>
+
+      <div id="proj-bars" style="margin-bottom:var(--s4)"></div>
+
+      <div class="proj-total">
+        <div class="lbl">Total at age 60 (today's $)</div>
+        <div class="num" id="proj-total">—</div>
+        <div class="lbl" id="proj-yrs"></div>
+      </div>
+
+      <div style="margin-top:var(--s5);font-size:var(--text-sm)">
+        <h4 style="margin-bottom:.5rem">What this would mean</h4>
+        <div id="proj-meaning" style="color:var(--muted);line-height:1.7"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MY PATHS ==================== -->
+<div id="paths" class="section">
+  <h2>📁 My Saved Paths</h2>
+  <p style="margin-bottom:var(--s4)">Save the current playthrough with a name (e.g. "Recon Track", "Married Early", "Got Hurt"), then play different scenarios and compare. Each save captures: my final stats, every decision I made, and the full path I took.</p>
+
+  <div style="display:flex;gap:.5rem;margin-bottom:var(--s5);flex-wrap:wrap">
+    <button class="gc-btn" onclick="savePath()" style="border-color:var(--primary);color:var(--primary)">💾 Save Current Playthrough</button>
+    <button class="gc-btn" onclick="emailResults()" style="border-color:var(--gold);color:var(--gold)">📧 Email My Results</button>
+    <button class="gc-btn" onclick="exportAll()">⬇️ Export All as JSON</button>
+    <button class="gc-btn" onclick="document.getElementById('importInput').click()">⬆️ Import from JSON</button>
+    <input type="file" id="importInput" accept=".json" style="display:none" onchange="importAll(event)">
+  </div>
+
+  <div id="paths-list">
+    <div class="card pad" style="color:var(--muted);text-align:center;font-style:italic">No saved paths yet. Click "Save Current Playthrough" above to add the current run.</div>
   </div>
 </div>
 
@@ -1013,11 +1182,16 @@ function basePay(rank, tisMonths){
 function defaultState(){
   return {
     name:'Marine', age:18, branch:'usmc',
+    player_email:'', player_name:'',
     rank:'E-1', tis_months:0, stage:'setup',
     mos:'', path:[], // log of completed stages
     failed_stages:[],
-    // money
+    // money — current balances
     savings:1500, tsp:0, debt:0, tsp_pct:5,
+    roth_ira:0, taxable_invest:0,
+    // investment monthly allocations (apply in settleCashFlow)
+    ira_monthly:0, taxable_monthly:0, extra_savings_monthly:0,
+    invest_strategy:'balanced', // conservative | balanced | aggressive
     // life
     married:false, kids:0, pets:0,
     housing:'barracks', // barracks | on_base | off_base | own
@@ -1930,13 +2104,29 @@ function settleCashFlow(){
   const elapsed = G.tis_months - _lastTisCheckpoint;
   if(elapsed<=0){ _lastTisCheckpoint = G.tis_months; return; }
   const b = calcBudget(G);
-  G.savings += b.net_to_savings * elapsed;
-  G.tsp += b.tsp_contrib * elapsed * 1.05; // rough growth + 5% match if BRS-like
-  // debt paydown if has debt and has positive cashflow
-  if(G.debt>0){
-    G.debt = Math.max(0, G.debt - (b.net_to_savings*0.3*elapsed));
+  const strat = STRATEGY_RETURNS[G.invest_strategy] || STRATEGY_RETURNS.balanced;
+
+  // Investment allocations come OUT of net_to_savings; if not enough, scale down
+  const ira_in = Math.min(G.ira_monthly||0, IRA_CAP_2026_MONTHLY);
+  const tax_in = G.taxable_monthly||0;
+  const sav_in = G.extra_savings_monthly||0;
+  const monthly_allocated = ira_in + tax_in + sav_in;
+  const remaining_after_alloc = b.net_to_savings - monthly_allocated;
+
+  // Grow each bucket with monthly compounding for the elapsed period
+  for(let i=0;i<elapsed;i++){
+    // TSP: contribution + DoD 5% match (after 2yr TIS) + growth
+    const tspMatch = (G.tis_months - elapsed + i) >= 24 ? b.tsp_contrib : 0;
+    G.tsp = (G.tsp + b.tsp_contrib + tspMatch) * (1 + strat.tsp/12);
+    G.roth_ira = ((G.roth_ira||0) + ira_in) * (1 + strat.ira/12);
+    G.taxable_invest = ((G.taxable_invest||0) + tax_in) * (1 + strat.taxable/12);
+    G.savings = (G.savings + remaining_after_alloc + sav_in) * (1 + strat.savings/12);
   }
-  // age
+
+  // debt paydown if positive cashflow remains
+  if(G.debt>0 && remaining_after_alloc>0){
+    G.debt = Math.max(0, G.debt - (remaining_after_alloc*0.3*elapsed));
+  }
   G.age = 18 + Math.floor(G.tis_months/12);
   _lastTisCheckpoint = G.tis_months;
 }
@@ -2655,6 +2845,417 @@ function renderPayTableFromData(){
   `;
 }
 
+/* ════════════════════════════════════════════════════════════
+   💼  INVESTMENT MODULE — projections + UI sync
+   ═══════════════════════════════════════════════════════════ */
+const STRATEGY_RETURNS = {
+  conservative: { tsp:0.06, ira:0.06, taxable:0.06, savings:0.04 },
+  balanced:     { tsp:0.08, ira:0.08, taxable:0.08, savings:0.04 },
+  aggressive:   { tsp:0.10, ira:0.10, taxable:0.10, savings:0.04 }
+};
+const IRA_CAP_2026_MONTHLY = 583; // $7,000 / 12 ≈ $583
+const INFLATION = 0.03;
+
+function projectToAge60(){
+  const yrsRemaining = Math.max(0, 60 - G.age);
+  const months = yrsRemaining * 12;
+  const r = STRATEGY_RETURNS[G.invest_strategy] || STRATEGY_RETURNS.balanced;
+  const b = calcBudget(G);
+
+  // Current monthly contribution flows
+  const tsp_in = b.tsp_contrib + (G.tis_months>=24 ? b.tsp_contrib : 0); // approx 5% DoD match after 2yr TIS
+  const ira_in = Math.min(G.ira_monthly||0, IRA_CAP_2026_MONTHLY);
+  const tax_in = G.taxable_monthly||0;
+  const sav_in = G.extra_savings_monthly||0;
+
+  // Start from current balances
+  let tsp = G.tsp, ira = G.roth_ira||0, tax = G.taxable_invest||0, sav = G.savings;
+  for(let m=0; m<months; m++){
+    tsp = (tsp + tsp_in) * (1 + r.tsp/12);
+    ira = (ira + ira_in) * (1 + r.ira/12);
+    tax = (tax + tax_in) * (1 + r.taxable/12);
+    sav = (sav + sav_in) * (1 + r.savings/12);
+  }
+  // Inflation-adjust to today's dollars
+  const infl = Math.pow(1+INFLATION, yrsRemaining);
+  return {
+    tsp: tsp/infl, ira: ira/infl, taxable: tax/infl, savings: sav/infl,
+    total: (tsp+ira+tax+sav)/infl,
+    years: yrsRemaining
+  };
+}
+
+function renderInvestmentsTab(){
+  // Sync inputs with state
+  const tspIn = document.getElementById('inv-tsp');
+  const iraIn = document.getElementById('inv-ira');
+  const taxIn = document.getElementById('inv-tax');
+  const savIn = document.getElementById('inv-sav');
+  if(!tspIn) return;
+  tspIn.value = G.tsp_pct;
+  iraIn.value = G.ira_monthly||0;
+  taxIn.value = G.taxable_monthly||0;
+  savIn.value = G.extra_savings_monthly||0;
+
+  // Strategy card highlighting
+  document.querySelectorAll('.strategy-card').forEach(c=>c.classList.toggle('sel', c.dataset.strat===G.invest_strategy));
+
+  // Available cashflow shown
+  const b = calcBudget(G);
+  const cashflowEl = document.getElementById('inv-cashflow');
+  if(cashflowEl) cashflowEl.textContent = (b.net_to_savings>=0?'+':'−')+fmt(Math.abs(b.net_to_savings))+'/mo';
+
+  // Bar widths
+  document.getElementById('inv-tsp-bar').style.width = Math.min(100, G.tsp_pct)+'%';
+  document.getElementById('inv-ira-bar').style.width = Math.min(100, ((G.ira_monthly||0)/IRA_CAP_2026_MONTHLY)*100)+'%';
+  document.getElementById('inv-tax-bar').style.width = Math.min(100, ((G.taxable_monthly||0)/1000)*100)+'%';
+  document.getElementById('inv-sav-bar').style.width = Math.min(100, ((G.extra_savings_monthly||0)/1000)*100)+'%';
+
+  // Projection
+  const p = projectToAge60();
+  const maxBar = p.total || 1;
+  const buckets = [
+    {label:'TSP',          val:p.tsp,     color:'var(--primary)'},
+    {label:'Roth IRA',     val:p.ira,     color:'var(--gold)'},
+    {label:'Index funds',  val:p.taxable, color:'var(--success)'},
+    {label:'HY Savings',   val:p.savings, color:'var(--blue)'}
+  ];
+  const bars = document.getElementById('proj-bars');
+  bars.innerHTML = buckets.map(b=>`
+    <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);margin-bottom:.2rem;font-family:var(--mono)">
+      <span>${b.label}</span><span>${fmt(b.val)}</span>
+    </div>
+    <div class="proj-bar">
+      <div class="proj-fill" style="width:${Math.max(2,(b.val/maxBar)*100)}%;background:${b.color}">${fmt(b.val)}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('proj-total').textContent = fmt(p.total);
+  document.getElementById('proj-yrs').textContent = `compounded ${p.years} years from age ${G.age}`;
+
+  const safeWithdrawal = p.total * 0.04;
+  const monthlyRetIncome = safeWithdrawal/12;
+  document.getElementById('proj-meaning').innerHTML = `
+    At a safe 4% withdrawal rate, this nest egg provides <strong>${fmt(monthlyRetIncome)}/mo</strong> in retirement income for life — on top of any military pension (~$3,500-5,000/mo at 20 yrs).<br><br>
+    Today's median US retirement savings at age 60 is ~$112k. <strong>${p.total > 500000 ? `Your projection is ${(p.total/112000).toFixed(1)}× the median.` : 'There\'s room to push the allocations higher.'}</strong>
+  `;
+}
+
+// Wire input listeners (set up once on first render)
+let _investListenersWired = false;
+function wireInvestmentListeners(){
+  if(_investListenersWired) return;
+  const handler = ()=>{
+    G.tsp_pct = parseInt(document.getElementById('inv-tsp').value) || 0;
+    G.ira_monthly = parseInt(document.getElementById('inv-ira').value) || 0;
+    G.taxable_monthly = parseInt(document.getElementById('inv-tax').value) || 0;
+    G.extra_savings_monthly = parseInt(document.getElementById('inv-sav').value) || 0;
+    renderInvestmentsTab();
+    if(typeof renderDash==='function') renderDash();
+    if(typeof renderBudget==='function') renderBudget();
+    autoSave();
+  };
+  ['inv-tsp','inv-ira','inv-tax','inv-sav'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', handler);
+  });
+  _investListenersWired = true;
+}
+
+function setStrategy(s){
+  G.invest_strategy = s;
+  renderInvestmentsTab();
+  autoSave();
+}
+
+/* ════════════════════════════════════════════════════════════
+   📁  SAVED PATHS — multiple playthrough management
+   ═══════════════════════════════════════════════════════════ */
+const PATHS_KEY = 'usmc_path_game_saves_v1';
+
+function loadPaths(){
+  try{ return JSON.parse(localStorage.getItem(PATHS_KEY)||'[]'); }catch(e){ return []; }
+}
+function writePaths(arr){
+  try{ localStorage.setItem(PATHS_KEY, JSON.stringify(arr)); }catch(e){ console.error(e); }
+}
+
+function savePath(){
+  const name = prompt('Name this playthrough (e.g. "Recon Track", "Married Early", "Got Hurt"):', `Path ${new Date().toLocaleDateString()}`);
+  if(!name) return;
+  const paths = loadPaths();
+  const proj = projectToAge60();
+  paths.push({
+    id: 'p_'+Date.now(),
+    name,
+    saved_at: new Date().toISOString(),
+    player_name: G.player_name||'',
+    player_email: G.player_email||'',
+    state: JSON.parse(JSON.stringify(G)),
+    history: JSON.parse(JSON.stringify(G_HISTORY)),
+    projection_at_60: proj
+  });
+  writePaths(paths);
+  renderPathsList();
+  alert(`✓ Saved "${name}" — see it in 📁 My Paths.`);
+}
+
+function loadPath(id){
+  const paths = loadPaths();
+  const p = paths.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`Load "${p.name}"? Your current run will be replaced (save it first if you want to keep it).`)) return;
+  G = Object.assign(defaultState(), p.state);
+  G_HISTORY = p.history || [];
+  _lastTisCheckpoint = G.tis_months;
+  renderScene();
+  showSection('play', document.querySelector('.tab[onclick*="play"]'));
+}
+
+function deletePath(id){
+  const paths = loadPaths();
+  const p = paths.find(x=>x.id===id);
+  if(!p || !confirm(`Delete "${p.name}"? This can't be undone.`)) return;
+  writePaths(paths.filter(x=>x.id!==id));
+  renderPathsList();
+}
+
+function renderPathsList(){
+  const paths = loadPaths();
+  const wrap = document.getElementById('paths-list');
+  if(!wrap) return;
+  if(paths.length===0){
+    wrap.innerHTML = `<div class="card pad" style="color:var(--muted);text-align:center;font-style:italic">No saved paths yet. Click "Save Current Playthrough" above to add the current run.</div>`;
+    return;
+  }
+  wrap.innerHTML = paths.slice().reverse().map(p=>{
+    const s = p.state;
+    const date = new Date(p.saved_at).toLocaleDateString();
+    return `<div class="path-card">
+      <h4>${p.name}</h4>
+      <div class="meta">Saved ${date} · ${p.player_name?p.player_name+' · ':''}${p.player_email||''}</div>
+      <div class="path-stats">
+        <div class="path-stat"><div class="v">${s.rank}</div><div class="l">Rank</div></div>
+        <div class="path-stat"><div class="v">${(s.tis_months/12).toFixed(1)}y</div><div class="l">Time in service</div></div>
+        <div class="path-stat"><div class="v">${s.mos||'—'}</div><div class="l">MOS</div></div>
+        <div class="path-stat"><div class="v">${fmt(s.savings+(s.tsp||0)+(s.roth_ira||0)+(s.taxable_invest||0)-s.debt)}</div><div class="l">Net worth</div></div>
+        <div class="path-stat"><div class="v">${fmt(p.projection_at_60?.total||0)}</div><div class="l">Age-60 projection</div></div>
+        <div class="path-stat"><div class="v">${s.kids}</div><div class="l">Kids</div></div>
+        <div class="path-stat"><div class="v">${s.quals?.length||0}</div><div class="l">Qualifications</div></div>
+        <div class="path-stat"><div class="v">${p.history?.length||0}</div><div class="l">Decisions made</div></div>
+      </div>
+      <div class="path-actions">
+        <button onclick="loadPath('${p.id}')">▶ Load &amp; Play</button>
+        <button onclick="emailPath('${p.id}')">📧 Email this path</button>
+        <button class="danger" onclick="deletePath('${p.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportAll(){
+  const all = { paths: loadPaths(), current: G, history: G_HISTORY, exported_at: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `marinepath-export-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function importAll(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data.paths) writePaths(data.paths);
+      if(data.current && confirm('Replace current game with imported state?')){
+        G = Object.assign(defaultState(), data.current);
+        G_HISTORY = data.history || [];
+        _lastTisCheckpoint = G.tis_months;
+        renderScene();
+      }
+      renderPathsList();
+      alert(`✓ Imported ${data.paths?.length||0} saved paths.`);
+    }catch(err){ alert('Import failed: '+err.message); }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+
+/* ════════════════════════════════════════════════════════════
+   📧  EMAIL RESULTS — mailto-based, no backend required
+   ═══════════════════════════════════════════════════════════ */
+function buildReport(){
+  const b = calcBudget(G);
+  const p = projectToAge60();
+  const visited = [...new Set(G_HISTORY.map(h=>h.scene_stage).filter(Boolean))];
+  const decisions = G_HISTORY.map((h,i)=>`  ${i+1}. [${h.scene_stage}] ${h.choice_label}`).join('\n');
+  return `MARINE CAREER SIM — PATH REPORT
+${'='.repeat(50)}
+
+PLAYER
+  Name:           ${G.player_name||'(not set)'}
+  Email:          ${G.player_email||'(not set)'}
+  Saved:          ${new Date().toLocaleString()}
+
+CURRENT STATE
+  Age:            ${G.age}
+  Rank:           ${G.rank} (${RANK_TITLE[G.rank]||''})
+  Time in service:${(G.tis_months/12).toFixed(1)} years
+  MOS:            ${G.mos||'—'}
+  Stage:          ${SCENES[G.stage]?.stage||G.stage}
+
+FINANCIAL SNAPSHOT
+  Base pay:       ${fmt(b.bp)}/mo
+  Gross pay:      ${fmt(b.gross)}/mo
+  Net take-home:  ${fmt(b.net)}/mo
+  Total bills:    ${fmt(b.total_bills)}/mo
+  Savings rate:   ${b.gross>0?Math.round((b.net_to_savings/b.gross)*100):0}%
+
+  Cash savings:   ${fmt(G.savings)}
+  TSP balance:    ${fmt(G.tsp)}
+  Roth IRA:       ${fmt(G.roth_ira||0)}
+  Taxable invest: ${fmt(G.taxable_invest||0)}
+  Debt:           ${fmt(G.debt)}
+  Net worth:      ${fmt(G.savings+G.tsp+(G.roth_ira||0)+(G.taxable_invest||0)-G.debt)}
+
+INVESTMENT PLAN
+  TSP contribution:    ${G.tsp_pct}% of base
+  Roth IRA monthly:    ${fmt(G.ira_monthly||0)}
+  Index funds monthly: ${fmt(G.taxable_monthly||0)}
+  HY savings monthly:  ${fmt(G.extra_savings_monthly||0)}
+  Strategy:            ${G.invest_strategy||'balanced'}
+
+PROJECTION AT AGE 60 (today's dollars)
+  TSP:            ${fmt(p.tsp)}
+  Roth IRA:       ${fmt(p.ira)}
+  Index funds:    ${fmt(p.taxable)}
+  HY savings:     ${fmt(p.savings)}
+  TOTAL:          ${fmt(p.total)}
+  4% safe withdrawal = ${fmt(p.total*0.04/12)}/mo retirement income
+
+LIFE
+  Married:        ${G.married?'Yes':'No'}
+  Kids:           ${G.kids}
+  Pets:           ${G.pets}
+  Housing:        ${G.housing}
+  Vehicle:        ${G.car}
+  Phone:          ${G.has_phone?'Yes ('+fmt(G.phone_bill)+'/mo)':'No'}
+
+EDUCATION
+  College credits: ${G.edu_credits}
+  Degree:          ${G.degree}
+  GI Bill:         ${G.gibill}
+
+QUALIFICATIONS EARNED
+  ${G.quals.length?G.quals.join(', '):'(none yet)'}
+
+DEPLOYMENTS: ${G.deployments}
+
+STAGES VISITED
+${visited.map(v=>`  • ${v}`).join('\n')||'  (none yet)'}
+
+DECISIONS MADE (${G_HISTORY.length})
+${decisions||'  (none yet)'}
+
+SETBACKS WORKED THROUGH
+${G.failed_stages.length?G.failed_stages.map(s=>'  • '+s).join('\n'):'  (none)'}
+
+${'='.repeat(50)}
+Generated by Semper Fidelis Career Sim
+  https://github.com/aaroncorvo/marinepath
+`;
+}
+
+function emailResults(){
+  const report = buildReport();
+  const to = G.player_email || '';
+  const subject = `My Marine Career Path — ${G.rank} ${G.mos||''} at ${(G.tis_months/12).toFixed(1)} yrs`;
+  const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(report)}`;
+  if(mailto.length > 1800){
+    // Fall back to clipboard if mailto too long for most clients
+    navigator.clipboard.writeText(report).then(()=>{
+      alert(`📋 Report copied to clipboard (too long for mailto).\nPaste into a fresh email.`);
+    });
+    return;
+  }
+  window.location.href = mailto;
+}
+
+function emailPath(id){
+  const paths = loadPaths();
+  const p = paths.find(x=>x.id===id);
+  if(!p) return;
+  // Temporarily swap G to build report
+  const savedG = G, savedH = G_HISTORY;
+  G = p.state; G_HISTORY = p.history||[];
+  emailResults();
+  G = savedG; G_HISTORY = savedH;
+}
+
+/* ════════════════════════════════════════════════════════════
+   👤  ACCOUNT — local-first, Netlify Identity hooks ready
+   ═══════════════════════════════════════════════════════════ */
+function openAcctModal(){
+  document.getElementById('acctName').value = G.player_name||'';
+  document.getElementById('acctEmail').value = G.player_email||'';
+  document.getElementById('acctModal').classList.add('show');
+}
+function closeAcctModal(){ document.getElementById('acctModal').classList.remove('show'); }
+function saveAcct(){
+  G.player_name = document.getElementById('acctName').value.trim();
+  G.player_email = document.getElementById('acctEmail').value.trim();
+  closeAcctModal();
+  renderAcctBtn();
+  autoSave();
+}
+function renderAcctBtn(){
+  const btn = document.getElementById('acctBtn');
+  if(!btn) return;
+  if(G.player_name || G.player_email){
+    btn.textContent = `👤 ${G.player_name || G.player_email}`;
+    btn.classList.add('signed');
+  } else {
+    btn.textContent = '👤 Sign In';
+    btn.classList.remove('signed');
+  }
+}
+
+/* Netlify Identity integration — graceful no-op when not enabled */
+function initNetlifyIdentity(){
+  if(typeof netlifyIdentity === 'undefined') return; // widget not loaded
+  netlifyIdentity.on('init', user=>{
+    if(user){
+      G.player_name = user.user_metadata?.full_name || G.player_name;
+      G.player_email = user.email || G.player_email;
+      renderAcctBtn();
+    }
+  });
+  netlifyIdentity.on('login', user=>{
+    G.player_name = user.user_metadata?.full_name || '';
+    G.player_email = user.email || '';
+    renderAcctBtn();
+    autoSave();
+    netlifyIdentity.close();
+  });
+  netlifyIdentity.on('logout', ()=>{
+    G.player_name = ''; G.player_email = '';
+    renderAcctBtn();
+  });
+}
+
+/* Override showSection so investment & paths tabs render their content when opened */
+const _origShowSection = typeof showSection==='function'?showSection:null;
+function showSection(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='invest'){ renderInvestmentsTab(); wireInvestmentListeners(); }
+  if(id==='paths'){ renderPathsList(); }
+}
+
 // Initialize game on first render
 (function initGame(){
   try{
@@ -2672,8 +3273,12 @@ function renderPayTableFromData(){
     }
   }catch(e){ console.warn('Save load failed, starting fresh:', e); }
   renderScene();
+  renderAcctBtn();
   // Load data after first paint so the app is interactive immediately
   loadGameData();
+  // Wire Netlify Identity if/when the widget script finishes loading
+  if(typeof netlifyIdentity !== 'undefined'){ initNetlifyIdentity(); netlifyIdentity.init(); }
+  else { window.addEventListener('DOMContentLoaded',()=>{ if(typeof netlifyIdentity !== 'undefined'){ initNetlifyIdentity(); netlifyIdentity.init(); } }); }
 })();
 </script>
 </body>

@@ -1,0 +1,266 @@
+{
+  "source": "goarmy.com, operationmilitarykids.org 2026, specialforces.americanspecialops.com, guardsf.com",
+  "note": "All months measured from Day 0 (enlistment/active duty start). Ranges given for variable stages.",
+  "primary_path_18X": [
+    {
+      "stage": "MEPS / Enlistment",
+      "months_start": -2,
+      "months_end": 0,
+      "rank": "Civilian",
+      "pay": 0
+    },
+    {
+      "stage": "Infantry OSUT (22 wks)",
+      "months_start": 0,
+      "months_end": 5.5,
+      "rank": "E-1\u2192E-2",
+      "pay": 2261
+    },
+    {
+      "stage": "Airborne School (3 wks)",
+      "months_start": 5.5,
+      "months_end": 6.25,
+      "rank": "E-2",
+      "pay": 2261
+    },
+    {
+      "stage": "Special Forces Preparation Course SFPC (6 wks)",
+      "months_start": 6.25,
+      "months_end": 7.75,
+      "rank": "E-2",
+      "pay": 2261
+    },
+    {
+      "stage": "SFAS (5 wks \u2014 2026 extended)",
+      "months_start": 7.75,
+      "months_end": 9,
+      "rank": "E-2\u2192E-3",
+      "pay": 2378
+    },
+    {
+      "stage": "SFQC Phase I Individual Skills (13 wks)",
+      "months_start": 10,
+      "months_end": 13,
+      "rank": "E-3",
+      "pay": 2378
+    },
+    {
+      "stage": "SFQC Phase II MOS Qual (15-50 wks \u2014 varies)",
+      "months_start": 13,
+      "months_end": 25,
+      "rank": "E-3\u2192E-4 Spc",
+      "pay": 2634
+    },
+    {
+      "stage": "SFQC Phase III Language (16-24 wks)",
+      "months_start": 25,
+      "months_end": 31,
+      "rank": "E-4",
+      "pay": 2634
+    },
+    {
+      "stage": "SFQC Phase IV Robin Sage (4 wks)",
+      "months_start": 31,
+      "months_end": 32,
+      "rank": "E-4",
+      "pay": 2634
+    },
+    {
+      "stage": "Green Beret Awarded \u2014 Assigned to SFG",
+      "months_start": 32,
+      "months_end": 96,
+      "rank": "E-4 Spc \u2192 Sgt\u2192SSgt",
+      "pay_range": "2634-4235"
+    },
+    {
+      "stage": "Senior NCO SF (SFC/MSG)",
+      "months_start": 96,
+      "months_end": 200,
+      "rank": "E-7 SFC \u2192 E-8 MSG",
+      "pay_range": "4456-6812"
+    },
+    {
+      "stage": "20-Year Retirement",
+      "months_start": 240,
+      "months_end": null,
+      "rank": "E-7 SFC to E-9 SGM",
+      "pension_BRS_monthly_E7": 2237
+    }
+  ],
+  "primary_path_11X_option40_ranger": [
+    {
+      "stage": "MEPS / Enlistment",
+      "months_start": -2,
+      "months_end": 0,
+      "rank": "Civilian",
+      "pay": 0
+    },
+    {
+      "stage": "Infantry OSUT (22 wks)",
+      "months_start": 0,
+      "months_end": 5.5,
+      "rank": "E-1\u2192E-2",
+      "pay": 2261
+    },
+    {
+      "stage": "Airborne School (3 wks)",
+      "months_start": 5.5,
+      "months_end": 6.25,
+      "rank": "E-2",
+      "pay": 2261
+    },
+    {
+      "stage": "RASP 1 (8 wks)",
+      "months_start": 6.25,
+      "months_end": 8.25,
+      "rank": "E-2\u2192E-3",
+      "pay": 2378
+    },
+    {
+      "stage": "75th Ranger Regiment \u2014 Ranger Battalion",
+      "months_start": 8.25,
+      "months_end": 60,
+      "rank": "E-3\u2192E-4\u2192E-5",
+      "pay_range": "2378-3207"
+    },
+    {
+      "stage": "Ranger School (61 days)",
+      "months_start": 18,
+      "months_end": 20,
+      "rank": "E-4 Spc",
+      "pay": 2634,
+      "note": "Typically sent 12-18 months into Ranger Bn service"
+    },
+    {
+      "stage": "SFAS (in-service path from Ranger Bn)",
+      "months_start": 60,
+      "months_end": 62,
+      "rank": "E-5 Sgt",
+      "pay": 3207
+    },
+    {
+      "stage": "SFQC full pipeline",
+      "months_start": 62,
+      "months_end": 94,
+      "rank": "E-5\u2192E-6 SSgt",
+      "pay": 4235
+    },
+    {
+      "stage": "Assigned SFG as Green Beret",
+      "months_start": 94,
+      "months_end": 180,
+      "rank": "E-6\u2192E-7",
+      "pay_range": "4235-5592"
+    },
+    {
+      "stage": "Senior NCO SF or Delta track",
+      "months_start": 180,
+      "months_end": 240,
+      "rank": "E-7\u2192E-8",
+      "pay_range": "5592-6812"
+    },
+    {
+      "stage": "20-Year Retirement",
+      "months_start": 240,
+      "months_end": null,
+      "rank": "E-7 SFC to E-9 SGM"
+    }
+  ],
+  "alternate_path_11X_infantry_only_no_soF": [
+    {
+      "stage": "OSUT",
+      "months_start": 0,
+      "months_end": 5.5
+    },
+    {
+      "stage": "Airborne (optional)",
+      "months_start": 5.5,
+      "months_end": 6.25
+    },
+    {
+      "stage": "Fleet 11B Infantry",
+      "months_start": 6.25,
+      "months_end": 48
+    },
+    {
+      "stage": "Ranger School or Sniper School (optional add-ons)",
+      "months_start": 24,
+      "months_end": 26
+    },
+    {
+      "stage": "Senior NCO 11B Infantry",
+      "months_start": 48,
+      "months_end": 240
+    },
+    {
+      "stage": "20-Year Retirement",
+      "months_start": 240,
+      "months_end": null
+    }
+  ],
+  "rank_promotion_milestones": [
+    {
+      "rank": "E-1 Pvt",
+      "typical_months_TIS": 0,
+      "base_pay_2026_month0": 2216.69,
+      "base_pay_2026_after4mo": 2407.2,
+      "automatic": true
+    },
+    {
+      "rank": "E-2 PFC",
+      "typical_months_TIS": 6,
+      "base_pay_2026": 2261.0,
+      "automatic": true,
+      "note": "6 months TIS, 4 months TIG"
+    },
+    {
+      "rank": "E-3 PFC (Army Pvt 1st Class)",
+      "typical_months_TIS": 12,
+      "base_pay_2026": 2378.0,
+      "automatic": true,
+      "note": "12 months TIS, 6 months TIG"
+    },
+    {
+      "rank": "E-4 Specialist/Corporal",
+      "typical_months_TIS": 24,
+      "base_pay_2026": 2634.0,
+      "automatic": false,
+      "note": "Typically 24 months TIS. Board-waivable. Ranger/SOF units may promote faster."
+    },
+    {
+      "rank": "E-5 Sergeant",
+      "typical_months_TIS": 40,
+      "base_pay_2026": 2872.0,
+      "automatic": false,
+      "note": "Promotion board + points. Average 3-4 years TIS. SOF billets = additional promotion points."
+    },
+    {
+      "rank": "E-6 Staff Sergeant",
+      "typical_months_TIS": 84,
+      "base_pay_2026": 3136.0,
+      "automatic": false,
+      "note": "~7-8 years TIS average. Competitive."
+    },
+    {
+      "rank": "E-7 Sergeant First Class",
+      "typical_months_TIS": 144,
+      "base_pay_2026": 3626.0,
+      "automatic": false,
+      "note": "~12-14 years TIS. Very competitive. SF 18Z Team Sergeant billet."
+    },
+    {
+      "rank": "E-8 Master Sergeant / 1st Sgt",
+      "typical_months_TIS": 192,
+      "base_pay_2026": 5657.0,
+      "automatic": false,
+      "note": "~16-18 years TIS. ~5% of SSGs selected."
+    },
+    {
+      "rank": "E-9 Sergeant Major",
+      "typical_months_TIS": 228,
+      "base_pay_2026": 6371.0,
+      "automatic": false,
+      "note": "<1% of Army enlisted. Exceptional performance required."
+    }
+  ]
+}

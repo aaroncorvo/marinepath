@@ -32,6 +32,40 @@ Black multicam aesthetic with USMC scarlet (`#be0f34`) and gold (`#bf9522`) acce
 
 ---
 
+## Accounts, Saved Paths, and Email Results
+
+The app supports a layered persistence model so it works immediately with zero backend setup, with a clear upgrade path when you're ready to add cloud sync.
+
+### Layer 1 — Works right now (local-first)
+
+- **👤 Account button** in the top-right opens a modal that captures the player's name + email. Stored in `localStorage` alongside the game state. No password, no backend needed.
+- **📁 My Paths tab** lets the player save multiple named playthroughs ("Recon Track", "Married Early", etc.), see a stats summary card for each, and load any one back into the simulator with one click.
+- **📧 Email My Results** generates a full plain-text career report — current rank, financial snapshot, investment plan, age-60 projection, decisions made, paths visited — and opens a pre-filled `mailto:` link in the default email client. If the report is too long for `mailto:` (common on Outlook), it falls back to copying to clipboard.
+- **⬇️ Export All as JSON / ⬆️ Import** lets the player move their saves between devices manually.
+
+### Layer 2 — Enable Netlify Identity for real cloud sync (optional, no code change)
+
+The Netlify Identity widget script is already loaded in `index.html`. To activate it:
+
+1. In your Netlify dashboard → site → **Integrations** → **Netlify Identity** → **Enable Identity**
+2. Under **Registration**, choose: Open (anyone can sign up) or Invite-only
+3. (Optional) Under **External providers**, enable Google / GitHub / Apple OAuth
+4. Done. The "👤 Sign In" button in the topbar will now open the Identity modal. Once signed in, the player's name + email auto-populate and the `acctBtn` turns green.
+
+The app already listens for `netlifyIdentity` events (`init`, `login`, `logout`) — sign-in state flows through to the same `G.player_name` / `G.player_email` fields used by the local flow, so the rest of the app needs zero changes.
+
+### Layer 3 — Server-side email + cloud-saved paths (future)
+
+When you want real email delivery (instead of `mailto:`) and cloud-stored playthroughs synced across devices, add Netlify Functions:
+
+- `netlify/functions/email-report.js` — accepts a JWT from Identity, calls Resend or SendGrid to send the report to the user's email
+- `netlify/functions/save-path.js` — accepts a JWT + playthrough JSON, stores in Netlify Blobs keyed by user email
+- `netlify/functions/list-paths.js` — returns the user's saved paths from Netlify Blobs
+
+The frontend logic is already factored so swapping `localStorage` calls for `fetch('/.netlify/functions/save-path', ...)` is a contained change.
+
+---
+
 ## Run locally
 
 ```bash
