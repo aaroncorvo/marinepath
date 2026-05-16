@@ -3691,7 +3691,52 @@ function renderScene(){
   const isEarningStage = b.bp >= 2400 && !['setup','spouse_profile','start','meps','boot_arrive','boot_grad','navy_boot','af_bmt','cg_boot','ocs'].includes(G.stage);
   const moneyGateBlock = isEarningStage && unallocated > 100;
   const negativeBlock = isEarningStage && b.net_to_savings < -50;
+  const bonusAllocPending = !!G._bonus_pending_alloc;
   let gateBanner = '';
+
+  // ── BONUS ALLOCATION GATE (highest priority — blocks until allocated) ──
+  if(bonusAllocPending){
+    const amount = G._bonus_pending_alloc.amount;
+    const efTarget = (b.total_bills || 0) * 6;
+    const efGap = Math.max(0, efTarget - (G.emergency_fund||0));
+    gateBanner += `<div style="padding:var(--s4);margin-bottom:var(--s4);background:color-mix(in srgb,var(--gold) 16%,transparent);border:2px solid var(--gold);border-radius:var(--r-md)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.6rem">
+        <strong style="color:var(--gold);font-size:var(--text-base)">💰 ${fmt(amount)} bonus just landed — where does it go?</strong>
+        <span style="font-family:var(--mono);font-size:var(--text-xs);color:var(--muted)">Allocate before continuing</span>
+      </div>
+      <div style="font-size:var(--text-xs);color:var(--muted);margin-bottom:var(--s3)">This is real money. The decision I make right now compounds for decades — or evaporates in 90 days. Pick a playbook:</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.5rem">
+        <button class="choice" onclick="allocateBonus('max_ira_rest_index')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>📈 Max Roth IRA + rest to index funds</span></div>
+          <div class="choice-desc" style="font-size:.7rem">$7K → Roth IRA, ${fmt(Math.max(0,amount-7000))} → index funds. Smartest long-term. <span style="color:var(--gold);font-family:var(--mono)">FV @ 8% to 60: ${fmt(amount*Math.pow(1.08,Math.max(0,60-(G.birth_date?currentAge(G):G.age))))}</span></div>
+        </button>
+        ${efGap>0?`<button class="choice" onclick="allocateBonus('emergency_first')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🛡 Build emergency fund first (6 mo target)</span></div>
+          <div class="choice-desc" style="font-size:.7rem">Top up EF to 6-mo expenses (${fmt(Math.min(amount,efGap))}), then IRA + index. Sleep-at-night first.</div>
+        </button>`:''}
+        ${G.debt>500?`<button class="choice" onclick="allocateBonus('pay_debt')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🔥 Pay down ${fmt(Math.min(amount,G.debt))} of debt</span></div>
+          <div class="choice-desc" style="font-size:.7rem">Kills high-APR interest drag (currently ${((G.debt_apr||.08)*100).toFixed(0)}%). Rest invested.</div>
+        </button>`:''}
+        <button class="choice" onclick="allocateBonus('home_fund')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🏠 All ${fmt(amount)} to home down-payment fund</span></div>
+          <div class="choice-desc" style="font-size:.7rem">Build toward a VA-loan house — closing costs, furniture, repairs.</div>
+        </button>
+        ${G.car==='none'?`<button class="choice" onclick="allocateBonus('car_and_invest')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🚗 Buy $5K used car (cash) + invest the rest</span></div>
+          <div class="choice-desc" style="font-size:.7rem">Smart middle ground: real freedom, no debt, rest compounds in IRA + index.</div>
+        </button>`:''}
+        <button class="choice" onclick="allocateBonus('truck_splurge')" style="padding:.6rem .8rem;text-align:left">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🛻 Drop ${fmt(Math.min(8000,amount))} on a financed truck</span></div>
+          <div class="choice-desc" style="font-size:.7rem;color:var(--warn)">Classic E-4 move. New $600/mo payment for 7 years. Wrecks the savings rate but feels great.</div>
+        </button>
+        <button class="choice" onclick="allocateBonus('keep_cash')" style="padding:.6rem .8rem;text-align:left;border-color:var(--border)">
+          <div class="choice-label" style="margin-bottom:.2rem"><span>🐢 Leave it all in cash savings</span></div>
+          <div class="choice-desc" style="font-size:.7rem;color:var(--muted)">Earns ~4% HY savings (vs ~8% market). At my age, that's giving up <strong>${fmt(amount*Math.pow(1.08,Math.max(0,60-(G.birth_date?currentAge(G):G.age))) - amount*Math.pow(1.04,Math.max(0,60-(G.birth_date?currentAge(G):G.age))))}</strong> by age 60.</div>
+        </button>
+      </div>
+    </div>`;
+  }
   if(moneyGateBlock){
     gateBanner = `<div style="padding:var(--s4);margin-bottom:var(--s4);background:color-mix(in srgb,var(--warn) 18%,transparent);border:2px solid var(--warn);border-radius:var(--r-md);display:flex;justify-content:space-between;align-items:center;gap:var(--s4);flex-wrap:wrap">
       <div>
@@ -3707,7 +3752,7 @@ function renderScene(){
     </div>`;
   }
 
-  // build choices — disable when money gate is active
+  // build choices — disable when money gate OR bonus allocation is active
   const choicesHtml = s.choices.map((c,i)=>{
     if(c.requires && !c.requires(G)) return '';
     const tags = (c.tags||[]).map(t=>{
@@ -3715,7 +3760,7 @@ function renderScene(){
       return `<span class="choice-tag ${type}">${sub(text)}</span>`;
     }).join('');
     // Per-choice money check: if this option's apply would crater the budget badly, mark it
-    const disabled = (moneyGateBlock || negativeBlock) ? 'disabled' : '';
+    const disabled = (moneyGateBlock || negativeBlock || bonusAllocPending) ? 'disabled' : '';
     const dimStyle = disabled ? 'opacity:.45;cursor:not-allowed' : '';
     return `<button class="choice" ${disabled} onclick="${disabled?'':`chooseChoice(${i})`}" style="${dimStyle}">
       <div class="choice-label"><span>${sub(c.label)}</span></div>
@@ -4790,6 +4835,7 @@ function setEnlistmentBonus(g, key){
 }
 
 // Call this from any scene's apply when a milestone is reached
+// Bonus money lands in savings AND triggers a forced-allocation banner at the next scene
 function payBonusAt(g, milestone){
   if(!g._bonus_milestones || !g._bonus_milestones.length) return 0;
   let paid = 0;
@@ -4803,10 +4849,101 @@ function payBonusAt(g, milestone){
     return true;
   });
   if(paid > 0){
+    g._bonus_pending_alloc = { amount: paid, milestone };
     const remaining = (g.signing_bonus_total - g.signing_bonus_paid);
-    g.event = { type:'win', text:`💰 Sign-on bonus tranche paid: <strong>${fmt(paid)}</strong> added to savings. ${remaining>0?fmt(remaining)+' still owed at later milestones.':'Full bonus now received.'}` };
+    g.event = { type:'win', text:`💰 <strong>${fmt(paid)}</strong> sign-on bonus deposited to savings (milestone: ${milestone.replace(/_/g,' ')}). ${remaining>0?fmt(remaining)+' still owed.':'Full bonus received.'} <strong>Decide where this lump sum goes before continuing →</strong>` };
   }
   return paid;
+}
+
+// Forced bonus allocation — called from the banner buttons below scene
+function allocateBonus(strategy){
+  if(!G._bonus_pending_alloc) return;
+  const amount = G._bonus_pending_alloc.amount;
+  if(amount > G.savings) return; // safety
+  // All strategies start by deducting from G.savings (where the bonus landed)
+  const move = (dest, $) => {
+    G.savings -= $;
+    if(dest === 'roth_ira')          G.roth_ira = (G.roth_ira||0) + $;
+    else if(dest === 'taxable')      G.taxable_invest = (G.taxable_invest||0) + $;
+    else if(dest === 'emergency')    G.emergency_fund = (G.emergency_fund||0) + $;
+    else if(dest === 'home')         G.home_fund = (G.home_fund||0) + $;
+    else if(dest === 'debt')         G.debt = Math.max(0, G.debt - $);
+    else if(dest === 'car_cash'){
+      // Buy a used car in cash if not already owned
+      if(G.car === 'none'){ G.car = 'used_cash'; G.car_value = Math.min(8000, $); }
+    }
+    else if(dest === 'spend')        { /* gone */ G.morale += 10; }
+    else if(dest === 'savings')      G.savings += $; // re-credit (no-op net)
+  };
+  let summary = '';
+  switch(strategy){
+    case 'max_ira_rest_index': {
+      const ira = Math.min(amount, 7000); // approx annual cap
+      const idx = amount - ira;
+      if(ira>0) move('roth_ira', ira);
+      if(idx>0) move('taxable', idx);
+      summary = `Maxed Roth IRA with ${fmt(ira)}, rest (${fmt(idx)}) to index funds. Smartest long-term play — invested at age ${G.birth_date?currentAge(G):G.age}, this compounds to ${fmt(amount*Math.pow(1.08, Math.max(0,60-(G.birth_date?currentAge(G):G.age))))} by 60.`;
+      break;
+    }
+    case 'emergency_first': {
+      const targetEF = (calcBudget(G).total_bills || 3000) * 6;
+      const efGap = Math.max(0, targetEF - (G.emergency_fund||0));
+      const efAdd = Math.min(amount, efGap);
+      const rest = amount - efAdd;
+      const ira = Math.min(rest, 7000);
+      const idx = rest - ira;
+      if(efAdd>0) move('emergency', efAdd);
+      if(ira>0) move('roth_ira', ira);
+      if(idx>0) move('taxable', idx);
+      summary = `Built emergency fund to 6-mo target (${fmt(efAdd)}), then ${fmt(ira)} to IRA, ${fmt(idx)} to index funds. Safest sequence.`;
+      break;
+    }
+    case 'pay_debt': {
+      const debtAmt = Math.min(amount, G.debt);
+      const rest = amount - debtAmt;
+      if(debtAmt>0) move('debt', debtAmt);
+      if(rest>0){
+        const ira = Math.min(rest, 7000); const idx = rest - ira;
+        if(ira>0) move('roth_ira', ira); if(idx>0) move('taxable', idx);
+      }
+      summary = `Paid down ${fmt(debtAmt)} of debt${rest>0?', remainder '+fmt(rest)+' to IRA + index':''}. Removes high-APR interest drag.`;
+      break;
+    }
+    case 'home_fund': {
+      move('home', amount);
+      summary = `All ${fmt(amount)} to home down-payment fund. Building toward a VA-loan house.`;
+      break;
+    }
+    case 'car_and_invest': {
+      const carCash = G.car==='none' ? Math.min(5000, amount) : 0;
+      const rest = amount - carCash;
+      if(carCash>0){ G.car='used_cash'; G.car_value=5000; G.savings -= carCash; }
+      if(rest>0){ const ira = Math.min(rest, 7000); const idx = rest - ira; if(ira>0) move('roth_ira', ira); if(idx>0) move('taxable', idx); }
+      summary = G.car==='used_cash' && carCash>0 ? `Bought a $5K used car in cash, ${fmt(rest)} invested.` : `Already have a car. ${fmt(amount)} fully invested.`;
+      break;
+    }
+    case 'truck_splurge': {
+      // Player wants to take $10K toward a financed truck down payment + buys vehicle
+      const downpay = Math.min(8000, amount);
+      const rest = amount - downpay;
+      G.savings -= downpay; // gone to dealer
+      G.car = 'financed'; G.car_value = 42000; G.car_payment = 600; G.debt += (42000 - downpay);
+      if(rest>0) move('emergency', rest); // small EF cushion
+      G.morale += 15; G.reputation -= 3;
+      summary = `Put ${fmt(downpay)} down on a financed truck (the classic E-4 move). New $600/mo payment. Remainder to emergency fund.`;
+      break;
+    }
+    case 'keep_cash': {
+      // No movement — leave in savings. Banner closes but warns about 0% return
+      summary = `Kept all ${fmt(amount)} in cash savings (~4% HY savings rate at best). At age ${G.birth_date?currentAge(G):G.age}, leaving it here for 38 years vs investing at 8% = ${fmt(amount*Math.pow(1.04,38))} vs ${fmt(amount*Math.pow(1.08,38))}.`;
+      break;
+    }
+  }
+  G._bonus_pending_alloc = null;
+  G.event = { type:'win', text:`💰 ${fmt(amount)} bonus allocated. ${summary}` };
+  renderScene();
+  autoSave();
 }
 
 // Auto-allocate leftover unallocated cash following priority playbook:
