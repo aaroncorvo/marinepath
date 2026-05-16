@@ -1003,7 +1003,7 @@ function basePay(rank, tisMonths){
 function defaultState(){
   return {
     name:'Marine', age:18, branch:'usmc',
-    rank:'E-1', tis_months:0, stage:'start',
+    rank:'E-1', tis_months:0, stage:'setup',
     mos:'', path:[], // log of completed stages
     failed_stages:[],
     // money
@@ -1014,6 +1014,9 @@ function defaultState(){
     car:'none', // none | used_cash | financed | upgrade
     car_payment:0, car_value:0, mortgage:0,
     rent_extra:0, // extra paid above BAH for off-base
+    // starting-life flags (set by character creator)
+    had_starting_car:false, starting_relationship:'single',
+    has_phone:true, phone_bill:65,
     // stats
     fitness:80, reputation:70, morale:80, health:'healthy',
     edu_credits:0, degree:'none', gibill:'intact',
@@ -1149,17 +1152,37 @@ const SCENES = {
   },
   'car_choice':{
     stage:'First Unit',
-    title:`Month 5 — The Truck Question`,
-    text:`Everyone in my squad has a truck. I don\'t even have a car. The base shuttle runs to the BX and chow hall, but I can\'t leave base without a ride. <strong>What do I do?</strong>`,
+    title:`Month 5 — The Vehicle Question`,
+    text:`Some of the guys are buying their first vehicle. Some are upgrading whatever they brought in. Some are going carless. The lifted trucks in the parking lot are tempting either way. <strong>What's my move?</strong>`,
     choices:[
+      {label:'Keep my current car (paid off — insurance + gas only)',
+       desc:'No payment. $0 from savings. Same ~$180/mo for insurance + gas. Smartest financial move if my current car is reliable.',
+       tags:['ok:Max savings','ok:No new debt'],
+       requires:g=>g.car==='used_cash' && g.had_starting_car,
+       apply:g=>{g.tis_months+=1;},
+       next:'school_choice'},
+      {label:'Keep paying off my current car loan',
+       desc:'Stick with the financed car I came in with. Same monthly payment + insurance + gas. I avoid new debt but keep the existing loan.',
+       tags:['ok:No new debt','warn:Existing loan'],
+       requires:g=>g.car==='financed' && g.had_starting_car,
+       apply:g=>{g.tis_months+=1;},
+       next:'school_choice'},
+      {label:'Sell my current car, go carless',
+       desc:'Sell what I have, pocket the cash, use rides and the base shuttle. Maximum saving rate.',
+       tags:['ok:Max savings','warn:-Some freedom'],
+       requires:g=>g.had_starting_car,
+       apply:g=>{g.savings+=Math.max(0,(g.car_value||0)-(g.car==='financed'?(g.debt>0?Math.min(g.debt,g.car_value||0):0):0));if(g.car==='financed')g.debt=Math.max(0,g.debt-(g.car_value||0));g.car='none';g.car_payment=0;g.car_value=0;g.tis_months+=1;},
+       next:'school_choice'},
       {label:'Buy nothing — use rides and the shuttle',
        desc:'Total monthly car cost: $0. Less freedom, but I bank an extra $830/mo vs the truck guys.',
        tags:['ok:Max savings','warn:-Some freedom'],
+       requires:g=>!g.had_starting_car,
        apply:g=>{g.car='none';g.car_payment=0;g.car_value=0;g.tis_months+=1;},
        next:'school_choice'},
       {label:'Buy a $5,000 used Civic in cash',
-       desc:'I spend $5k from savings, but I own it free and clear. Insurance + gas ~$180/mo. No payment.',
+       desc:'Spend $5k from savings, own it free and clear. Insurance + gas ~$180/mo. No payment.',
        tags:['ok:No debt','info:-$5k savings'],
+       requires:g=>g.car!=='used_cash' || !g.had_starting_car,
        apply:g=>{g.car='used_cash';g.car_value=5000;g.car_payment=0;g.savings=Math.max(0,g.savings-5000);g.tis_months+=1;},
        next:'school_choice'},
       {label:'Finance a $42,000 lifted Tacoma at 14% APR',
@@ -1817,15 +1840,16 @@ function calcBudget(g){
   const car_total = g.car_payment + (g.car==='none'?0:180);
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
+  const phone = g.has_phone ? (g.phone_bill||0) : 0;
   const misc = 350;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + misc;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + misc;
   // Savings = net take-home minus bills
   const net_to_savings = net - total_bills;
   return {
     bp, bah, bas, special, gross,
     taxable, ftax, fica, stax,
     tsp_contrib, net,
-    housing_cost, food, car_total, kids_cost, pet_cost, misc, total_bills,
+    housing_cost, food, car_total, kids_cost, pet_cost, phone, misc, total_bills,
     net_to_savings
   };
 }
@@ -1917,10 +1941,11 @@ function renderBudget(){
     <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--warn);text-transform:uppercase;letter-spacing:.08em">━ Monthly Bills ━</div>
     ${b.housing_cost?`<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(${G.housing.replace('_',' ')})</span></span><span class="budget-amt neg">−${fmt(b.housing_cost)}</span></div>`:'<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(barracks — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
     ${b.food?`<div class="budget-row"><span>Food / groceries</span><span class="budget-amt neg">−${fmt(b.food)}</span></div>`:'<div class="budget-row"><span>Food <span style="color:var(--muted);font-size:.85em">(chow hall — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
-    ${b.car_total?`<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(pmt + ins + gas)</span></span><span class="budget-amt neg">−${fmt(b.car_total)}</span></div>`:'<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(none)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${b.car_total?`<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(${G.car==='financed'?'pmt + ins + gas':G.car==='used_cash'?'paid off — ins + gas':G.car==='upgrade'?'pmt + ins + gas':G.car==='none'?'':'pmt + ins + gas'})</span></span><span class="budget-amt neg">−${fmt(b.car_total)}</span></div>`:'<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(none)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${b.phone?`<div class="budget-row"><span>Cell phone <span style="color:var(--muted);font-size:.85em">(monthly plan)</span></span><span class="budget-amt neg">−${fmt(b.phone)}</span></div>`:''}
     ${b.kids_cost?`<div class="budget-row"><span>Kids <span style="color:var(--muted);font-size:.85em">(${G.kids} × $600)</span></span><span class="budget-amt neg">−${fmt(b.kids_cost)}</span></div>`:''}
     ${b.pet_cost?`<div class="budget-row"><span>Pets <span style="color:var(--muted);font-size:.85em">(${G.pets})</span></span><span class="budget-amt neg">−${fmt(b.pet_cost)}</span></div>`:''}
-    <div class="budget-row"><span>Misc / personal <span style="color:var(--muted);font-size:.85em">(phone, gym, etc.)</span></span><span class="budget-amt neg">−${fmt(b.misc)}</span></div>
+    <div class="budget-row"><span>Misc / personal <span style="color:var(--muted);font-size:.85em">(gym, hygiene, weekend)</span></span><span class="budget-amt neg">−${fmt(b.misc)}</span></div>
     <div class="budget-row total"><span>Total Bills</span><span class="budget-amt neg"><strong>−${fmt(b.total_bills)}/mo</strong></span></div>
 
     <div style="margin-top:1rem;padding:var(--s4);background:${b.net_to_savings>=0?'color-mix(in srgb,var(--success) 12%,transparent)':'color-mix(in srgb,var(--error) 12%,transparent)'};border-radius:var(--r-md);border:1px solid ${b.net_to_savings>=0?'var(--success)':'var(--error)'}">
@@ -1964,6 +1989,15 @@ function renderTree(){
 }
 
 function renderScene(){
+  // Character creator screen — intercept before standard SCENES lookup
+  if(G.stage === 'setup'){
+    renderCharacterCreator();
+    renderDash();
+    renderBudget();
+    renderTree();
+    autoSave();
+    return;
+  }
   settleCashFlow();
   const s = SCENES[G.stage];
   if(!s){ document.getElementById('sceneCard').innerHTML = '<div>Unknown scene: '+G.stage+'</div>'; return; }
@@ -2071,6 +2105,135 @@ function chooseChoice(i){
   let next = c.next;
   if(typeof next==='function') next = next(G);
   if(next){ G.stage = next; }
+  renderScene();
+}
+
+// ════════════════════════════════════════════════════════════
+//  🎖️ CHARACTER CREATOR — pre-game setup screen
+// ════════════════════════════════════════════════════════════
+function renderCharacterCreator(){
+  const card = document.getElementById('sceneCard');
+  card.innerHTML = `
+    <div class="scene-stage">Pre-Mission Brief</div>
+    <div class="scene-title">🎖 Character Setup — What Do I Show Up With?</div>
+    <div class="scene-text" style="margin-bottom:var(--s5)">
+      Before I sign the contract, set up my real-world starting conditions.
+      Every recruit shows up with different baggage — savings, a car, a phone, a relationship.
+      Configure what's actually mine, then hit confirm and the career begins.
+    </div>
+
+    <div style="display:grid;gap:var(--s5)">
+
+      <!-- Identity -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Identity ━</div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;font-size:var(--text-sm)">
+          <label>Age: <input type="number" id="cc-age" value="${G.age||18}" min="17" max="35" style="width:70px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+        </div>
+      </div>
+
+      <!-- Money Starting Out -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Money Starting Out ━</div>
+        <div style="display:grid;gap:.7rem;font-size:var(--text-sm)">
+          <label>Cash savings: $<input type="number" id="cc-savings" value="${G.savings||1500}" min="0" max="50000" step="100" style="width:100px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+          <label>Existing debt (student loans, credit card): $<input type="number" id="cc-debt" value="${G.debt||0}" min="0" max="100000" step="500" style="width:100px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+          <label>College credits already earned: <input type="number" id="cc-credits" value="${G.edu_credits||0}" min="0" max="200" step="3" style="width:70px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+        </div>
+      </div>
+
+      <!-- Vehicle -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Vehicle ━</div>
+        <div style="display:grid;gap:.55rem">
+          <label class="chk" style="cursor:pointer"><input type="radio" name="cc-car" value="none" ${(!G.had_starting_car&&G.car==='none')?'checked':''}><span><strong>No car yet</strong> — I'll get rides at first and decide later</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="cc-car" value="owned" ${G.had_starting_car&&G.car==='used_cash'?'checked':''}><span><strong>I have a car, paid off</strong> — insurance + gas only (~$180/mo). I don't need to buy one, but I can still choose to upgrade later.</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="cc-car" value="financed" ${G.had_starting_car&&G.car==='financed'?'checked':''}><span><strong>I have a car, still financed</strong> — monthly payment + insurance + gas</span></label>
+        </div>
+        <div id="cc-car-details" style="display:none;margin-top:.6rem;padding:.7rem;background:var(--surf2);border:1px solid var(--border);border-radius:.5rem;font-size:var(--text-sm)">
+          Loan balance: $<input type="number" id="cc-car-debt" value="8000" min="0" max="80000" step="500" style="width:100px;padding:.35rem;background:var(--bg);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin:0 .8rem 0 .3rem">
+          Monthly payment: $<input type="number" id="cc-car-payment" value="280" min="0" max="2000" step="10" style="width:80px;padding:.35rem;background:var(--bg);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin-left:.3rem">
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Cell Phone ━</div>
+        <label class="chk" style="cursor:pointer"><input type="checkbox" id="cc-phone" ${G.has_phone!==false?'checked':''}><span>I have a cell phone — monthly bill: $<input type="number" id="cc-phone-cost" value="${G.phone_bill||65}" min="0" max="200" step="5" style="width:65px;padding:.3rem;background:var(--surf2);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin:0 .3rem">/mo</span></label>
+      </div>
+
+      <!-- Relationship -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Relationship Status ━</div>
+        <select id="cc-rel" style="padding:.55rem .8rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;min-width:280px">
+          <option value="single" ${G.starting_relationship==='single'?'selected':''}>Single</option>
+          <option value="dating" ${G.starting_relationship==='dating'?'selected':''}>Dating someone seriously</option>
+          <option value="engaged" ${G.starting_relationship==='engaged'?'selected':''}>Engaged</option>
+          <option value="married" ${G.married?'selected':''}>Already married</option>
+        </select>
+      </div>
+
+      <!-- Dependents -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Dependents ━</div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:var(--text-sm)">
+          <label>Kids: <input type="number" id="cc-kids" value="${G.kids||0}" min="0" max="6" style="width:55px;padding:.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+          <label>Pets: <input type="number" id="cc-pets" value="${G.pets||0}" min="0" max="5" style="width:55px;padding:.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:var(--s6);padding:var(--s4);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px solid var(--primary);border-radius:var(--r-md);font-size:var(--text-sm)">
+      <strong style="color:var(--primary)">Heads up:</strong> if you start with a car, you'll see a "Keep my current car" option at the Month 5 vehicle scene. You can still buy/finance a different one later — it's a real choice, not locked in.
+    </div>
+
+    <div style="margin-top:var(--s5);display:flex;gap:.6rem">
+      <button class="choice" style="background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 0 0 1px var(--gold)" onclick="confirmCharacterSetup()">
+        <div class="choice-label"><span>✓ Confirm & Begin My Career</span></div>
+        <div class="choice-desc">Lock in these starting conditions and head to the recruiter's office.</div>
+      </button>
+    </div>
+  `;
+  // Toggle car details panel when "financed" is picked
+  const updateCarDetails = ()=>{
+    const v = (document.querySelector('input[name="cc-car"]:checked')||{}).value;
+    document.getElementById('cc-car-details').style.display = v==='financed' ? 'block' : 'none';
+  };
+  document.querySelectorAll('input[name="cc-car"]').forEach(r=>r.addEventListener('change',updateCarDetails));
+  updateCarDetails();
+}
+
+function confirmCharacterSetup(){
+  const val = (id, fallback=0)=>{ const v = parseInt(document.getElementById(id).value); return isNaN(v) ? fallback : v; };
+  G.age = val('cc-age',18);
+  G.savings = val('cc-savings',1500);
+  G.debt = val('cc-debt',0);
+  G.edu_credits = val('cc-credits',0);
+  G.kids = val('cc-kids',0);
+  G.pets = val('cc-pets',0);
+  const rel = document.getElementById('cc-rel').value;
+  G.starting_relationship = rel;
+  G.married = (rel==='married');
+  if(G.married){ G.housing = 'off_base'; G.rent_extra = 400; }
+  const car = (document.querySelector('input[name="cc-car"]:checked')||{}).value || 'none';
+  if(car==='owned'){
+    G.car = 'used_cash'; G.car_value = 8000; G.car_payment = 0; G.had_starting_car = true;
+  } else if(car==='financed'){
+    G.car = 'financed';
+    const loan = val('cc-car-debt',8000);
+    G.car_value = Math.round(loan*1.15);
+    G.debt += loan;
+    G.car_payment = val('cc-car-payment',280);
+    G.had_starting_car = true;
+  } else {
+    G.car = 'none'; G.car_value = 0; G.car_payment = 0; G.had_starting_car = false;
+  }
+  G.has_phone = document.getElementById('cc-phone').checked;
+  G.phone_bill = val('cc-phone-cost',65);
+  G.stage = 'start';
+  G.event = { type:'info', text:`Setup confirmed. Starting savings: ${fmt(G.savings)}. ${G.had_starting_car?'Driving in with a car already.':'No car yet.'} ${G.married?'Married.':'Single.'} ${G.has_phone?'Phone bill ~'+fmt(G.phone_bill)+'/mo.':''} Time to meet the recruiter.` };
+  _lastTisCheckpoint = G.tis_months;
   renderScene();
 }
 
@@ -2205,10 +2368,11 @@ calcBudget = function(g){
   const car_total = g.car_payment + (g.car==='none'?0:180);
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
+  const phone = g.has_phone ? (g.phone_bill||0) : 0;
   const misc = 350;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + misc;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + misc;
   const net_to_savings = net - total_bills;
-  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, car_total, kids_cost, pet_cost, misc, total_bills, net_to_savings };
+  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, car_total, kids_cost, pet_cost, phone, misc, total_bills, net_to_savings };
 };
 
 /* Render MOS Deep Dive table dynamically from data */
