@@ -1,0 +1,12 @@
+{
+  "name": "marinepath",
+  "version": "1.0.0",
+  "description": "Military Path — Career Sim (Netlify deploy)",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  },
+  "scripts": {
+    "dev": "python3 -m http.server 8000"
+  }
+}

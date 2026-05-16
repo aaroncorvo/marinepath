@@ -43,26 +43,53 @@ The app supports a layered persistence model so it works immediately with zero b
 - **📧 Email My Results** generates a full plain-text career report — current rank, financial snapshot, investment plan, age-60 projection, decisions made, paths visited — and opens a pre-filled `mailto:` link in the default email client. If the report is too long for `mailto:` (common on Outlook), it falls back to copying to clipboard.
 - **⬇️ Export All as JSON / ⬆️ Import** lets the player move their saves between devices manually.
 
-### Layer 2 — Enable Netlify Identity for real cloud sync (optional, no code change)
+### Layer 2 — Real multi-user cloud sync (Netlify Identity + Blobs + Functions)
 
-The Netlify Identity widget script is already loaded in `index.html`. To activate it:
+The cloud-sync stack is **built and committed**. The only manual step left is enabling Identity in your Netlify dashboard.
 
-1. In your Netlify dashboard → site → **Integrations** → **Netlify Identity** → **Enable Identity**
-2. Under **Registration**, choose: Open (anyone can sign up) or Invite-only
-3. (Optional) Under **External providers**, enable Google / GitHub / Apple OAuth
-4. Done. The "👤 Sign In" button in the topbar will now open the Identity modal. Once signed in, the player's name + email auto-populate and the `acctBtn` turns green.
+**Backend (already in this repo):**
+- `netlify/functions/save-path.js` — accepts a signed-in user's JWT + a path object, stores it in Netlify Blobs keyed by `<userEmail>/<id>`
+- `netlify/functions/list-paths.js` — returns every path under the user's email prefix
+- `netlify/functions/delete-path.js` — deletes a specific path
+- `netlify/functions/_auth.js` — shared helper that extracts the verified Identity user from `clientContext`
+- `package.json` — declares `@netlify/blobs` dep so Netlify auto-installs on deploy
+- `netlify.toml` — declares `functions = "netlify/functions"` and esbuild bundler
 
-The app already listens for `netlifyIdentity` events (`init`, `login`, `logout`) — sign-in state flows through to the same `G.player_name` / `G.player_email` fields used by the local flow, so the rest of the app needs zero changes.
+**Frontend (already wired in `index.html`):**
+- `isCloudSignedIn()`, `getAuthHeaders()`, `cloudSavePath()`, `cloudListPaths()`, `cloudDeletePath()`, `syncCloudPaths()` helpers
+- `savePath()` now writes to localStorage first (instant) AND POSTs to `/.netlify/functions/save-path` if signed in
+- `renderPathsList()` pulls from cloud + merges into local on every render when signed in
+- `deletePath()` removes from cloud too when signed in
+- The "👤 Sign In" button now calls `openSignIn()` which opens the Identity magic-link modal when Identity is loaded, falling back to the local-only name/email modal otherwise
+- `netlifyIdentity.on('login', …)` fires `syncCloudPaths()` to pull existing paths down on first sign-in
 
-### Layer 3 — Server-side email + cloud-saved paths (future)
+**One-time setup in the Netlify dashboard (~3 minutes):**
 
-When you want real email delivery (instead of `mailto:`) and cloud-stored playthroughs synced across devices, add Netlify Functions:
+1. **Site dashboard → Integrations → Netlify Identity → Enable Identity**
+2. Under **Registration**, choose:
+   - *Open* (anyone with an email can sign up — fine for personal/family use), or
+   - *Invite-only* (you manually invite people via email)
+3. (Optional) Under **External providers**, enable Google / GitHub / Apple OAuth so users can sign in with one click
+4. **Site dashboard → Integrations → Netlify Blobs → Enable** (free tier covers thousands of saves)
+5. **Trigger a new deploy** so the Functions and Blobs binding go live (`git push` does this automatically)
 
-- `netlify/functions/email-report.js` — accepts a JWT from Identity, calls Resend or SendGrid to send the report to the user's email
-- `netlify/functions/save-path.js` — accepts a JWT + playthrough JSON, stores in Netlify Blobs keyed by user email
-- `netlify/functions/list-paths.js` — returns the user's saved paths from Netlify Blobs
+That's it. After step 5:
+- The 👤 Sign In button opens the Identity magic-link modal
+- Signing in pulls any cloud-saved paths down to the current device
+- New saves write to cloud automatically
+- Saves follow the user across phone, laptop, tablet
+- Multiple users can use the same URL — each has their own email-keyed namespace
 
-The frontend logic is already factored so swapping `localStorage` calls for `fetch('/.netlify/functions/save-path', ...)` is a contained change.
+**Free tier limits:**
+- Netlify Identity: 1,000 active monthly users
+- Netlify Blobs: 1 GB storage, 100k operations/month
+- Netlify Functions: 125k invocations/month + 100 hr runtime
+
+For a family-of-five planning tool this is effectively free forever.
+
+### Layer 3 — Server-side email (future)
+
+`mailto:` works today but caps at ~1800-char body length on some clients. To send real emails via Resend or SendGrid, add a fourth function `netlify/functions/email-report.js` that takes the user's JWT + the report body and calls the email provider. ~30 lines of code; not built yet.
 
 ---
 

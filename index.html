@@ -394,7 +394,7 @@ tr:hover td{background:var(--off)}
     </div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center">
-    <button class="acct-btn" id="acctBtn" onclick="openAcctModal()">👤 Sign In</button>
+    <button class="acct-btn" id="acctBtn" onclick="openSignIn()">👤 Sign In</button>
     <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
   </div>
 </div>
@@ -5431,12 +5431,12 @@ function writePaths(arr){
   try{ localStorage.setItem(PATHS_KEY, JSON.stringify(arr)); }catch(e){ console.error(e); }
 }
 
-function savePath(){
+async function savePath(){
   const name = prompt('Name this playthrough (e.g. "Recon Track", "Married Early", "Got Hurt"):', `Path ${new Date().toLocaleDateString()}`);
   if(!name) return;
   const paths = loadPaths();
   const proj = projectToAge60();
-  paths.push({
+  const pathObj = {
     id: 'p_'+Date.now(),
     name,
     saved_at: new Date().toISOString(),
@@ -5445,10 +5445,18 @@ function savePath(){
     state: JSON.parse(JSON.stringify(G)),
     history: JSON.parse(JSON.stringify(G_HISTORY)),
     projection_at_60: proj
-  });
+  };
+  // Always write locally first (instant)
+  paths.push(pathObj);
   writePaths(paths);
   renderPathsList();
-  alert(`✓ Saved "${name}" — see it in 📁 My Paths.`);
+  // Try cloud sync in background if signed in via Identity
+  if(isCloudSignedIn()){
+    const result = await cloudSavePath(pathObj);
+    alert(result ? `✓ Saved "${name}" — synced to cloud as ${G.player_email||netlifyIdentity.currentUser().email}.` : `✓ Saved "${name}" locally. Cloud sync failed — will retry next save.`);
+  } else {
+    alert(`✓ Saved "${name}" locally. Sign in to sync across devices.`);
+  }
 }
 
 function loadPath(id){
@@ -5463,20 +5471,43 @@ function loadPath(id){
   showSection('play', document.querySelector('.tab[onclick*="play"]'));
 }
 
-function deletePath(id){
+async function deletePath(id){
   const paths = loadPaths();
   const p = paths.find(x=>x.id===id);
   if(!p || !confirm(`Delete "${p.name}"? This can't be undone.`)) return;
   writePaths(paths.filter(x=>x.id!==id));
+  if(isCloudSignedIn()) await cloudDeletePath(id);
   renderPathsList();
 }
 
-function renderPathsList(){
+// Pull from cloud + merge into local store on demand
+async function syncCloudPaths(){
+  if(!isCloudSignedIn()) return;
+  const cloudPaths = await cloudListPaths();
+  if(!cloudPaths) return;
+  const local = loadPaths();
+  const localIds = new Set(local.map(p=>p.id));
+  // Add any cloud paths not in local
+  let added = 0;
+  cloudPaths.forEach(cp => { if(!localIds.has(cp.id)){ local.push(cp); added++; } });
+  if(added > 0){
+    writePaths(local);
+    renderPathsList();
+  }
+}
+
+async function renderPathsList(){
+  // If signed in, pull cloud paths first (fire and forget — they merge in)
+  if(isCloudSignedIn()){ syncCloudPaths(); }
   const paths = loadPaths();
   const wrap = document.getElementById('paths-list');
   if(!wrap) return;
   if(paths.length===0){
-    wrap.innerHTML = `<div class="card pad" style="color:var(--muted);text-align:center;font-style:italic">No saved paths yet. Click "Save Current Playthrough" above to add the current run.</div>`;
+    const signedIn = isCloudSignedIn();
+    wrap.innerHTML = `<div class="card pad" style="color:var(--muted);text-align:center;font-style:italic">
+      No saved paths yet. Click "Save Current Playthrough" above to add the current run.
+      ${signedIn?'<br><br>☁️ Signed in — saves will sync across devices automatically.':'<br><br>Sign in (top-right) to sync saves across devices via Netlify Identity.'}
+    </div>`;
     return;
   }
   wrap.innerHTML = paths.slice().reverse().map(p=>{
@@ -5676,6 +5707,55 @@ function emailPath(id){
 /* ════════════════════════════════════════════════════════════
    👤  ACCOUNT — local-first, Netlify Identity hooks ready
    ═══════════════════════════════════════════════════════════ */
+// Open Netlify Identity modal if loaded, else fall back to local name/email modal
+function openSignIn(){
+  if(typeof netlifyIdentity !== 'undefined' && netlifyIdentity.open){
+    netlifyIdentity.open(); // login or signup with email magic-link
+  } else {
+    openAcctModal();
+  }
+}
+
+// ── Cloud sync helpers — only fire when player is signed in via Netlify Identity ──
+function isCloudSignedIn(){
+  return !!(typeof netlifyIdentity !== 'undefined' && netlifyIdentity.currentUser && netlifyIdentity.currentUser());
+}
+async function getAuthHeaders(){
+  try{
+    const user = netlifyIdentity.currentUser();
+    if(!user) return {};
+    const token = await user.jwt(); // auto-refreshes when needed
+    return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+  }catch(e){ return {}; }
+}
+async function cloudSavePath(pathObj){
+  if(!isCloudSignedIn()) return null;
+  try{
+    const headers = await getAuthHeaders();
+    const r = await fetch('/.netlify/functions/save-path', { method:'POST', headers, body: JSON.stringify(pathObj) });
+    if(!r.ok) throw new Error(r.status);
+    return await r.json();
+  }catch(e){ console.warn('Cloud save failed, kept local:', e.message); return null; }
+}
+async function cloudListPaths(){
+  if(!isCloudSignedIn()) return null;
+  try{
+    const headers = await getAuthHeaders();
+    const r = await fetch('/.netlify/functions/list-paths', { headers });
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    return data.paths || [];
+  }catch(e){ console.warn('Cloud list failed:', e.message); return null; }
+}
+async function cloudDeletePath(id){
+  if(!isCloudSignedIn()) return null;
+  try{
+    const headers = await getAuthHeaders();
+    const r = await fetch('/.netlify/functions/delete-path', { method:'POST', headers, body: JSON.stringify({id}) });
+    return r.ok;
+  }catch(e){ console.warn('Cloud delete failed:', e.message); return null; }
+}
+
 function openAcctModal(){
   document.getElementById('acctName').value = G.player_name||'';
   document.getElementById('acctEmail').value = G.player_email||'';
@@ -5717,6 +5797,8 @@ function initNetlifyIdentity(){
     renderAcctBtn();
     autoSave();
     netlifyIdentity.close();
+    // Pull any cloud-saved paths down to this device
+    if(typeof syncCloudPaths==='function') syncCloudPaths();
   });
   netlifyIdentity.on('logout', ()=>{
     G.player_name = ''; G.player_email = '';
