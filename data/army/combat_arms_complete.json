@@ -1,0 +1,370 @@
+{
+  "branch": "United States Army",
+  "version": "2026",
+  "first_person": true,
+  "file": "army_combat_arms_complete.json",
+  "description": "Complete Army combat arms and combat-adjacent MOS list with ASVAB requirements, OSUT duration, SOF pipeline paths, and career progression. Combat arms in the Army is defined as: Infantry (11), Engineers (12 \u2014 combat element), Field Artillery (13), Air Defense Artillery (14), Armor (19). Combat-adjacent includes Aviation (15), Special Forces (18), Ranger (75th), Civil Affairs (38), PSYOP (37), EOD (89), and Combat Medic (68W).",
+  "combat_arms_branches": {
+    "infantry_CMF11": {
+      "branch_name": "Infantry (CMF 11)",
+      "description": "I am the queen of battle. Infantry is the Army's primary ground combat force \u2014 the tip of the spear in every direct-action engagement. All other combat arms exist to support and enable infantry to close with and destroy the enemy.",
+      "mos_list": [
+        {
+          "mos": "11B",
+          "title": "Infantryman",
+          "asvab": "CO = 87",
+          "osut_weeks": 22,
+          "location": "Fort Moore (formerly Fort Benning), GA",
+          "description": "I am the core infantry MOS. I fight on foot, operate rifles and machine guns, conduct raids and ambushes, and lead small-unit tactics. This is the most common path to Rangers, SF, and MARSOC (as a joint-service transfer).",
+          "enlistment_option": "11X contract \u2014 Army assigns me to 11B (Rifleman) or 11C (Mortarman) after OSUT",
+          "sof_paths": [
+            "Option 40 contract \u2192 Ranger Assessment and Selection Program (RASP) \u2192 75th Ranger Regiment",
+            "After 1 enlistment \u2192 SFAS \u2192 Special Forces Qualification Course (SFQC) \u2192 Green Beret",
+            "Ranger Regiment \u2192 SFAS is fastest track to SF in practice"
+          ],
+          "special_schools_available": [
+            "Ranger School (tab)",
+            "Airborne School",
+            "Air Assault",
+            "SERE",
+            "Sniper School",
+            "Pathfinder"
+          ],
+          "civilian_value": "Low direct transfer \u2014 law enforcement, security, law enforcement SOF programs",
+          "first_person": "My job is to close with and destroy the enemy. Every other MOS in this list either supports me or shares my battlefield. If I want Ranger or SF, this is the most direct and proven path."
+        },
+        {
+          "mos": "11C",
+          "title": "Indirect Fire Infantryman (Mortarman)",
+          "asvab": "CO = 87",
+          "osut_weeks": 22,
+          "location": "Fort Moore, GA",
+          "description": "I operate 60mm, 81mm, and 120mm mortars providing indirect fire support to infantry units. I can also attend the same SOF pipelines as 11B.",
+          "sof_paths": [
+            "Same Option 40/RASP/SFAS paths as 11B"
+          ],
+          "first_person": "I provide indirect fire support to my fellow infantrymen. I still qualify for every SOF pipeline available to 11B."
+        }
+      ]
+    },
+    "engineer_CMF12": {
+      "branch_name": "Combat Engineers (CMF 12)",
+      "description": "Combat engineers are the Army's mobility, counter-mobility, and survivability force. We breach obstacles, clear routes of IEDs, build bridges, and demolish enemy structures. Combat engineers fight alongside infantry and are considered combat arms.",
+      "mos_list": [
+        {
+          "mos": "12B",
+          "title": "Combat Engineer",
+          "asvab": "CO = 87",
+          "osut_weeks": 14,
+          "location": "Fort Leonard Wood, MO",
+          "description": "I construct and destroy obstacles, detect and neutralize explosives, perform route clearance, conduct breaching operations, and support combined arms maneuver. The 'Sapper' identity \u2014 the combat engineer's elite tier.",
+          "elite_path": {
+            "sapper_leader_course": {
+              "location": "Fort Leonard Wood, MO",
+              "duration_weeks": 5,
+              "description": "The 'Sapper tab' equivalent of the Ranger tab for engineers. 28 days of intensive combat engineering, demolitions, land nav, small-unit tactics, and leadership. High attrition. Earns the Sapper Tab.",
+              "attrition": "~50%",
+              "note": "Chain of command expects 12Bs to earn the Sapper tab before attending Ranger School"
+            }
+          },
+          "sof_paths": [
+            "Sapper School \u2192 Ranger School \u2192 Ranger Regiment (Option 40 or volunteer)",
+            "SFAS \u2192 18C (Special Forces Engineer Sergeant) \u2014 the SF engineer MOS",
+            "18C is one of the 5 SF specialty MOSs in an Operational Detachment-Alpha (ODA)"
+          ],
+          "special_schools": [
+            "Sapper Leader Course",
+            "Airborne School",
+            "Air Assault",
+            "Ranger School",
+            "SFAS"
+          ],
+          "first_person": "My path to SF is through 18C \u2014 the engineer on an ODA. I can also go Ranger Regiment. The Sapper tab is my first major milestone."
+        },
+        {
+          "mos": "12C",
+          "title": "Bridge Crewmember",
+          "asvab": "CO = 87",
+          "description": "I construct and operate tactical bridges and rafts for river crossings and gap crossings under combat conditions.",
+          "sof_paths": [
+            "SFAS available as volunteer after serving in 12C"
+          ]
+        },
+        {
+          "mos": "12D",
+          "title": "Diver",
+          "asvab": "ST = 110",
+          "description": "Combat diving MOS \u2014 underwater construction, demolition, and salvage. One of the most specialized 12-series MOSs.",
+          "note": "Extremely high ASVAB requirement. Direct pipeline to diving operations supporting SOF."
+        },
+        {
+          "mos": "12Z",
+          "title": "Combat Engineer Senior Sergeant",
+          "description": "Senior NCO leadership MOS for experienced combat engineers. Career progression from 12B at E-7+."
+        }
+      ]
+    },
+    "field_artillery_CMF13": {
+      "branch_name": "Field Artillery (CMF 13)",
+      "description": "Field Artillery is the Army's indirect fire and fire support branch. I operate cannon, rocket, and missile systems, or I work as a forward observer calling in precision fires on the enemy. Artillery is considered combat arms.",
+      "mos_list": [
+        {
+          "mos": "13B",
+          "title": "Cannon Crewmember",
+          "asvab": "FA = 93",
+          "osut_weeks": 10,
+          "location": "Fort Sill, OK",
+          "description": "I operate howitzers (M777 155mm, M119 105mm) providing indirect fire support. I load, aim, and fire artillery pieces in support of infantry and armor maneuver.",
+          "sof_paths": [
+            "SFAS volunteer after completing first enlistment",
+            "13B can volunteer for RASP if physically qualified"
+          ],
+          "first_person": "My artillery skills support every ground operation. If I want SF, I go the 18C or 18B route after SFAS."
+        },
+        {
+          "mos": "13F",
+          "title": "Fire Support Specialist (Forward Observer / FISTer)",
+          "asvab": "FA = 96",
+          "osut_weeks": 14,
+          "location": "Fort Sill, OK",
+          "description": "I am the forward observer \u2014 embedded directly with infantry, armor, and cavalry platoons at the front of the fight. I coordinate artillery, mortars, close air support (CAS), attack aviation, and naval gunfire. I use AFATDS digital fire control systems. This MOS is NOT rear-echelon \u2014 I am at the forward edge of the battle alongside infantry.",
+          "sof_paths": [
+            "13F in Ranger Battalion \u2192 most directly translates to SF 18F (Intel) or officer fire support paths",
+            "SFAS as volunteer \u2192 18F or any 18-series after SFQC",
+            "JTAC-qualified 13Fs are highly valued in Ranger Regiment \u2014 actively recruited"
+          ],
+          "ranger_path": "13F is one of the few non-infantry MOSs actively recruited by Ranger Regiment due to fires and JTAC expertise. Option 40 and RASP2 available.",
+          "special_quals": [
+            "JTAC (Joint Terminal Attack Controller) \u2014 coordinates close air support",
+            "AFATDS operator",
+            "Fire Support NCO"
+          ],
+          "first_person": "I call in the fires. I am embedded with the tip of the spear. My JTAC qualification makes me one of the most valuable non-infantry soldiers in Ranger Regiment and SF. If I want SOF, this is one of the strongest non-infantry starting points."
+        },
+        {
+          "mos": "13M",
+          "title": "Multiple Launch Rocket System (MLRS) Crewmember",
+          "asvab": "FA = 93",
+          "osut_weeks": 10,
+          "location": "Fort Sill, OK",
+          "description": "I operate the M270 MLRS and M142 HIMARS rocket systems \u2014 the Army's precision long-range strike assets. HIMARS has become one of the most strategically significant weapons of the 2022 Ukraine war and modern peer-to-peer conflict.",
+          "first_person": "I operate HIMARS. My skills are increasingly in demand as long-range precision fires become central to modern warfare."
+        },
+        {
+          "mos": "13R",
+          "title": "Field Artillery Radar Operator",
+          "asvab": "SC = 93",
+          "description": "I operate counter-battery radar (TPQ-36, TPQ-37, Q-53) to detect and locate enemy artillery and mortar positions."
+        }
+      ]
+    },
+    "air_defense_CMF14": {
+      "branch_name": "Air Defense Artillery (CMF 14)",
+      "description": "Air Defense Artillery protects the force and critical assets from aerial attack, missiles, rockets, and drones. As UAS (drone) threats grow in modern warfare, ADA has become more operationally prominent than any time since the Cold War.",
+      "mos_list": [
+        {
+          "mos": "14S",
+          "title": "Air and Missile Defense Crewmember (SHORAD)",
+          "asvab": "MM = 93",
+          "description": "I operate short-range air defense systems (Stinger, M-SHORAD, Avenger) protecting ground forces from helicopters, drones, and low-altitude fixed-wing threats.",
+          "current_relevance": "SHORAD has seen a massive renaissance due to drone warfare in Ukraine and peer-threat environments. M-SHORAD units are being rapidly expanded.",
+          "first_person": "My skills are some of the most relevant in modern warfare. UAS and counter-drone is the fastest-growing threat domain in any near-peer conflict."
+        },
+        {
+          "mos": "14T",
+          "title": "Patriot Missile Crewmember",
+          "asvab": "MM = 93",
+          "description": "I operate the Patriot air and missile defense system protecting from ballistic missiles, cruise missiles, and aircraft."
+        }
+      ]
+    },
+    "armor_CMF19": {
+      "branch_name": "Armor / Cavalry (CMF 19)",
+      "description": "Armor is the Army's shock and exploitation force. I operate main battle tanks (M1 Abrams) or serve as a Cavalry Scout \u2014 the Army's eyes and ears in reconnaissance and security operations.",
+      "mos_list": [
+        {
+          "mos": "19D",
+          "title": "Cavalry Scout",
+          "asvab": "CO = 87",
+          "osut_weeks": 16,
+          "location": "Fort Moore, GA (transitioning to Fort Knox, KY)",
+          "description": "I am the Army's reconnaissance and security specialist. My job is to find the enemy, not necessarily to destroy him \u2014 though I will if required. I operate Bradley Fighting Vehicles, Strykers, or HMMWVs. I am the first to make contact with the enemy, report, and shape the battlefield for the main force.",
+          "11B_vs_19D_honest_assessment": {
+            "choose_19D_if": "I want to understand the full battlefield, operate vehicles, and serve as the brigade's forward reconnaissance element. Stetsons and spurs. Unit esprit de corps is distinct.",
+            "choose_11B_if": "I want maximum SOF eligibility and the most direct path to Rangers or SF. More slots, more schools, better promotion flow in some units.",
+            "reality": "In modern counterinsurgency, 19D and 11B often do identical jobs. In near-peer war, scouts resume their true recon and security role.",
+            "both_can_do": "RASP, SFAS, Ranger School, Airborne, Air Assault, Sniper School"
+          },
+          "sof_paths": [
+            "RASP (Ranger Assessment and Selection Program) \u2014 same process as 11B",
+            "SFAS \u2014 same eligibility as 11B; will become 18D (medic), 18E (comms), or 18B/18C in SF based on testing",
+            "Army Reconnaissance Course (ARC) \u2014 professional certification course for scouts"
+          ],
+          "special_schools": [
+            "Army Reconnaissance Course (ARC)",
+            "Airborne",
+            "Air Assault",
+            "Ranger School",
+            "SFAS",
+            "Sniper School",
+            "Pathfinder"
+          ],
+          "first_person": "My radio is my primary weapon. I find the enemy first and report accurately. If I want SOF, every door open to infantry is open to me too."
+        },
+        {
+          "mos": "19K",
+          "title": "M1 Armor Crewman",
+          "asvab": "CO = 87",
+          "osut_weeks": 22,
+          "location": "Fort Moore, GA (transitioning to Fort Knox, KY)",
+          "description": "I operate the M1A2 Abrams Main Battle Tank \u2014 one of the most powerful land weapons systems on earth. I serve as driver, loader, gunner, and eventually tank commander. The Abrams is 68 tons of firepower, protection, and mobility.",
+          "crew_positions": [
+            "Driver (E-1 to E-3)",
+            "Loader (E-3 to E-4)",
+            "Gunner (E-4 to E-5)",
+            "Tank Commander (E-5+)"
+          ],
+          "sof_paths": [
+            "SFAS volunteer \u2014 will need a secondary MOS reclassification after SF selection",
+            "Less common SOF path than 11B/19D \u2014 tankers are valuable in heavy units",
+            "Some 19Ks serve in cavalry/recon roles compatible with Ranger Regiment"
+          ],
+          "civilian_value": "Limited direct transfer but 22 weeks of OSUT builds exceptional discipline and mechanical/tactical skills. Veterans, mechanics, defense contractor roles.",
+          "first_person": "I am the hammer. My tank crew is a family of four. I won't have as many SOF opportunities as 11B, but I can still pursue Rangers or SF if I want to badly enough."
+        }
+      ]
+    }
+  },
+  "combat_adjacent_sof_enabling": {
+    "description": "These MOSs are not officially 'combat arms' but they fight alongside or within special operations units and have direct SOF pipelines.",
+    "mos_list": [
+      {
+        "mos": "18X",
+        "title": "Special Forces Candidate (Direct Entry Contract)",
+        "asvab": "GT = 110",
+        "osut_and_pipeline_weeks": "10 weeks BCT + 3 weeks Airborne + SFAS (35 days) + SFQC (12-18 months depending on specialty)",
+        "description": "I enlist directly for the SF pipeline. If I fail SFAS or SFQC, I am reclassified to Army needs \u2014 potentially a non-combat-arms MOS I did not choose. High risk but fastest path if I qualify.",
+        "risk": "Failure = involuntary reclass (historically: 92G, 88M, 92A were common). 18X fail rate from contract to completion is significant.",
+        "specialties_after_sfqc": [
+          {
+            "mos": "18B",
+            "title": "Special Forces Weapons Sergeant",
+            "description": "All weapons \u2014 U.S. and foreign. Direct action, raids, marksmanship training of partner forces."
+          },
+          {
+            "mos": "18C",
+            "title": "Special Forces Engineer Sergeant",
+            "description": "Demolitions, construction, breaching, route clearance, IED defeat. Pathway from 12B."
+          },
+          {
+            "mos": "18D",
+            "title": "Special Forces Medical Sergeant",
+            "description": "50-week medic course \u2014 the most medically trained enlisted person in the DoD. Near-physician skill level. Pipeline from 68W."
+          },
+          {
+            "mos": "18E",
+            "title": "Special Forces Communications Sergeant",
+            "description": "All communications systems, clandestine comms, radio operations. Pathway from 25-series."
+          },
+          {
+            "mos": "18F",
+            "title": "Special Forces Intelligence Sergeant",
+            "description": "HUMINT, targeting, mission analysis, operational intelligence. Pathway from 35-series or 13F."
+          }
+        ],
+        "first_person": "If I am absolutely sure I want SF and I have the test scores and physical fitness, 18X is the most direct route. But failure means I go wherever the Army needs me."
+      },
+      {
+        "mos": "68W",
+        "title": "Combat Medic Specialist",
+        "asvab": "ST = 101 or GT = 107",
+        "osut_weeks": 16,
+        "location": "Fort Sam Houston, TX",
+        "description": "I am the primary battlefield medic. Combat Medics earn EMT-Basic certification and deploy embedded with every combat arms unit. 68W is the primary pipeline to 18D (SF Medical Sergeant) \u2014 one of the most elite medical roles in the world.",
+        "18D_path": "68W \u2192 SFAS \u2192 selected for 18D track \u2192 50-week Special Forces Medical Sergeant course (near-physician level medical training)",
+        "sof_value": "18D is the most medically trained enlisted person in the entire DoD. SF medics perform surgeries, run clinics in denied areas, and train partner nation medics.",
+        "first_person": "If I want to be the 18D on an ODA \u2014 the team medic who can perform surgery in a mountain village \u2014 68W is my starting point."
+      },
+      {
+        "mos": "75th_ranger_regiment",
+        "title": "75th Ranger Regiment (Any MOS via RASP)",
+        "description": "The 75th Ranger Regiment is the Army's premier light infantry force. It is not an MOS \u2014 it is a unit assignment. Any qualifying MOS can attempt RASP (Ranger Assessment and Selection Program).",
+        "rasp_details": {
+          "RASP_1": {
+            "for": "E-1 through E-3 (junior enlisted)",
+            "duration_weeks": 8,
+            "location": "Fort Moore, GA",
+            "attrition": "~50-60% do not complete",
+            "what_it_tests": "Physical fitness, swim, land navigation, marksmanship, oral boards, psychological evaluation"
+          },
+          "RASP_2": {
+            "for": "E-4 and above, NCOs, officers",
+            "duration_weeks": 3,
+            "note": "Less physically intense, more leadership and judgment focused"
+          }
+        },
+        "option_40_contract": "Guarantees a RASP slot in your enlistment contract. Does NOT guarantee graduation or assignment.",
+        "ranger_tab_vs_scroll": {
+          "tab": "Earned by graduating Ranger School \u2014 open to most Army soldiers, not just Ranger Regiment",
+          "scroll": "The unit patch of the 75th Ranger Regiment \u2014 only worn by those assigned there"
+        },
+        "mos_commonly_in_ranger_regiment": [
+          "11B (majority)",
+          "13F (JTAC/Fire Support)",
+          "18-series (SF soldiers on exchange)",
+          "68W (medic)",
+          "12B (engineer)",
+          "19D (scout)"
+        ],
+        "first_person": "Ranger Regiment is where I prove myself before going to SF. Most SF soldiers I'll meet went through Regiment first. It is the best finishing school in the Army."
+      }
+    ]
+  },
+  "sof_decision_tree": {
+    "description": "My decision tree for Army SOF path \u2014 which MOS gives me the best foundation for which SOF unit?",
+    "if_I_want_rangers_first": {
+      "best_mos": "11B with Option 40",
+      "backup_mos": "13F with Option 40 (JTAC value in Regiment)",
+      "path": "OSUT \u2192 Airborne \u2192 RASP \u2192 Ranger Battalion \u2192 Ranger School (tab) \u2192 SFAS when ready"
+    },
+    "if_I_want_sf_directly": {
+      "best_contract": "18X (risky) or 11B/13F \u2192 serve 1 enlistment \u2192 volunteer for SFAS",
+      "path": "OSUT \u2192 serve in unit \u2192 SFAS (35 days) \u2192 SFQC by specialty (12-18 months) \u2192 ODA assignment"
+    },
+    "if_I_want_delta_force_eventually": {
+      "best_path": "11B \u2192 Option 40 \u2192 Ranger Regiment \u2192 earn Ranger tab \u2192 SFAS \u2192 ODA \u2192 after 4+ years in SF \u2192 Delta Selection (OTC, 6 months, ~50% attrition)",
+      "note": "Delta selects almost exclusively from Special Forces and Rangers. Straight infantry rarely makes it."
+    },
+    "if_I_want_combat_but_not_sof": {
+      "best_options": [
+        "11B conventional infantry",
+        "19D Cavalry Scout",
+        "13F Fire Support (JTAC)",
+        "12B Sapper"
+      ],
+      "note": "All four put me in direct combat roles with real deployment cycles and meaningful career progression."
+    }
+  },
+  "pay_2026": {
+    "enlisted_monthly_base": {
+      "E1_under4mo": 2216.69,
+      "E2": 2487.69,
+      "E3": 2636.1,
+      "E4_2yr": 2924.4,
+      "E5_4yr": 3316.8,
+      "E6_6yr": 3823.67,
+      "E7_6yr": 4456.21,
+      "E8_8yr": 5240.36,
+      "E9_10yr": 6910.15
+    },
+    "special_pays_combat_arms": {
+      "jump_static": 150,
+      "jump_HALO": 225,
+      "hostile_fire": 225,
+      "combat_zone_tax_exclusion": true,
+      "enlistment_bonus_19K": 47500,
+      "enlistment_bonus_11B_option40": 20000,
+      "sf_completion_bonus_18series": 40000
+    }
+  }
+}

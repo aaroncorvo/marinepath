@@ -12,13 +12,15 @@ data/
 │   ├── README.md
 │   ├── pay_2026.json
 │   ├── mos_complete.json
+│   ├── combat_arms_complete.json   ← Expanded: all 11/12/13/14/19-series + 68W + 18X + RASP
 │   ├── career_stages.json
 │   ├── timeline.json
 │   └── decision_tree.json
 ├── navy/                 ← Navy SEAL / SWCC pipeline
 │   └── decision_tree.json
 ├── air_force/            ← AFSWC: CCT / PJ / SR / TACP (2026 Zulu Course)
-│   └── decision_tree.json
+│   ├── decision_tree.json
+│   └── pj_expanded.json            ← Expanded: full PJ pipeline + AFSOC vs ACC tracks + civilian transition
 ├── coast_guard/          ← CG: MSRT / TACLET / Special Missions Cmd
 │   └── decision_tree.json
 └── _shared/              ← Cross-branch reference data

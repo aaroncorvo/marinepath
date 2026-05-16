@@ -1,0 +1,269 @@
+{
+  "branch": "United States Air Force",
+  "version": "2026",
+  "first_person": true,
+  "file": "af_pj_expanded.json",
+  "description": "Expanded Air Force Pararescue (PJ) career path \u2014 from enlistment through senior NCO, AFSOC assignment, JSOC support, and post-military transition. Includes honest comparison to other AFSWC paths and all special pay details.",
+  "pj_overview": {
+    "afsc": "1T2X1",
+    "title": "Pararescueman (PJ)",
+    "nickname": "Guardian Angel",
+    "motto": "That Others May Live",
+    "unique_position": "PJs are the ONLY DoD specialty specifically trained and equipped to conduct full-spectrum Personnel Recovery in both conventional and unconventional environments. Every other AFSWC operator has a primary function (CCT = air control, SR = recon, TACP = fires). PJs primary function is personnel recovery and emergency medicine.",
+    "total_active_duty_pjs": "~500 across Active Duty, Guard, and Reserve",
+    "pipeline_attrition": "80%+ of candidates who attempt the PJ pipeline do not complete it",
+    "medical_credential": "Nationally Registered Paramedic (NR-P) \u2014 same certification as civilian flight paramedics"
+  },
+  "entry_requirements": {
+    "age": "17-39",
+    "citizenship": "U.S. Citizen",
+    "education": "High School Diploma or GED",
+    "asvab_general_G": 60,
+    "vision": "Correctable to 20/20; normal color vision (no waivers)",
+    "medical": "Class III flight physical; no claustrophobia or fear of heights",
+    "clearance": "Secret (upgrades to TS/SCI possible in AFSOC assignments)",
+    "volunteer": "PJ is NEVER assigned \u2014 I must volunteer. No one is forced into PJ.",
+    "past_test_minimums": {
+      "underwater_swim_2x25m": "Pass \u2014 no time limit (technique matters)",
+      "surface_swim_500m": "Under 10:07 (competitive: under 9:00)",
+      "run_1_5mi": "Under 10:10 (competitive: under 9:00)",
+      "pullups": "10 minimum (competitive: 18+)",
+      "situps_2min": "54 minimum (competitive: 75+)",
+      "pushups_2min": "52 minimum (competitive: 75+)"
+    },
+    "training_advice": "Meeting minimums is not enough. I should train to competitive standards for 6-12 months before shipping. Water confidence is the single biggest predictor of success."
+  },
+  "pipeline": [
+    {
+      "phase": 1,
+      "stage": "Basic Military Training (BMT)",
+      "duration_weeks": 7.5,
+      "location": "Lackland AFB (JBSA), San Antonio, TX",
+      "rank": "E-1",
+      "pay": 2216.69,
+      "description": "Standard Air Force enlisted entry. I am flagged for AFSWC pipeline from day one."
+    },
+    {
+      "phase": 2,
+      "stage": "Special Warfare Preparatory Course (SW Prep)",
+      "duration_weeks": 8,
+      "location": "Lackland AFB, TX",
+      "rank": "E-2",
+      "pay": 2487.69,
+      "description": "Intensive physical preparation: running, rucking, swimming, strength and conditioning. Multiple pool sessions per week \u2014 buddy breathing, drownproofing, extended underwater work. Water confidence weeds out candidates here.",
+      "next_pass": "Assessment and Selection",
+      "next_fail": "af_reclass"
+    },
+    {
+      "phase": 3,
+      "stage": "Special Warfare Assessment and Selection (SW A&S) \u2014 2026 redesign",
+      "duration_weeks": 4,
+      "location": "Lackland AFB, TX",
+      "rank": "E-2",
+      "description": "Physical performance, cognitive ability, teamwork, leadership, and mental resilience under sustained fatigue and ambiguity. Gate event \u2014 high attrition.",
+      "next_pass": "Zulu Course",
+      "next_fail": "af_reclass"
+    },
+    {
+      "phase": 4,
+      "stage": "Zulu Course \u2014 NEW November 2025",
+      "duration_weeks": 16,
+      "location": "Camp Bullis, TX",
+      "rank": "E-2 to E-3",
+      "pay_e3": 2636.1,
+      "description": "New Phase 2 for ALL AFSWC paths added November 2025 per Air Force Special Warfare Training Wing Pipeline Optimization. Covers: advanced shooting (CQB to 500m), moving under fire, small-unit communication, land navigation, and combat fundamentals. Every PJ now arrives at medical training with a solid combat warrior foundation.",
+      "significance": "This change means PJs entering the Pararescue Apprentice Course are now more tactically lethal than previous generations at the same point in training."
+    },
+    {
+      "phase": 5,
+      "stage": "Special Warfare Combat Dive Course",
+      "duration_weeks": 6,
+      "location": "Panama City, FL",
+      "rank": "E-3",
+      "description": "SCUBA qualification: open and closed-circuit diving, underwater navigation, combat diving procedures, dive physics and medicine. Closed-circuit rebreather eliminates candidates who struggle under equipment stress."
+    },
+    {
+      "phase": 6,
+      "stage": "Army Basic Airborne School",
+      "duration_weeks": 3,
+      "location": "Fort Moore, GA",
+      "pay_added": "Jump pay $150/month (static line)",
+      "description": "5 qualifying static-line jumps. All PJs are airborne qualified."
+    },
+    {
+      "phase": 7,
+      "stage": "Military Freefall (HALO/HAHO) School",
+      "duration_weeks": 5,
+      "location": "Yuma Proving Ground, AZ",
+      "pay_added": "MFF pay $225/month",
+      "description": "HALO (High Altitude Low Opening) and HAHO (High Altitude High Opening) oxygen-equipped jumps above 25,000 feet. PJs can insert by any means into any environment."
+    },
+    {
+      "phase": 8,
+      "stage": "SERE School",
+      "duration_weeks": 3,
+      "location": "Fairchild AFB, WA",
+      "description": "Survival, Evasion, Resistance, and Escape. All PJs are SERE Level C qualified."
+    },
+    {
+      "phase": 9,
+      "stage": "Modernized Pararescue Provider Program (MP3) \u2014 NRP / Paramedic",
+      "duration_weeks": 39,
+      "location": "Lackland AFB, TX",
+      "description": "The core medical phase. I earn my Nationally Registered EMT (NREMT) and Nationally Registered Paramedic (NR-P) certifications. Training also includes: Tactical Combat Casualty Care (TCCC-CP), prolonged field care (PFC), K9 TCCC, CBRN medical response, surgical airway procedures, needle decompression, hemorrhage control, and IV/IO access. This is the equivalent of 1.5 years of civilian paramedic school compressed into 9 months.",
+      "credentials_earned": [
+        "National Registry EMT (NREMT)",
+        "National Registry Paramedic (NR-P)",
+        "TCCC-CP",
+        "Prolonged Field Care (PFC)"
+      ]
+    },
+    {
+      "phase": 10,
+      "stage": "Pararescue Apprentice Course",
+      "duration_weeks": 22,
+      "location": "Kirtland AFB, NM",
+      "description": "Core PJ tactical training: field medical care in hostile environments, mountaineering, helicopter operations (hoist, fast rope, SPIE rig), advanced parachuting integration, and tactical employment of PJ teams. I earn the Pararescue Maroon Beret and AFSC 1T2X1 at graduation.",
+      "beret_awarded": "Maroon Beret",
+      "total_pipeline_bmt_to_beret_months": 30
+    }
+  ],
+  "post_pipeline_career": {
+    "assignment_tracks": [
+      {
+        "track": "AFSOC Special Tactics Squadron (STS)",
+        "description": "I am assigned to a Special Tactics Squadron and deploy embedded with SEAL Teams, Army SF, Rangers, and other SOCOM units worldwide. This is the highest-demand, most operationally intense PJ assignment.",
+        "bases": [
+          "Hurlburt Field FL",
+          "Cannon AFB NM",
+          "Davis-Monthan AZ",
+          "Kadena AB Japan",
+          "Pope AAF NC"
+        ],
+        "operations": "Direct support to special operations personnel recovery, combat search and rescue behind enemy lines, JSOC integration"
+      },
+      {
+        "track": "ACC Rescue Squadron (Conventional)",
+        "description": "I am assigned to an Air Combat Command rescue squadron. More helicopter-centric. Primary mission: downed pilot recovery, non-combatant evacuation, disaster response. Less SOF-intense but still demanding and deployable.",
+        "bases": [
+          "Davis-Monthan AZ",
+          "Moody AFB GA",
+          "Patrick SFB FL",
+          "Various OCONUS"
+        ]
+      }
+    ],
+    "progression_by_rank": [
+      {
+        "phase": "E-1 to E-4 (0-4 years)",
+        "description": "I complete the pipeline, earn my beret, and integrate into a rescue or special tactics squadron. Focus: developing tactical and medical skills at the operational unit level. Minimum rank: Airman First Class (E-3) at most points.",
+        "pay_range": "$2,636 to $2,924/month base"
+      },
+      {
+        "phase": "E-5 to E-6 (4-10 years)",
+        "description": "I become a team leader. Advanced medical training: trauma rotations at civilian Level I trauma centers, advanced airway management, flight medic upgrades. Possible assignment to JSOC support. Eligible to instruct at pipeline schools.",
+        "pay_range": "$3,317 to $3,824/month base",
+        "key_quals_this_phase": [
+          "Flight Medic certification",
+          "Advanced TCCC instructor",
+          "Static Line Jumpmaster (SLJM)",
+          "HALO control",
+          "OJT upgrade to 5-level then 7-level"
+        ]
+      },
+      {
+        "phase": "E-7 to E-9 (10-20+ years)",
+        "description": "I serve as section leader, flight superintendent, or Special Tactics Team Sergeant. I shape the pipeline, brief commanders, and manage the most complex personnel recovery missions in the DoD. Some E-7/E-8 PJs commission as Combat Rescue Officers (CROs) through OTS.",
+        "pay_range": "$4,456 to $8,105/month base",
+        "commission_path": "PJ \u2192 OTS (Officer Training School) \u2192 Combat Rescue Officer (CRO) \u2014 13DX AFSC \u2014 leads PJ teams as an officer"
+      }
+    ],
+    "special_pays_full_stack": {
+      "base_pay_E4_4yr": 2924.4,
+      "special_duty_assignment_pay_SDAP": "$150 to $450/month",
+      "demo_hazardous_duty": "$150/month",
+      "parachute_jump_static": "$150/month",
+      "mff_halo_pay": "$225/month",
+      "dive_duty": "$240/month",
+      "hostile_fire_deployed": "$225/month",
+      "BAH_hurlburt_e5_with_dep": "~$2,100/month",
+      "BAS": 452.56,
+      "combat_zone_tax_exclusion": true,
+      "total_annual_compensation_e4_e5_estimate": "$55,000 to $75,000 including BAH and all special pays"
+    }
+  },
+  "retirement_at_20_years": {
+    "pension_formula": "High-3: 2.5% \u00d7 years \u00d7 average highest 36 months pay",
+    "BRS_option": "2.0% \u00d7 years \u00d7 pay PLUS TSP government match (up to 5%)",
+    "estimate_e7_20yr": "$2,069/month pension for life",
+    "TRICARE": true,
+    "VA_benefits": true,
+    "credentials_retained": "NR-P (Nationally Registered Paramedic) recertification required every 2 years \u2014 but I keep the credential for life if I maintain it"
+  },
+  "post_military_civilian_paths": [
+    {
+      "path": "Flight Paramedic / Critical Care Transport",
+      "description": "My NR-P certification is identical to civilian flight paramedics. I can step directly into helicopter EMS or critical care transport with no additional school. Starting salary $50,000-$75,000; experienced HEMS $80,000-$120,000."
+    },
+    {
+      "path": "Fire Service",
+      "description": "My paramedic cert + physical fitness + operational discipline makes me extremely competitive at any fire department, including FDNY, LAFD, Chicago. Most departments actively recruit SOF veterans."
+    },
+    {
+      "path": "Federal Law Enforcement",
+      "description": "FBI HRT, DEA SOG, USMS SOG, BORTAC, Secret Service CAT \u2014 all actively recruit from special operations communities. PJ background is among the most valued."
+    },
+    {
+      "path": "Medical School / PA School",
+      "description": "GI Bill covers tuition. PJ experience (thousands of real patient contacts, surgical procedures, combat trauma) is extraordinary application material. Multiple PJs have become emergency physicians, flight surgeons, and PAs."
+    },
+    {
+      "path": "Defense / Government Contractor",
+      "description": "Advising on personnel recovery doctrine, medical training contracts, TS/SCI cleared analyst roles. $90,000-$150,000+ with appropriate clearance."
+    }
+  ],
+  "pj_vs_other_afswc_honest_comparison": {
+    "CCT": {
+      "primary_skill": "Air traffic control + direct action",
+      "medical": "Basic TCCC \u2014 not paramedic",
+      "SOF_integration": "Highest \u2014 deploys with all SOF including Tier 1",
+      "career_ceiling_civilian": "Air traffic control (FAA cert) + federal law enforcement"
+    },
+    "PJ": {
+      "primary_skill": "Personnel recovery + paramedic-level medicine",
+      "medical": "Nationally Registered Paramedic (NR-P) \u2014 highest in AFSWC",
+      "SOF_integration": "High \u2014 AFSOC track; conventional rescue track also available",
+      "career_ceiling_civilian": "Flight paramedic, physician, federal LE \u2014 most versatile civilian transition"
+    },
+    "SR": {
+      "primary_skill": "Strategic reconnaissance + intelligence collection",
+      "medical": "Basic TCCC",
+      "SOF_integration": "High \u2014 works in denied areas supporting senior commanders",
+      "career_ceiling_civilian": "Intel community, DoD contractor"
+    },
+    "TACP": {
+      "primary_skill": "Close air support (JTAC) + fires coordination",
+      "medical": "Basic TCCC",
+      "SOF_integration": "Moderate to High \u2014 conventional Army/Marine embed + AFSOC STS track",
+      "career_ceiling_civilian": "Defense contractor, fire coordination, federal LE"
+    },
+    "verdict_first_person": "If I want the most medically transferable career \u2014 one where I can step out of the military and immediately practice as a paramedic, flight medic, or pivot to PA/medical school \u2014 PJ is the right choice. If I want maximum SOF integration and the JTAC fires mission, CCT is stronger. Both are elite and both are 2+ year pipelines with 80%+ attrition."
+  },
+  "life_layer": {
+    "college": {
+      "CCAF": "Community College of the Air Force \u2014 free associate degree automatically aligned with AFSC",
+      "TA": "$4,500/yr \u2014 difficult during pipeline, feasible at operational unit during non-deployment periods",
+      "GI_Bill": "36 months post-separation",
+      "medical_degree_path": "EMDP2 (Enlisted to Medical Degree Preparatory Program) \u2014 Army equivalent exists; AF version limited but GI Bill path works"
+    },
+    "marriage_family": {
+      "pipeline": "Do NOT get married during the 30-month pipeline unless the relationship is rock solid \u2014 attrition, moves, and zero free time are brutal on new relationships",
+      "first_assignment": "Marriage is realistic after assignment to operational unit. BAH at Hurlburt Field or Cannon ABF with dependents adds $1,800-2,200/month.",
+      "kids": "Possible but AFSOC STS deployments are frequent. Have an honest conversation with your partner about what this life looks like."
+    },
+    "injury": {
+      "during_pipeline": "Medical hold, recycle if injury heals in time. Some injuries end the PJ pipeline permanently \u2014 plan a civilian emergency medicine or fire service backup.",
+      "during_career": "Limited duty, medical board, VA rating if separated. NR-P credential is your financial floor \u2014 you can practice paramedicine the day you're medically separated."
+    }
+  }
+}
