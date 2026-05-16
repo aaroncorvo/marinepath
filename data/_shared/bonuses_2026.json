@@ -1,30 +1,55 @@
 {
   "source": "FY2026 official: Army HRC Sep 2025, MARADMIN 526/25, Navy CNRC, Air Force.com, CG FY2026",
   "effective_date": "2026-01-01",
-  "note": "Maximum achievable through stacking. Actual amounts depend on enlistment length, ASVAB, and recruiter allocation.",
+  "note": "Maximum achievable through stacking. Actual amounts depend on enlistment length, ASVAB, and recruiter allocation. Tranche amounts here use simulator-reachable milestones: boot_grad, soi_grad, first_unit, first_duty, sqt_grad.",
+  "milestone_legend": {
+    "boot_grad": "Within 30 days of basic training graduation (Quick Ship + initial EB)",
+    "soi_grad": "After AIT / MOS school graduation",
+    "first_unit": "Arrival at first operational unit (remainder + spread)",
+    "first_duty": "After tech school + first duty station arrival (AF + CG)",
+    "sqt_grad": "After SEAL Qualification Training (Navy SEAL only)"
+  },
   "bonuses": {
     "army_11b": {
       "branch": "army", "mos": "11B", "title": "Infantryman",
       "max_eb": 50000, "lrp_eligible": 65000,
       "payment_milestones": [
-        { "milestone": "boot_grad", "amount": 10000, "note": "Quick Ship + initial EB tranche" },
-        { "milestone": "first_unit", "amount": 15000, "note": "Remainder at first duty station" }
+        { "milestone": "boot_grad", "amount": 15000, "note": "Quick Ship + initial EB tranche" },
+        { "milestone": "soi_grad",  "amount": 15000, "note": "After AIT (post-OSUT for combat arms)" },
+        { "milestone": "first_unit", "amount": 20000, "note": "Ranger Option 40 + remainder at first unit" }
       ],
       "max_total_with_lrp": 115000,
       "note": "Broadest SOF on-ramp. Most SFAS candidates come from 11B. Ranger bonus +$20K if Option 40."
     },
-    "army_11c": { "branch": "army", "mos": "11C", "title": "Mortarman", "max_eb": 50000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"boot_grad","amount":10000},{"milestone":"first_unit","amount":15000}], "max_total_with_lrp": 115000 },
+    "army_11c": {
+      "branch": "army", "mos": "11C", "title": "Mortarman",
+      "max_eb": 50000, "lrp_eligible": 65000,
+      "payment_milestones": [
+        { "milestone": "boot_grad", "amount": 15000 },
+        { "milestone": "soi_grad",  "amount": 15000 },
+        { "milestone": "first_unit", "amount": 20000 }
+      ],
+      "max_total_with_lrp": 115000
+    },
     "army_13f": {
       "branch": "army", "mos": "13F", "title": "Fire Support / JTAC",
       "max_eb": 30000, "lrp_eligible": 65000,
-      "payment_milestones": [{"milestone":"boot_grad","amount":8000},{"milestone":"first_unit","amount":12000}],
+      "payment_milestones": [
+        { "milestone": "boot_grad", "amount": 10000, "note": "Quick Ship + initial" },
+        { "milestone": "soi_grad",  "amount": 10000, "note": "FA AIT graduation" },
+        { "milestone": "first_unit", "amount": 10000, "note": "College credit bonus + remainder" }
+      ],
       "max_total_with_lrp": 95000,
       "note": "Ranger Regiment actively recruits 13F. Most SOF-valuable non-infantry MOS."
     },
     "army_18x": {
       "branch": "army", "mos": "18X", "title": "Special Forces Candidate",
       "max_eb": 50000, "lrp_eligible": 65000, "language_bonus": 45000,
-      "payment_milestones": [{"milestone":"boot_grad","amount":15000},{"milestone":"sfas_pass","amount":27000},{"milestone":"sfqc_grad","amount":8000}],
+      "payment_milestones": [
+        { "milestone": "boot_grad", "amount": 15000, "note": "Initial EB after BCT" },
+        { "milestone": "soi_grad",  "amount": 20000, "note": "After SFAS pass" },
+        { "milestone": "first_unit", "amount": 15000, "note": "After SFQC graduation" }
+      ],
       "max_total_with_lrp": 160000,
       "note": "Arabic/Korean/Russian = +$30-45K language bonus. ~60% wash at SFAS."
     },
@@ -32,14 +57,17 @@
     "army_19k": {
       "branch": "army", "mos": "19K", "title": "M1 Armor Crewman",
       "max_eb": 47500, "lrp_eligible": 0,
-      "payment_milestones": [{"milestone":"boot_grad","amount":20000},{"milestone":"first_unit","amount":27500}],
+      "payment_milestones": [
+        { "milestone": "boot_grad",  "amount": 20000 },
+        { "milestone": "first_unit", "amount": 27500 }
+      ],
       "note": "Highest advertised Army combat arms EB in FY2026."
     },
     "army_12b": { "branch": "army", "mos": "12B", "title": "Combat Engineer", "max_eb": 5000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"boot_grad","amount":5000}], "note": "12D Diver MOS has +$24.5K Level 4 EB." },
     "usmc_0311": {
       "branch": "marines", "mos": "0311", "title": "Rifleman",
       "max_eb": 15000, "lrp_eligible": 0,
-      "payment_milestones": [{"milestone":"soi_grad","amount":15000}],
+      "payment_milestones": [{ "milestone": "soi_grad", "amount": 15000 }],
       "note": "USMC FY2026 = ONE bonus per enlistee. $15K via QW (add 2 years to contract)."
     },
     "usmc_0321": { "branch": "marines", "mos": "0321", "title": "Recon Marine", "max_eb": 15000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"soi_grad","amount":15000}], "retention_kicker_84mo": 50000, "note": "$50K lateral move kicker available at retention (FY2027)." },
@@ -47,19 +75,27 @@
     "navy_seal": {
       "branch": "navy", "mos": "SO", "title": "Navy SEAL",
       "max_eb": 35000, "lrp_eligible": 65000,
-      "payment_milestones": [{"milestone":"sqt_grad","amount":35000,"note":"Paid AFTER SQT graduation, NOT at boot camp"}],
+      "payment_milestones": [{ "milestone": "sqt_grad", "amount": 35000, "note": "Paid AFTER SQT graduation, NOT at boot camp" }],
       "max_total_with_lrp": 140000,
       "note": "Only ~9.5% of SEAL contracts earn a Trident. EBSR paid after SQT only."
     },
-    "navy_swcc": { "branch": "navy", "mos": "SB", "title": "SWCC", "max_eb": 50000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"swcc_charlie_phase","amount":50000}], "max_total_with_lrp": 115000, "note": "EBSR $30K = DOUBLE the SEAL rate. Higher bonus, lower attrition." },
-    "navy_eod": { "branch": "navy", "mos": "EOD", "title": "Navy EOD", "max_eb": 45000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"eod_a_school","amount":45000}], "max_total_with_lrp": 110000 },
-    "navy_nd": { "branch": "navy", "mos": "ND", "title": "Navy Diver", "max_eb": 45000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"dive_a_school","amount":45000}], "max_total_with_lrp": 110000 },
-    "af_pj": { "branch": "air_force", "mos": "1T2X1", "title": "Pararescue (PJ)", "max_eb": 40000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"contract_spread","amount":20000}], "retention_srb": 125000, "note": "50% at first duty, rest spread. SNCO retention SRB up to $125K." },
-    "af_cct": { "branch": "air_force", "mos": "1Z2X1", "title": "Combat Control", "max_eb": 40000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"contract_spread","amount":20000}], "retention_srb": 125000 },
-    "af_tacp": { "branch": "air_force", "mos": "1Z3X1", "title": "TACP", "max_eb": 40000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"contract_spread","amount":20000}], "retention_srb": 125000 },
-    "af_sr": { "branch": "air_force", "mos": "1Z4X1", "title": "Special Reconnaissance", "max_eb": 40000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"contract_spread","amount":20000}], "retention_srb": 125000 },
+    "navy_swcc": { "branch": "navy", "mos": "SB", "title": "SWCC", "max_eb": 50000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"sqt_grad","amount":50000,"note":"After Charlie Phase (sim uses sqt_grad milestone)"}], "max_total_with_lrp": 115000, "note": "EBSR $30K = DOUBLE the SEAL rate. Higher bonus, lower attrition." },
+    "navy_eod": { "branch": "navy", "mos": "EOD", "title": "Navy EOD", "max_eb": 45000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"sqt_grad","amount":45000,"note":"After EOD A-school (~51 wk)"}], "max_total_with_lrp": 110000 },
+    "navy_nd": { "branch": "navy", "mos": "ND", "title": "Navy Diver", "max_eb": 45000, "lrp_eligible": 65000, "payment_milestones": [{"milestone":"sqt_grad","amount":45000,"note":"After Dive A-school"}], "max_total_with_lrp": 110000 },
+    "af_pj": {
+      "branch": "air_force", "mos": "1T2X1", "title": "Pararescue (PJ)",
+      "max_eb": 40000, "lrp_eligible": 0, "retention_srb": 125000,
+      "payment_milestones": [
+        { "milestone": "first_duty", "amount": 20000, "note": "50% at first duty station / Maroon Beret pinned" },
+        { "milestone": "first_unit", "amount": 20000, "note": "Remaining 50% spread, paid at AFSOC unit assignment" }
+      ],
+      "note": "50% at first duty, rest spread. SNCO retention SRB up to $125K."
+    },
+    "af_cct": { "branch": "air_force", "mos": "1Z2X1", "title": "Combat Control", "max_eb": 40000, "lrp_eligible": 0, "retention_srb": 125000, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"first_unit","amount":20000}] },
+    "af_tacp": { "branch": "air_force", "mos": "1Z3X1", "title": "TACP", "max_eb": 40000, "lrp_eligible": 0, "retention_srb": 125000, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"first_unit","amount":20000}] },
+    "af_sr": { "branch": "air_force", "mos": "1Z4X1", "title": "Special Reconnaissance", "max_eb": 40000, "lrp_eligible": 0, "retention_srb": 125000, "payment_milestones": [{"milestone":"first_duty","amount":20000},{"milestone":"first_unit","amount":20000}] },
     "cg_msrt": { "branch": "coast_guard", "mos": "ME", "title": "MSRT", "max_eb": 0, "lrp_eligible": 0, "payment_milestones": [], "note": "NO MSRT-specific bonus in FY2026. Internal selection 3-4 yrs after enlistment." },
-    "cg_ast": { "branch": "coast_guard", "mos": "AST", "title": "Aviation Survival Tech", "max_eb": 75000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"ast_a_school","amount":75000}], "note": "Critical rating EB stacked up to $75K CG cap." }
+    "cg_ast": { "branch": "coast_guard", "mos": "AST", "title": "Aviation Survival Tech", "max_eb": 75000, "lrp_eligible": 0, "payment_milestones": [{"milestone":"first_duty","amount":75000,"note":"Critical rating EB after AST A-school"}], "note": "Critical rating EB stacked up to $75K CG cap." }
   },
   "strategy_notes": {
     "stacking": [
@@ -74,7 +110,7 @@
       "Navy SB: paid after Charlie Phase of SWCC training",
       "Navy EOD/ND: after respective A-school graduation",
       "Air Force: 50% at first duty station, rest spread",
-      "Army: varies — some at AIT graduation, some spread",
+      "Army: 50% within 30 days of AIT graduation, 50% at contract midpoint",
       "Marines: at SOI or first permanent duty station"
     ],
     "retention_premiums": [

@@ -1962,7 +1962,13 @@ const SCENES = {
     text:`Assigned to an Air Force Special Operations Command unit. Deployments rotate. SODI + jump + (dive if PJ/CCT) special pays kick in.`,
     choices:[
       {label:'Operate 4–5 years',
-       apply:g=>{g.tis_months+=54;g.rank='E-6';g.deployments+=3;g.reputation+=12;g.morale-=6;g.savings+=22000;g.path.push('Active AFSOC operator');g.event={type:'win',text:'4-5 years operational. Made E-6. AFSOC patch on my flight suit.'};},
+       apply:g=>{
+         g.tis_months+=54;g.rank='E-6';g.deployments+=3;g.reputation+=12;g.morale-=6;g.savings+=22000;
+         g.path.push('Active AFSOC operator');
+         payBonusAt(g,'first_duty'); // CCT/TACP/SR who skipped the PJ pipeline still need this tranche
+         payBonusAt(g,'first_unit'); // remaining 50% spread of AF SW bonus
+         if(!g.event) g.event={type:'win',text:'4-5 years operational. Made E-6. AFSOC patch on my flight suit.'};
+       },
        next:'mid_career_check'}
     ]
   },
@@ -2030,6 +2036,7 @@ const SCENES = {
        apply:g=>{
          g.tis_months+=5;g.quals.push('PJ');g.mos='1T2 Pararescue';g.rank='E-4';
          g.event={type:'win',text:'🎖 Maroon Beret pinned. MOS 1T2X1 Pararescue. ~30 months from MEPS. Now: AFSOC ST track or ACC Rescue track?'};
+         payBonusAt(g,'first_duty'); // 50% of AF SW bonus at first duty / Maroon Beret
        },
        next:'afsoc_pj_track_decision'}
     ]
@@ -2082,7 +2089,11 @@ const SCENES = {
     text:`12-week A-school at Charleston. Boarding ops, law enforcement, weapons, vessel inspection. Graduates serve afloat on cutters before being eligible for MSRT/TACLET tryouts.`,
     choices:[
       {label:'Graduate ME A-School + first cutter tour',
-       apply:g=>{g.tis_months+=18;g.mos='ME (Maritime Enforcement)';g.quals.push('Boarding Officer');g.deployments+=1;g.rank='E-4';g.path.push('CG ME → cutter tour');},
+       apply:g=>{
+         g.tis_months+=18;g.mos='ME (Maritime Enforcement)';g.quals.push('Boarding Officer');g.deployments+=1;g.rank='E-4';
+         g.path.push('CG ME → cutter tour');
+         payBonusAt(g,'first_duty'); // critical-rating EB pays here for AST/CG bonus paths
+       },
        next:'cg_msrt_tryout'}
     ]
   },
@@ -2112,7 +2123,12 @@ const SCENES = {
     text:`Assigned to an MSRT. Counter-terrorism, high-risk boardings, VIP protection in maritime environments. New Special Missions Command means more career growth path than ever for CG SOF.`,
     choices:[
       {label:'Operate 4 years',
-       apply:g=>{g.tis_months+=48;g.rank='E-6';g.deployments+=2;g.reputation+=10;g.savings+=15000;g.path.push('Active CG MSRT operator');g.event={type:'win',text:'4 years MSRT. SMC-aligned. Solid career trajectory.'};},
+       apply:g=>{
+         g.tis_months+=48;g.rank='E-6';g.deployments+=2;g.reputation+=10;g.savings+=15000;
+         g.path.push('Active CG MSRT operator');
+         payBonusAt(g,'first_unit'); // catch-all for any pending CG tranche
+         if(!g.event) g.event={type:'win',text:'4 years MSRT. SMC-aligned. Solid career trajectory.'};
+       },
        next:'mid_career_check'}
     ]
   },
@@ -2122,7 +2138,11 @@ const SCENES = {
     text:`Standard CG career on cutters, stations, sectors. Lower op-tempo than the other branches\' SOF, more stable home life, real domestic mission impact.`,
     choices:[
       {label:'Build a stable CG career',
-       apply:g=>{g.tis_months+=36;g.rank='E-5';g.deployments+=1;g.savings+=10000;g.path.push('CG standard career');},
+       apply:g=>{
+         g.tis_months+=36;g.rank='E-5';g.deployments+=1;g.savings+=10000;
+         g.path.push('CG standard career');
+         payBonusAt(g,'first_unit'); // AST/CG bonus tranches if any remain
+       },
        next:'mid_career_check'}
     ]
   },
