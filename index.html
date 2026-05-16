@@ -2467,6 +2467,70 @@ function renderBudget(){
         ${b.net_to_savings>=0 ? `At this rate I save <strong>${fmt(b.net_to_savings*12)}/yr</strong> on top of my <strong>${fmt(b.tsp_contrib*12)}/yr</strong> going into TSP.` : 'I\'m burning savings each month. Something has to change.'}
       </div>
     </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <!-- 💸 LIVE ADJUST — every input recomputes the whole panel + age-60 -->
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div style="margin-top:var(--s5);padding-top:var(--s5);border-top:2px solid var(--gold)">
+      <h3 style="margin-bottom:.3rem">💸 Adjust My Money — Live</h3>
+      <p style="font-size:var(--text-xs);color:var(--muted);margin-bottom:var(--s4)">Change any number below — bills, goal contributions, investment buckets — and watch the budget AND the age-60 projection update instantly. This is the "envelope budget" view: every dollar gets a job.</p>
+
+      <div style="font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">━ Discretionary bills (edit anything) ━</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem var(--s4);margin-bottom:var(--s4)">
+        ${[
+          {key:'groceries', label:'Groceries'},
+          {key:'eating_out', label:'Eating out'},
+          {key:'subscriptions', label:'Subscriptions'},
+          {key:'fun_money', label:'Fun money'},
+          {key:'personal', label:'Personal'},
+          {key:'misc', label:'Other necessities'}
+        ].map(row=>{
+          const v = billValue(G, row.key);
+          return `<label style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:var(--text-xs)">
+            <span style="color:var(--muted)">${row.label}</span>
+            <span style="display:flex;align-items:center;gap:.2rem">$<input type="number" min="0" step="10" value="${v}" data-bill="${row.key}" onchange="adjustBudget('bill','${row.key}',this.value)" style="width:75px;padding:.3rem .4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;font-family:var(--mono);text-align:right">/mo</span>
+          </label>`;
+        }).join('')}
+      </div>
+
+      <div style="font-family:var(--mono);font-size:var(--text-xs);color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">━ Savings envelopes ━</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem var(--s4);margin-bottom:var(--s4)">
+        ${[
+          {key:'emergency_fund_monthly', label:'→ Emergency fund', balance:G.emergency_fund||0, type:'bill'},
+          {key:'home_fund_monthly',      label:'→ Home down payment', balance:G.home_fund||0, type:'bill'},
+          {key:'ira_monthly',            label:'→ Roth IRA', balance:G.roth_ira||0, type:'invest', cap:583, capNote:'$583/mo max (2026 cap)'},
+          {key:'taxable_monthly',        label:'→ Index funds (taxable)', balance:G.taxable_invest||0, type:'invest'},
+          {key:'extra_savings_monthly',  label:'→ Extra HY savings', balance:0, type:'invest'}
+        ].map(row=>{
+          const v = row.type==='bill' ? billValue(G, row.key) : (G[row.key]||0);
+          const capAttr = row.cap ? `max="${row.cap}"` : '';
+          return `<label style="display:flex;flex-direction:column;gap:.2rem;font-size:var(--text-xs)">
+            <span style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:var(--text)">${row.label}</span>
+              <span style="font-family:var(--mono);color:var(--success);font-size:.7rem">${row.balance?'Bal: '+fmt(row.balance):''}</span>
+            </span>
+            <span style="display:flex;align-items:center;gap:.2rem">$<input type="number" min="0" step="25" ${capAttr} value="${v}" onchange="adjustBudget('${row.type}','${row.key}',this.value)" style="width:90px;padding:.3rem .4rem;background:var(--surf2);border:1px solid var(--gold);border-radius:.3rem;color:var(--text);font:inherit;font-family:var(--mono);text-align:right">/mo${row.cap?' <span style="font-size:.65rem;color:var(--muted)">'+row.capNote+'</span>':''}</span>
+          </label>`;
+        }).join('')}
+      </div>
+
+      <!-- 📈 LIVE IMPACT AT AGE 60 -->
+      ${(()=>{
+        const proj = projectToAge60();
+        const civ = civilianCareerProjection(G);
+        const pension20 = (yearsOfService(G) + (240-G.tis_months)/12 >= 20) ? basePay(G.rank,G.tis_months)*0.50*12 : 0;
+        return `<div style="margin-top:var(--s4);padding:var(--s5);background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 18%,transparent),color-mix(in srgb,var(--primary) 8%,transparent));border:2px solid var(--gold);border-radius:var(--r-md)">
+          <h4 style="font-size:var(--text-base);margin-bottom:.5rem;color:var(--gold)">📈 Live Impact at Age 60</h4>
+          <div style="font-size:var(--text-sm);line-height:1.8">
+            <div style="display:flex;justify-content:space-between"><span>Total nest egg:</span><strong style="font-family:var(--mono);color:var(--gold);font-size:var(--text-lg)">${fmt(proj.total)}</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--muted)"><span>↳ TSP / Roth IRA / Index / Savings</span><span>${fmt(proj.tsp)} / ${fmt(proj.ira)} / ${fmt(proj.taxable)} / ${fmt(proj.savings)}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;padding-top:.4rem;border-top:1px solid color-mix(in srgb,var(--gold) 30%,transparent)"><span>Monthly retirement income (4% rule):</span><strong style="font-family:var(--mono);color:var(--success)">${fmt(proj.total*0.04/12)}/mo</strong></div>
+            ${pension20?`<div style="display:flex;justify-content:space-between"><span>+ 20-yr military pension:</span><strong style="font-family:var(--mono);color:var(--success)">${fmt(pension20/12)}/mo</strong></div>`:''}
+            <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--muted)"><span>+ Civilian salary (today's degree progress):</span><span>${fmt(civ.salaryLow/12)}–${fmt(civ.salaryHigh/12)}/mo</span></div>
+          </div>
+        </div>`;
+      })()}
+    </div>
   `;
 }
 
@@ -3465,6 +3529,23 @@ function renderBudgetLiveSummary(){
       <div><strong>Home fund balance:</strong> <span style="font-family:var(--mono);color:var(--success)">${fmt(G.home_fund||0)}</span></div>
     </div>
   `;
+}
+
+// Single live-edit handler for the Quick Adjust section in the Monthly Budget panel
+function adjustBudget(type, key, val){
+  const v = Math.max(0, parseFloat(val) || 0);
+  if(type === 'bill'){
+    if(!G.bills_custom) G.bills_custom = {};
+    G.bills_custom[key] = v;
+  } else if(type === 'invest'){
+    // Roth IRA cap enforcement
+    if(key === 'ira_monthly') G[key] = Math.min(v, 583);
+    else G[key] = v;
+  }
+  if(typeof renderBudget==='function') renderBudget();
+  if(typeof renderDash==='function') renderDash();
+  if(typeof renderInvestmentsTab==='function' && document.getElementById('invest')?.classList.contains('active')) renderInvestmentsTab();
+  autoSave();
 }
 
 function updateBill(key, val){
