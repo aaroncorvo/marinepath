@@ -1314,6 +1314,14 @@ function defaultState(){
     },
     // life
     married:false, kids:0, pets:0,
+    // Spouse profile (set after marriage)
+    spouse_works:'none', // 'none' | 'part_time' | 'full_time' | 'remote'
+    spouse_income_monthly:0, // her monthly take-home
+    spouse_in_school:false, spouse_school_cost:0, // monthly out-of-pocket (post-MyCAA)
+    spouse_car:'shared', // 'shared' | 'owned' | 'financed'
+    spouse_car_payment:0, spouse_phone:false, spouse_phone_bill:65,
+    spouse_personal:0, // her discretionary monthly
+    is_officer:false, commission_source:'', // 'OCS' | 'USNA' | 'ROTC' | 'ECP'
     housing:'barracks', // barracks | on_base | off_base | own
     car:'none', // none | used_cash | financed | upgrade
     car_payment:0, car_value:0, mortgage:0,
@@ -1380,6 +1388,24 @@ const SCENES = {
        desc:'4-year contract. CG basic → A-school → operational tour → MSRT/TACLET/Diver tryouts. New Special Missions Command stood up Oct 2026.',
        tags:['info:Coast Guard','ok:Domestic SOF','info:New SMC 2026'],
        apply:g=>{g.branch='coast_guard';g.mos='ME (Maritime Enforcement)';g.path.push('Enlisted: Coast Guard ME');},
+       next:'meps'},
+      {label:'Marine Corps Officer — OCS / TBS (commission as 2ndLt)',
+       desc:'Requires bachelor\'s degree first. ~10 weeks OCS, then 6 mo TBS. Higher starting pay (~$4,150/mo O-1), longer initial commit. Path to Infantry Officer (0302) → Reconnaissance Officer or MARSOC Special Operations Officer (0370).',
+       tags:['info:Officer track','ok:Higher pay','warn:4-yr college first'],
+       requires:g=>g.edu_credits>=120,
+       apply:g=>{g.branch='usmc';g.is_officer=true;g.commission_source='OCS';g.rank='E-1';g.mos='0302 Infantry Officer (candidate)';g.path.push('Enlisted as officer candidate: USMC OCS');},
+       next:'meps'},
+      {label:'Service Academy (USNA / USMA / USAFA / USCGA) — 4-yr scholarship',
+       desc:'Free college + officer commission. Highly competitive (~10% acceptance). 5-year active-duty service obligation post-grad. Commission as O-1 (2ndLt/2ndLt/2ndLt/Ens).',
+       tags:['ok:Free degree','ok:Commission','warn:5-yr ADSO'],
+       requires:g=>g.age<=22 && g.edu_credits<60,
+       apply:g=>{g.is_officer=true;g.commission_source='Academy';g.edu_credits=120;g.degree='bachelor\'s';g.age+=4;g.path.push('Service Academy — 4 yrs');},
+       next:'meps'},
+      {label:'ROTC scholarship — 4-yr college + commission',
+       desc:'College tuition covered + monthly stipend. 8-year total commitment (4 active + 4 reserves typically). Commission as O-1 upon graduation.',
+       tags:['ok:Free degree','ok:Commission','warn:8-yr commit'],
+       requires:g=>g.age<=22 && g.edu_credits<60,
+       apply:g=>{g.is_officer=true;g.commission_source='ROTC';g.edu_credits=120;g.degree='bachelor\'s';g.age+=4;g.path.push('ROTC scholarship — 4 yrs');},
        next:'meps'},
       {label:'Delay 1 year — Junior college first',
        desc:'Bank 30 credits, raise GT score, save $2k. Then enlist with stronger academics.',
@@ -1711,13 +1737,19 @@ const SCENES = {
          g.path.push('Married during post-boot leave');
          g.event={type:'info',text:'Got married during leave. BAH starts now (~{{bah}}/mo). I\'m no longer a single Marine.'};
        },
-       next:'kids_post_marriage'},
+       next:'spouse_profile'},
       {label:'Already married — bring spouse to first duty station',
        desc:'Skip ahead — I came in married. Spouse will join me after SOI.',
        requires:g=>g.married,
        apply:g=>{g.tis_months+=1;g.morale+=8;},
-       next:'kids_post_marriage'}
+       next:'spouse_profile'}
     ]
+  },
+  'spouse_profile':{
+    stage:'Spouse Profile',
+    title:`👰 My Spouse — Real Person, Real Budget`,
+    text:`(custom render — see renderSpouseProfile)`,
+    choices:[]
   },
   'kids_post_marriage':{
     stage:'Newly Married',
@@ -2308,13 +2340,13 @@ const SCENES = {
        tags:['info:+BAH','warn:New expenses'],
        requires:g=>!g.married,
        apply:g=>{g.married=true;g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.event={type:'info',text:'Got married. BAH starts (~{{bah}}/mo). Rent + utilities ~$2,200/mo. Net is positive but smaller than people think.'};},
-       next:'housing_choice_married'},
+       next:'spouse_profile'},
       {label:'Get married, take on-base family housing',
        desc:'BAH paid directly to housing office. No surprises. Less privacy.',
        tags:['ok:Predictable cost'],
        requires:g=>!g.married,
        apply:g=>{g.married=true;g.housing='on_base';g.tis_months+=1;g.event={type:'info',text:'Got married. On-base housing. BAH covers it 1:1. Predictable.'};},
-       next:'housing_choice_married'},
+       next:'spouse_profile'},
       {label:'Stay single — focus on MARSOC',
        desc:'Recon→MARSOC tempo punishes relationships. Consider marriage post-ITC.',
        requires:g=>!g.married,
@@ -2526,10 +2558,15 @@ const SCENES = {
     title:`I\'m a Raider — MOS 0372`,
     text:`Assigned to a Marine Special Operations Team (MSOT). Multiple high-tempo deployments. SDAP + dive + jump = significant boost. Body takes wear; career peaks.`,
     choices:[
-      {label:'Operate for 5 years (yrs 6-11 TIS)',
-       desc:'4 deployments. SSgt→GySgt range. Big savings build-up.',
+      {label:'Operate for 5 years (yrs 6-11 TIS) — auto-promote',
+       desc:'4 deployments. SSgt→GySgt range. Big savings build-up. Skip the board details.',
        apply:g=>{g.tis_months+=60;g.deployments+=3;g.reputation+=15;g.morale-=8;g.fitness=Math.max(55,g.fitness-3);g.savings+=20000;g.rank='E-7';g.event={type:'win',text:'5 years as active Raider. GySgt now. Body shows wear. Career as hoped.'};},
-       next:'mid_career_check'}
+       next:'mid_career_check'},
+      {label:'Press through SSgt → GySgt → MSgt boards (board-by-board)',
+       desc:'Walk through each promotion board explicitly. See exactly how I scored, what billet I picked, what got me selected (or passed over).',
+       tags:['ok:More detail','info:Realistic boards'],
+       apply:g=>{g.tis_months+=12;g.deployments+=1;g.fitness=Math.max(60,g.fitness-2);},
+       next:'promo_e6_board'}
     ]
   },
   'marsoc_fallback':{
@@ -2550,6 +2587,101 @@ const SCENES = {
       {label:'Senior NCO in Recon — Stay Operational',
        desc:'Stay Recon as Platoon Sergeant. Mentor next class.',
        apply:g=>{g.tis_months+=30;g.rank='E-6';g.deployments+=2;g.path.push('Senior Recon NCO');},
+       next:'mid_career_check'}
+    ]
+  },
+  // ════════ MID-CAREER PROMOTION BOARDS — E-6 / E-7 / E-8 ════════
+  'promo_e6_board':{
+    stage:'SSgt Board',
+    title:`Staff Sergeant (E-6) Board — Year 6-9`,
+    text:`SSgt is the first board-based promotion — no more cutting score. Headquarters convenes a board, reads my Service Record Book, and decides. Promotion brings <strong>real leadership</strong> (platoon-level), bigger paycheck (~$4,000/mo base + special pays), and SNCO mess privileges. <strong>This board uses reputation + duty performance + completed PME.</strong>`,
+    choices:[
+      {label:'Submit polished packet + chase rep-building billets',
+       desc:'Hit the board with strongest service record. Strong odds of selection.',
+       tags:['ok:+Rep','ok:On track'],
+       apply:g=>{
+         g.tis_months+=8;
+         const p = 0.45 + (g.reputation-70)/200;
+         if(rng()<p){g.rank='E-6';g.reputation+=8;g.event={type:'win',text:'🏅 Selected for SSgt by board. Big pay bump + leadership.'};}
+         else {g.event={type:'warn',text:'Not picked up by board this cycle. Re-eligible next year.'};g.tis_months+=12;}
+       },
+       next:'promo_e7_board'},
+      {label:'Volunteer for a hard B-billet (DI / Recruiter / MSG) — accelerator',
+       desc:'These billets are well-known board boosters. Strong NCO performance there = near-guaranteed SSgt.',
+       tags:['ok:Board accelerator','warn:3-yr B-billet'],
+       apply:g=>{g.tis_months+=36;g.rank='E-6';g.reputation+=12;g.morale-=8;g.savings+=18000;g.path.push('B-billet → SSgt');g.event={type:'win',text:'🏅 SSgt pinned during/after B-billet. Strong record.'};},
+       next:'promo_e7_board'},
+      {label:'Coast — let the board pass me by once',
+       desc:'Stay operational, skip the packet polish. May get picked up later anyway, may not.',
+       tags:['warn:Passover risk'],
+       apply:g=>{
+         g.tis_months+=12;
+         if(rng()<0.55){g.rank='E-6';g.event={type:'info',text:'Picked up SSgt on second look. Average packet.'};}
+         else {g.event={type:'warn',text:'Two passovers — career trajectory flattening.'};g.failed_stages.push('SSgt board');g.tis_months+=12;}
+       },
+       next:'promo_e7_board'}
+    ]
+  },
+  'promo_e7_board':{
+    stage:'GySgt Board',
+    title:`Gunnery Sergeant (E-7) Board — Year 11-14`,
+    text:`GySgt = "Gunny." The promotion that defines a Marine career. Highly competitive. Most who fail twice retire as SSgt. <strong>I need outstanding fitness reports, completed PME (CDET courses), strong leadership tour record.</strong>`,
+    choices:[
+      {label:'All-in: max PME + best-of-record fitness reports',
+       desc:'College credits in progress + Career Course completed + leadership billets. Strong odds.',
+       tags:['ok:+PME','ok:Strong packet'],
+       apply:g=>{
+         g.tis_months+=18;
+         const p = 0.35 + (g.reputation-70)/200 + (g.edu_credits>=60?0.08:0);
+         if(rng()<p){g.rank='E-7';g.reputation+=10;g.event={type:'win',text:'🏅 Selected GySgt. The promotion that defines a Marine career.'};}
+         else {g.event={type:'warn',text:'Passed over for GySgt. One more chance next year.'};g.tis_months+=12;}
+       },
+       next:'promo_e8_board'},
+      {label:'Take a high-visibility billet (Plt Sgt of Recon team / 1st Sgt slot)',
+       desc:'Higher rep payoff, but lower predictability — depends on commander\'s evaluation.',
+       tags:['ok:Big rep payoff','warn:Variable'],
+       apply:g=>{
+         g.tis_months+=24;
+         const r = rng();
+         if(r<0.55){g.rank='E-7';g.reputation+=15;g.event={type:'win',text:'🏅 GySgt + high-impact billet. Major career investment paid off.'};}
+         else if(r<0.85){g.event={type:'warn',text:'Strong billet, but passed over once. Try again next cycle.'};g.tis_months+=12;}
+         else {g.failed_stages.push('GySgt board');g.event={type:'bad',text:'Multiple passovers despite strong billet. SSgt cap — retire at SSgt likely.'};}
+       },
+       next:'promo_e8_board'},
+      {label:'Stay-the-course at current rank',
+       desc:'Don\'t chase GySgt — finish my 20 as SSgt. Lower pension, but more stable life.',
+       tags:['info:Career cap','warn:Lower pension'],
+       apply:g=>{g.tis_months+=36;g.event={type:'info',text:'Decided to retire as SSgt at 20. Less stress, smaller pension.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  'promo_e8_board':{
+    stage:'MSgt/1stSgt Board',
+    title:`Master Sergeant / First Sergeant (E-8) Board — Year 14-18`,
+    text:`Two career tracks at E-8: <strong>Master Sergeant</strong> (occupational specialist track — deep technical leader) or <strong>First Sergeant</strong> (command-track leader, runs a company). Same pay (~$5,500-7,500/mo base), different mission. The branch decides based on my profile.`,
+    choices:[
+      {label:'Pursue First Sergeant track — command leadership',
+       desc:'Run a company. Senior enlisted advisor to a captain. High-visibility, high-stress, top of NCO command leadership.',
+       tags:['ok:Command role','warn:High stress'],
+       apply:g=>{
+         g.tis_months+=24;
+         if(rng()<0.55){g.rank='E-8';g.reputation+=10;g.event={type:'win',text:'🏅 Selected 1stSgt. Running a company.'};}
+         else {g.event={type:'warn',text:'Selected MSgt instead (occupational track). Still E-8, different role.'};g.rank='E-8';g.reputation+=5;}
+       },
+       next:'last_tour'},
+      {label:'Pursue Master Sergeant track — technical leader',
+       desc:'Deep MOS specialist. Senior advisor on technical/operational matters. Often a less stressful path.',
+       tags:['ok:Technical track','info:Less command'],
+       apply:g=>{
+         g.tis_months+=18;
+         if(rng()<0.50){g.rank='E-8';g.reputation+=8;g.event={type:'win',text:'🏅 Selected MSgt. Senior technical leader.'};}
+         else {g.event={type:'warn',text:'Not picked up. Retire as GySgt at 20.'};g.tis_months+=12;}
+       },
+       next:'last_tour'},
+      {label:'Skip — retire as GySgt at year 20',
+       desc:'Take the GySgt pension. Less drama, still solid retirement.',
+       tags:['info:GySgt pension'],
+       apply:g=>{g.tis_months+=36;g.event={type:'info',text:'Retire as GySgt at 20. ~$3,300/mo pension for life.'};},
        next:'mid_career_check'}
     ]
   },
@@ -2729,12 +2861,25 @@ function calcBudget(g){
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
   const phone = g.has_phone ? (g.phone_bill||0) : 0;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly;
-  const net_to_savings = net - total_bills;
+  // ── Spouse contributions ─────────────────────────────────────
+  // Spouse income adds to household take-home; spouse costs become bills
+  const spouse_income = (g.married && g.spouse_income_monthly) ? g.spouse_income_monthly : 0;
+  const spouse_car_total = (g.married && g.spouse_car && g.spouse_car!=='shared')
+    ? ((g.spouse_car==='financed' ? (g.spouse_car_payment||0) : 0) + 180) : 0;
+  const spouse_phone_cost = (g.married && g.spouse_phone) ? (g.spouse_phone_bill||0) : 0;
+  const spouse_school_cost = (g.married && g.spouse_in_school) ? Math.max(0, (g.spouse_school_cost||0)) : 0;
+  const spouse_personal = (g.married) ? (g.spouse_personal||0) : 0;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly
+    + spouse_car_total + spouse_phone_cost + spouse_school_cost + spouse_personal;
+  // Household take-home = my net + spouse income (her take-home is already post-tax)
+  const household_net = net + spouse_income;
+  const net_to_savings = household_net - total_bills;
   return {
     bp, bah, bas, special, gross,
     taxable, ftax, fica, stax,
     tsp_contrib, net,
+    spouse_income, household_net,
+    spouse_car_total, spouse_phone_cost, spouse_school_cost, spouse_personal,
     housing_cost, food, groceries, car_total, car_insurance, car_gas,
     kids_cost, pet_cost, phone, personal, misc,
     eating_out, subscriptions, fun_money,
@@ -2879,7 +3024,8 @@ function renderBudget(){
     ${b.bah?`<div class="budget-row"><span>BAH <span style="color:var(--muted);font-size:.85em">(housing allowance · tax-free)</span></span><span class="budget-amt pos">+${fmt(b.bah)}</span></div>`:''}
     <div class="budget-row"><span>BAS <span style="color:var(--muted);font-size:.85em">(food allowance · tax-free)</span></span><span class="budget-amt pos">+${fmt(b.bas)}</span></div>
     ${b.special?`<div class="budget-row"><span>Special pays <span style="color:var(--muted);font-size:.85em">(jump/dive/SDAP · taxable)</span></span><span class="budget-amt pos">+${fmt(b.special)}</span></div>`:''}
-    <div class="budget-row total"><span>Gross Income</span><span class="budget-amt"><strong>${fmt(b.gross)}/mo</strong></span></div>
+    ${b.spouse_income?`<div class="budget-row"><span>👰 Spouse income <span style="color:var(--muted);font-size:.85em">(post-tax)</span></span><span class="budget-amt pos">+${fmt(b.spouse_income)}</span></div>`:''}
+    <div class="budget-row total"><span>${b.spouse_income?'Household Gross':'Gross Income'}</span><span class="budget-amt"><strong>${fmt(b.gross + (b.spouse_income||0))}/mo</strong></span></div>
 
     <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--error);text-transform:uppercase;letter-spacing:.08em">━ Taxes & Pre-Tax Deductions ━</div>
     <div class="budget-row"><span>Federal income tax <span style="color:var(--muted);font-size:.85em">(~10% of taxable)</span></span><span class="budget-amt neg">−${fmt(b.ftax)}</span></div>
@@ -2904,6 +3050,10 @@ function renderBudget(){
     ${b.eating_out?`<div class="budget-row"><span>Eating out / coffee</span><span class="budget-amt neg">−${fmt(b.eating_out)}</span></div>`:''}
     ${b.subscriptions?`<div class="budget-row"><span>Subscriptions <span style="color:var(--muted);font-size:.85em">(Netflix, etc.)</span></span><span class="budget-amt neg">−${fmt(b.subscriptions)}</span></div>`:''}
     ${b.fun_money?`<div class="budget-row"><span>Fun money / hobbies</span><span class="budget-amt neg">−${fmt(b.fun_money)}</span></div>`:''}
+    ${b.spouse_car_total?`<div class="budget-row"><span>👰 Spouse vehicle <span style="color:var(--muted);font-size:.85em">(${G.spouse_car==='financed'?'pmt + ins + gas':'paid off — ins + gas'})</span></span><span class="budget-amt neg">−${fmt(b.spouse_car_total)}</span></div>`:''}
+    ${b.spouse_phone_cost?`<div class="budget-row"><span>👰 Spouse phone</span><span class="budget-amt neg">−${fmt(b.spouse_phone_cost)}</span></div>`:''}
+    ${b.spouse_school_cost?`<div class="budget-row"><span>👰 Spouse school <span style="color:var(--muted);font-size:.85em">(post-MyCAA)</span></span><span class="budget-amt neg">−${fmt(b.spouse_school_cost)}</span></div>`:''}
+    ${b.spouse_personal?`<div class="budget-row"><span>👰 Spouse personal</span><span class="budget-amt neg">−${fmt(b.spouse_personal)}</span></div>`:''}
     ${b.ef_monthly?`<div class="budget-row"><span>→ Emergency fund <span style="color:var(--muted);font-size:.85em">(savings goal)</span></span><span class="budget-amt neg">−${fmt(b.ef_monthly)}</span></div>`:''}
     ${b.hf_monthly?`<div class="budget-row"><span>→ Home fund <span style="color:var(--muted);font-size:.85em">(down payment / closing)</span></span><span class="budget-amt neg">−${fmt(b.hf_monthly)}</span></div>`:''}
     <div class="budget-row total"><span>Total Bills</span><span class="budget-amt neg"><strong>−${fmt(b.total_bills)}/mo</strong></span></div>
@@ -3053,6 +3203,14 @@ function renderScene(){
   // Character creator screen — intercept before standard SCENES lookup
   if(G.stage === 'setup'){
     renderCharacterCreator();
+    renderDash();
+    renderBudget();
+    renderTree();
+    autoSave();
+    return;
+  }
+  if(G.stage === 'spouse_profile'){
+    renderSpouseProfile();
     renderDash();
     renderBudget();
     renderTree();
@@ -3439,6 +3597,121 @@ function confirmCharacterSetup(){
   renderScene();
 }
 
+// ════════════════════════════════════════════════════════════
+//  👰  SPOUSE PROFILE — set after any marriage decision
+// ════════════════════════════════════════════════════════════
+function renderSpouseProfile(){
+  const card = document.getElementById('sceneCard');
+  card.innerHTML = `
+    <div class="scene-stage">Spouse Profile · ${G.enlistment_date?formatDate(currentDate(G)):''}</div>
+    <div class="scene-title">👰 My Spouse — Real Person, Real Budget</div>
+    <div class="scene-text" style="margin-bottom:var(--s5)">
+      Marriage isn't a checkbox in the budget — it's a second person with her own income, expenses, and goals.
+      Fill in her real situation so the household budget reflects two people living one life.
+      <strong>Each decision below changes my net cash flow.</strong>
+    </div>
+
+    <div style="display:grid;gap:var(--s5)">
+
+      <!-- Work -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Does she work? ━</div>
+        <div style="display:grid;gap:.5rem">
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-work" value="none" ${G.spouse_works==='none'?'checked':''}><span><strong>Not working</strong> — stay-at-home, no income</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-work" value="part_time" ${G.spouse_works==='part_time'?'checked':''}><span><strong>Part-time</strong> — ~$1,500–2,200/mo take-home</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-work" value="full_time" ${G.spouse_works==='full_time'?'checked':''}><span><strong>Full-time</strong> — ~$3,000–4,500/mo take-home (huge household impact)</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-work" value="remote" ${G.spouse_works==='remote'?'checked':''}><span><strong>Remote / portable career</strong> — ~$3,500–5,500/mo. Survives PCS moves.</span></label>
+        </div>
+        <label style="margin-top:.5rem;font-size:var(--text-sm);display:block">Custom monthly take-home: $<input type="number" id="sp-income" value="${G.spouse_income_monthly||0}" min="0" max="20000" step="100" style="width:100px;padding:.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem">/mo</label>
+      </div>
+
+      <!-- School -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Is she in school? ━</div>
+        <label class="chk" style="cursor:pointer"><input type="checkbox" id="sp-school" ${G.spouse_in_school?'checked':''}><span>Yes — pursuing degree/cert</span></label>
+        <div id="sp-school-details" style="margin-top:.5rem;font-size:var(--text-sm);display:${G.spouse_in_school?'block':'none'}">
+          Monthly out-of-pocket (post-MyCAA $333/mo): $<input type="number" id="sp-school-cost" value="${G.spouse_school_cost||0}" min="0" max="3000" step="50" style="width:90px;padding:.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem">/mo
+          <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">MyCAA covers up to $4,000 lifetime ($333/mo equivalent) for eligible spouses pursuing associate degrees, licenses, or certifications. Anything above that is out-of-pocket.</div>
+        </div>
+      </div>
+
+      <!-- Car -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Does she have her own car? ━</div>
+        <div style="display:grid;gap:.5rem">
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-car" value="shared" ${G.spouse_car==='shared'||!G.spouse_car?'checked':''}><span><strong>We share my car</strong> — no extra costs</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-car" value="owned" ${G.spouse_car==='owned'?'checked':''}><span><strong>She has a paid-off car</strong> — insurance + gas only (~$180/mo)</span></label>
+          <label class="chk" style="cursor:pointer"><input type="radio" name="sp-car" value="financed" ${G.spouse_car==='financed'?'checked':''}><span><strong>She has a financed car</strong> — payment + insurance + gas</span></label>
+        </div>
+        <div id="sp-car-details" style="display:${G.spouse_car==='financed'?'block':'none'};margin-top:.5rem;padding:.5rem;background:var(--surf2);border:1px solid var(--border);border-radius:.5rem;font-size:var(--text-sm)">
+          Her monthly car payment: $<input type="number" id="sp-car-payment" value="${G.spouse_car_payment||280}" min="0" max="1500" step="10" style="width:90px;padding:.35rem;background:var(--bg);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit">/mo
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Phone plan? ━</div>
+        <label class="chk" style="cursor:pointer"><input type="checkbox" id="sp-phone" ${G.spouse_phone?'checked':''}><span>She has her own phone bill — $<input type="number" id="sp-phone-cost" value="${G.spouse_phone_bill||65}" min="0" max="200" step="5" style="width:70px;padding:.3rem;background:var(--surf2);border:1px solid var(--border);border-radius:.3rem;color:var(--text);font:inherit;margin:0 .3rem">/mo (else she's on my family plan)</span></label>
+      </div>
+
+      <!-- Discretionary -->
+      <div>
+        <div class="label" style="margin-bottom:.6rem">━ Her discretionary spending ━</div>
+        <label style="font-size:var(--text-sm)">Her hobbies / shopping / personal: $<input type="number" id="sp-personal" value="${G.spouse_personal||150}" min="0" max="2000" step="25" style="width:90px;padding:.4rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem">/mo</label>
+        <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">Healthy marriages give each partner a "no-questions-asked" budget. Real number — be honest.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px solid var(--primary);border-radius:var(--r-md);font-size:var(--text-sm)">
+      <strong style="color:var(--primary)">How this flows into the budget:</strong> her income adds to household take-home, her car costs become bills, her phone bill is its own line, school costs (post-MyCAA) are a bill, and her discretionary spending is its own monthly line.
+    </div>
+
+    <div style="margin-top:var(--s5)">
+      <button class="choice" style="background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 0 0 1px var(--gold)" onclick="confirmSpouseProfile()">
+        <div class="choice-label"><span>✓ Confirm Spouse Profile</span></div>
+        <div class="choice-desc">Lock in her situation. Household budget will reflect both of us.</div>
+      </button>
+    </div>
+  `;
+
+  // Sync income preset when work radio changes
+  const incomePresets = { none:0, part_time:1800, full_time:3700, remote:4500 };
+  document.querySelectorAll('input[name="sp-work"]').forEach(r=>{
+    r.addEventListener('change', e=>{
+      const inc = document.getElementById('sp-income');
+      const preset = incomePresets[e.target.value];
+      if(preset !== undefined) inc.value = preset;
+    });
+  });
+  // Toggle school details
+  document.getElementById('sp-school').addEventListener('change', e=>{
+    document.getElementById('sp-school-details').style.display = e.target.checked ? 'block' : 'none';
+  });
+  // Toggle car details
+  document.querySelectorAll('input[name="sp-car"]').forEach(r=>{
+    r.addEventListener('change', e=>{
+      document.getElementById('sp-car-details').style.display = e.target.value==='financed' ? 'block' : 'none';
+    });
+  });
+}
+
+function confirmSpouseProfile(){
+  const val = (id, fallback=0)=>{ const v = parseFloat(document.getElementById(id).value); return isNaN(v) ? fallback : v; };
+  G.spouse_works = (document.querySelector('input[name="sp-work"]:checked')||{}).value || 'none';
+  G.spouse_income_monthly = val('sp-income', 0);
+  G.spouse_in_school = document.getElementById('sp-school').checked;
+  G.spouse_school_cost = G.spouse_in_school ? val('sp-school-cost', 0) : 0;
+  G.spouse_car = (document.querySelector('input[name="sp-car"]:checked')||{}).value || 'shared';
+  G.spouse_car_payment = (G.spouse_car==='financed') ? val('sp-car-payment', 280) : 0;
+  G.spouse_phone = document.getElementById('sp-phone').checked;
+  G.spouse_phone_bill = G.spouse_phone ? val('sp-phone-cost', 65) : 0;
+  G.spouse_personal = val('sp-personal', 150);
+  G.path.push(`Spouse profile: ${G.spouse_works}${G.spouse_income_monthly?', $'+G.spouse_income_monthly+'/mo':''}${G.spouse_in_school?', in school':''}${G.spouse_car!=='shared'?', own car':''}`);
+  G.event = { type:'info', text:`Spouse profile confirmed. Household take-home now includes ${G.spouse_income_monthly?fmt(G.spouse_income_monthly)+'/mo from her':'her unpaid contributions'}. Bills reflect her car${G.spouse_car==='shared'?' (shared)':''}, phone${G.spouse_phone?' ('+fmt(G.spouse_phone_bill)+'/mo)':' (on my plan)'}, and personal spending (${fmt(G.spouse_personal)}/mo).` };
+  G.stage = 'kids_post_marriage';
+  renderScene();
+}
+
 // ── localStorage (game state + decision history) ──
 function autoSave(){
   try{
@@ -3597,9 +3870,17 @@ calcBudget = function(g){
   const kids_cost = g.kids * 600;
   const pet_cost = g.pets * 80;
   const phone = g.has_phone ? (g.phone_bill||0) : 0;
-  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly;
-  const net_to_savings = net - total_bills;
-  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, groceries, car_total, car_insurance, car_gas, kids_cost, pet_cost, phone, personal, misc, eating_out, subscriptions, fun_money, ef_monthly, hf_monthly, total_bills, net_to_savings };
+  const spouse_income = (g.married && g.spouse_income_monthly) ? g.spouse_income_monthly : 0;
+  const spouse_car_total = (g.married && g.spouse_car && g.spouse_car!=='shared')
+    ? ((g.spouse_car==='financed' ? (g.spouse_car_payment||0) : 0) + 180) : 0;
+  const spouse_phone_cost = (g.married && g.spouse_phone) ? (g.spouse_phone_bill||0) : 0;
+  const spouse_school_cost = (g.married && g.spouse_in_school) ? Math.max(0, (g.spouse_school_cost||0)) : 0;
+  const spouse_personal = (g.married) ? (g.spouse_personal||0) : 0;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + phone + personal + misc + eating_out + subscriptions + fun_money + ef_monthly + hf_monthly
+    + spouse_car_total + spouse_phone_cost + spouse_school_cost + spouse_personal;
+  const household_net = net + spouse_income;
+  const net_to_savings = household_net - total_bills;
+  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, spouse_income, household_net, spouse_car_total, spouse_phone_cost, spouse_school_cost, spouse_personal, housing_cost, food, groceries, car_total, car_insurance, car_gas, kids_cost, pet_cost, phone, personal, misc, eating_out, subscriptions, fun_money, ef_monthly, hf_monthly, total_bills, net_to_savings };
 };
 
 /* Render MOS Deep Dive table dynamically from data */
