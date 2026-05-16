@@ -1,0 +1,847 @@
+{
+  "meta": {
+    "title": "Marine Corps Career Decision Tree \u2014 Infantry \u2192 Recon \u2192 Sniper \u2192 MARSOC \u2192 20-Year Retirement",
+    "version": "1.0",
+    "sources": [
+      "marines.mil",
+      "marsoc.marines.mil",
+      "mcesg.marines.mil",
+      "dfas.mil",
+      "MARADMIN FY2026"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "START",
+      "type": "stage",
+      "title": "Pre-Enlistment / MEPS",
+      "elapsed_months": 0,
+      "rank": "Civilian",
+      "base_pay_monthly": 0,
+      "description": "Scores ASVAB. Signs contract. Picks MOS. Negotiate Recon (HZ) contract if GT 105+ and 1st Class PFT. Negotiate Marine College Fund. Marriage before ship date triggers BAH from Day 1.",
+      "decisions": [
+        {
+          "id": "D01",
+          "question": "HZ Recon contract available?",
+          "options": [
+            {
+              "label": "YES",
+              "next": "BOOT_CAMP",
+              "tag": "RECON_TRACK"
+            },
+            {
+              "label": "NO \u2014 0311 infantry contract",
+              "next": "BOOT_CAMP",
+              "tag": "INFANTRY_TRACK"
+            }
+          ]
+        },
+        {
+          "id": "D02",
+          "question": "Married before shipping?",
+          "options": [
+            {
+              "label": "YES",
+              "next": "BOOT_CAMP",
+              "effects": [
+                "BAH with dependents from Day 1"
+              ]
+            },
+            {
+              "label": "NO",
+              "next": "BOOT_CAMP",
+              "effects": [
+                "Barracks housing",
+                "No BAH"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BOOT_CAMP",
+      "type": "stage",
+      "title": "Recruit Training (Boot Camp)",
+      "elapsed_months_start": 0,
+      "elapsed_months_end": 3.25,
+      "duration_weeks": 13,
+      "location": "MCRD San Diego or MCRD Parris Island",
+      "rank_entry": "E-1 Pvt",
+      "rank_exit": "E-2 PFC",
+      "base_pay_entry": 2216.69,
+      "base_pay_exit": 2261.0,
+      "milestones": [
+        "Expert rifleman qual",
+        "1st Class PFT",
+        "Water survival cert",
+        "The Crucible (54-hr)",
+        "EGA Ceremony"
+      ],
+      "decisions": [
+        {
+          "id": "D03",
+          "question": "Graduate?",
+          "options": [
+            {
+              "label": "YES",
+              "next": "SOI_IRC"
+            },
+            {
+              "label": "NO \u2014 medical/discipline",
+              "next": "ADVERSITY_MEDICAL_EARLY",
+              "probability": "<1%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SOI_IRC",
+      "type": "stage",
+      "title": "School of Infantry \u2014 Infantry Rifleman Course (IRC)",
+      "elapsed_months_start": 3.25,
+      "elapsed_months_end": 7.0,
+      "duration_weeks": 14,
+      "location": "Camp Pendleton (West) or Camp Geiger (East)",
+      "rank": "E-2 PFC",
+      "base_pay": 2261.0,
+      "decisions": [
+        {
+          "id": "D04",
+          "question": "HZ Recon contract or 0311?",
+          "options": [
+            {
+              "label": "HZ \u2014 direct to RSAT screening",
+              "next": "RSAT_SCREENING"
+            },
+            {
+              "label": "0311 \u2014 fleet infantry first",
+              "next": "FLEET_INFANTRY_YEAR1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FLEET_INFANTRY_YEAR1",
+      "type": "stage",
+      "title": "Fleet Infantry \u2014 First 12-24 Months",
+      "elapsed_months_start": 7,
+      "elapsed_months_end": 19,
+      "rank_start": "E-2 PFC",
+      "rank_end": "E-3 LCpl",
+      "base_pay_end": 2378.0,
+      "active_decisions": [
+        "Start TA college courses",
+        "Open Roth TSP (5% + DoD match)",
+        "Housing strategy: on-base vs off-base BAH",
+        "Avoid predatory car lots",
+        "Build PFT toward 260+"
+      ],
+      "decisions": [
+        {
+          "id": "D05",
+          "question": "Apply for Recon Screening?",
+          "options": [
+            {
+              "label": "YES",
+              "next": "RSAT_SCREENING"
+            },
+            {
+              "label": "NO \u2014 stay 03XX",
+              "next": "FLEET_INFANTRY_YEAR2_4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RSAT_SCREENING",
+      "type": "decision_gate",
+      "title": "Recon Screening / RSAT",
+      "elapsed_months_typical": 19,
+      "elapsed_months_range": "14-30",
+      "rank": "E-3 LCpl",
+      "pass_rate": "20-40%",
+      "requirements": [
+        "GT 105+",
+        "PFT 235+",
+        "Secret clearance",
+        "WSI swim",
+        "No NJP last 12 months",
+        "Volunteer",
+        "Command endorsement"
+      ],
+      "decisions": [
+        {
+          "id": "D06",
+          "question": "Pass RSAT?",
+          "options": [
+            {
+              "label": "PASS",
+              "next": "GRC"
+            },
+            {
+              "label": "FAIL",
+              "next": "RSAT_FAIL_RECOVER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RSAT_FAIL_RECOVER",
+      "type": "recovery_node",
+      "title": "RSAT Fail \u2014 Recovery",
+      "decisions": [
+        {
+          "id": "D07",
+          "question": "Next step?",
+          "options": [
+            {
+              "label": "Re-screen next cycle (6-12 months)",
+              "next": "RSAT_SCREENING"
+            },
+            {
+              "label": "Scout Sniper path from 03XX",
+              "next": "SNIPER_QUAL_PATH"
+            },
+            {
+              "label": "Continue 03XX infantry career",
+              "next": "FLEET_INFANTRY_YEAR2_4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "GRC",
+      "type": "stage",
+      "title": "Ground Reconnaissance Course (GRC)",
+      "elapsed_months_start": 19,
+      "elapsed_months_end": 22,
+      "duration_weeks": 9,
+      "attrition_pct": "40-60%",
+      "decisions": [
+        {
+          "id": "D08",
+          "question": "Complete GRC?",
+          "options": [
+            {
+              "label": "PASS",
+              "next": "ARC"
+            },
+            {
+              "label": "FAIL",
+              "next": "RSAT_FAIL_RECOVER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ARC",
+      "type": "stage",
+      "title": "Amphibious Reconnaissance Course (ARC/BRC)",
+      "elapsed_months_start": 22,
+      "elapsed_months_end": 25.25,
+      "duration_weeks": 9,
+      "attrition_pct": "30-50%",
+      "decisions": [
+        {
+          "id": "D09",
+          "question": "Complete ARC?",
+          "options": [
+            {
+              "label": "PASS",
+              "next": "RECON_QUAL_SCHOOLS"
+            },
+            {
+              "label": "FAIL",
+              "next": "RSAT_FAIL_RECOVER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RECON_QUAL_SCHOOLS",
+      "type": "stage",
+      "title": "Recon Follow-on Schools (CDC + BAC + MFF + SERE)",
+      "elapsed_months_start": 25,
+      "elapsed_months_end": 42,
+      "sub_stages": [
+        {
+          "name": "Combatant Diver Course (CDC)",
+          "weeks": 8,
+          "location": "Panama City FL"
+        },
+        {
+          "name": "Basic Airborne Course (BAC)",
+          "weeks": 3,
+          "location": "Fort Liberty NC"
+        },
+        {
+          "name": "Military Free Fall (MFF/HALO)",
+          "weeks": 3,
+          "location": "Fort Liberty or Yuma AZ"
+        },
+        {
+          "name": "SERE Level C",
+          "weeks": 3,
+          "location": "Brunswick ME or Fairchild AFB WA"
+        }
+      ],
+      "mos_awarded": "0321 \u2192 0326 (Para-Diver)",
+      "rank_exit": "Cpl E-4",
+      "base_pay_cpl": 2634,
+      "decisions": [
+        {
+          "id": "D10",
+          "question": "Complete all qual schools?",
+          "options": [
+            {
+              "label": "YES \u2014 0326 Para-Diver Recon Marine",
+              "next": "RECON_ASSIGNED"
+            },
+            {
+              "label": "Injury during pipeline",
+              "next": "ADVERSITY_INJURY"
+            },
+            {
+              "label": "CDC fail (ear/lung DQ)",
+              "next": "RECON_PARTIAL_CDC_FAIL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RECON_PARTIAL_CDC_FAIL",
+      "type": "recovery_node",
+      "title": "CDC Fail \u2014 Recon Without Dive Qual",
+      "decisions": [
+        {
+          "id": "D11",
+          "question": "How to proceed?",
+          "options": [
+            {
+              "label": "0321 airborne-only in Recon unit \u2014 re-attempt CDC when cleared",
+              "next": "RECON_ASSIGNED"
+            },
+            {
+              "label": "Return to 03XX, pursue 0317 + MARSOC",
+              "next": "SNIPER_QUAL_PATH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RECON_ASSIGNED",
+      "type": "stage",
+      "title": "Assigned to Force Recon / Recon Battalion",
+      "elapsed_months_start": 42,
+      "elapsed_months_end": 60,
+      "rank_typical": "Cpl-Sgt",
+      "base_pay_sgt": 2872,
+      "description": "Operating in 4-man Recon teams. 6-9 month deployment cycles. Build sniper, JTAC, demo, language skills. TA college courses in garrison.",
+      "decisions": [
+        {
+          "id": "D12",
+          "question": "Pursue Scout Sniper from Recon unit?",
+          "options": [
+            {
+              "label": "YES \u2014 apply for SSBC",
+              "next": "SNIPER_QUAL_PATH"
+            },
+            {
+              "label": "NO \u2014 apply directly to MARSOC A&S",
+              "next": "MARSOC_AS"
+            },
+            {
+              "label": "Both \u2014 sniper first then MARSOC (strongest profile)",
+              "next": "SNIPER_QUAL_PATH"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SNIPER_QUAL_PATH",
+      "type": "stage",
+      "title": "Scout Sniper Basic Course (SSBC)",
+      "elapsed_months_start": 55,
+      "elapsed_months_end": 58,
+      "duration_weeks": "10-13",
+      "rank_typical": "Cpl-Sgt",
+      "attrition_pct": "~50%",
+      "prerequisites": [
+        "Expert rifleman",
+        "PFT 225+ 1st Class",
+        "GT 100+",
+        "No NJP last 12mo",
+        "Secret clearance",
+        "24 months remaining in USMC",
+        "Volunteer in sniper billet",
+        "10 evaluated stalks + ghillie suit pre-course",
+        "Battalion CO endorsement"
+      ],
+      "mos_earned": "0317 (03XX unit) or 0322 (Recon unit)",
+      "decisions": [
+        {
+          "id": "D13",
+          "question": "Complete SSBC?",
+          "options": [
+            {
+              "label": "PASS \u2014 qualified Scout Sniper",
+              "next": "MARSOC_AS"
+            },
+            {
+              "label": "FAIL \u2014 re-apply or continue in current MOS",
+              "next": "RECON_ASSIGNED"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MARSOC_AS",
+      "type": "decision_gate",
+      "title": "MARSOC Assessment and Selection (A&S Phase I + II)",
+      "elapsed_months_typical": 58,
+      "elapsed_months_range": "48-84",
+      "duration_weeks": 6,
+      "pass_rate": "~20-30% of all Phase I entrants",
+      "phases": [
+        {
+          "phase": "I",
+          "weeks": 3,
+          "location": "Camp Lejeune NC",
+          "description": "Physical fitness screening, PERRES program. 235+ PFT Day 1. Swim 300m in utilities."
+        },
+        {
+          "phase": "II",
+          "weeks": 3,
+          "location": "Undisclosed",
+          "description": "Full SOF selection. Mental/physical extreme. Team and individual assessment."
+        }
+      ],
+      "decisions": [
+        {
+          "id": "D14",
+          "question": "Selected at MARSOC A&S?",
+          "options": [
+            {
+              "label": "SELECTED \u2014 proceed to MRC",
+              "next": "MRC"
+            },
+            {
+              "label": "NOT SELECTED \u2014 B-billet options",
+              "next": "MARSOC_FAIL_RECOVERY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MARSOC_FAIL_RECOVERY",
+      "type": "recovery_node",
+      "title": "MARSOC Not Selected \u2014 B-Billet Fork",
+      "decisions": [
+        {
+          "id": "D15",
+          "question": "Which path?",
+          "options": [
+            {
+              "label": "Re-apply to MARSOC next cycle (many Raiders took 2-3 attempts)",
+              "next": "MARSOC_AS"
+            },
+            {
+              "label": "Marine Security Guard \u2014 embassy duty worldwide",
+              "next": "MSG_PROGRAM"
+            },
+            {
+              "label": "Drill Instructor B-billet \u2014 promotable, career-enhancing",
+              "next": "DI_BILLET"
+            },
+            {
+              "label": "Continue Recon/03XX \u2014 senior NCO track to 20 years",
+              "next": "SENIOR_ENLISTED_TRACK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MRC",
+      "type": "stage",
+      "title": "Marine Raider Course (MRC)",
+      "elapsed_months_start": 64,
+      "elapsed_months_end": 73,
+      "duration_weeks": 39,
+      "duration_months": 9,
+      "phases": [
+        {
+          "phase": 1,
+          "name": "Basic Skills",
+          "weeks": 10
+        },
+        {
+          "phase": 2,
+          "name": "Small Unit Tactics",
+          "weeks": 8
+        },
+        {
+          "phase": 3,
+          "name": "Special Operations",
+          "weeks": 10
+        },
+        {
+          "phase": 4,
+          "name": "Mission Execution",
+          "weeks": 11
+        }
+      ],
+      "mos_awarded": "0372 Critical Skills Operator (CSO) \u2014 Marine Raider",
+      "decisions": [
+        {
+          "id": "D16",
+          "question": "Complete MRC?",
+          "options": [
+            {
+              "label": "PASS \u2014 0372 CSO awarded. Assigned to MSOB",
+              "next": "MARSOC_ASSIGNED"
+            },
+            {
+              "label": "Medical/academic failure \u2014 returned to parent unit",
+              "next": "MARSOC_FAIL_RECOVERY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MARSOC_ASSIGNED",
+      "type": "stage",
+      "title": "Marine Raider \u2014 Assigned to MSOB",
+      "elapsed_months_start": 73,
+      "elapsed_months_end": 132,
+      "rank_typical": "Sgt-SSgt-GySgt",
+      "additional_pays_monthly": {
+        "SODI": 1000,
+        "jump_pay": 150,
+        "dive_pay": 150,
+        "hostile_fire_deployed": 225,
+        "family_sep_allowance": 250
+      },
+      "description": "Operational MSOT. Global deployments. Pursue JTAC, language, medical quals. TA college courses in garrison. Strong promotion track.",
+      "decisions": [
+        {
+          "id": "D17",
+          "question": "Career path toward retirement?",
+          "options": [
+            {
+              "label": "Remain in MARSOC through 20-year retirement",
+              "next": "RETIREMENT_20"
+            },
+            {
+              "label": "Re-assign to non-SOF unit as GySgt/MSgt and finish 20 years",
+              "next": "SENIOR_ENLISTED_TRACK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MSG_PROGRAM",
+      "type": "stage",
+      "title": "Marine Security Guard (MSG) \u2014 Embassy Duty",
+      "elapsed_months_start": 73,
+      "elapsed_months_end": 109,
+      "school_weeks": 8,
+      "school_location": "MCB Quantico VA",
+      "tour_duration_months": 24,
+      "mos_added": "8156",
+      "prerequisites": [
+        "LCpl-Sgt",
+        "GT 90+",
+        "Secret clearance",
+        "2nd Class PFT",
+        "No NJP within 1 year",
+        "38 months obligated service",
+        "No courts-martial",
+        "Height/weight standards",
+        "No visible dental fixtures",
+        "No eye surgery within 6mo",
+        "$500 min available funds",
+        "No marital counseling/separation in progress"
+      ],
+      "description": "Guards US diplomatic posts worldwide. 3 posts over 4-year program. Free housing + COLA. Strong savings opportunity. World travel.",
+      "decisions": [
+        {
+          "id": "D18",
+          "question": "After MSG tour?",
+          "options": [
+            {
+              "label": "Re-apply to MARSOC A&S",
+              "next": "MARSOC_AS"
+            },
+            {
+              "label": "Return to Recon/03XX \u2014 senior NCO track",
+              "next": "SENIOR_ENLISTED_TRACK"
+            },
+            {
+              "label": "MSG Det Commander (SSgt billet)",
+              "next": "SENIOR_ENLISTED_TRACK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DI_BILLET",
+      "type": "stage",
+      "title": "Drill Instructor B-Billet",
+      "elapsed_months_start": 73,
+      "elapsed_months_end": 109,
+      "school_weeks": 11,
+      "school_location": "MCRD Parris Island or San Diego",
+      "tour_duration_months": 24,
+      "requirements": [
+        "Cpl+ rank",
+        "1st Class PFT",
+        "Completed first enlistment",
+        "2 years remaining on contract",
+        "Strong pros/cons",
+        "No NJPs",
+        "Command endorsement"
+      ],
+      "decisions": [
+        {
+          "id": "D19",
+          "question": "After DI tour?",
+          "options": [
+            {
+              "label": "Re-apply to MARSOC",
+              "next": "MARSOC_AS"
+            },
+            {
+              "label": "Senior NCO track \u2014 toward 20 years",
+              "next": "SENIOR_ENLISTED_TRACK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SENIOR_ENLISTED_TRACK",
+      "type": "stage",
+      "title": "Senior NCO Infantry/Recon Track (Years 8-20)",
+      "elapsed_months_start": 96,
+      "elapsed_months_end": 240,
+      "rank_progression": "SSgt \u2192 GySgt \u2192 MSgt/1stSgt",
+      "base_pay_range_monthly": "$4,235 - $7,481",
+      "decisions": [
+        {
+          "id": "D20",
+          "question": "Reach 20 years?",
+          "options": [
+            {
+              "label": "YES \u2014 20-year retirement",
+              "next": "RETIREMENT_20"
+            },
+            {
+              "label": "Serve beyond 20 for higher rank retirement",
+              "next": "REENLIST_BEYOND_20"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FLEET_INFANTRY_YEAR2_4",
+      "type": "stage",
+      "title": "Fleet Infantry \u2014 No Recon Path (Years 2-4)",
+      "elapsed_months_start": 19,
+      "elapsed_months_end": 48,
+      "rank_typical": "Cpl E-4",
+      "base_pay": 2634,
+      "decisions": [
+        {
+          "id": "D21",
+          "question": "End of first enlistment?",
+          "options": [
+            {
+              "label": "Reenlist in 03XX \u2014 sniper path + 20 years",
+              "next": "SNIPER_QUAL_PATH"
+            },
+            {
+              "label": "Lateral move (0231 Intel / 0651 Data / 5811 MP / 2336 EOD)",
+              "next": "LAT_MOVE"
+            },
+            {
+              "label": "EAS \u2014 NOT recommended if pension is the goal",
+              "next": "EAS_EARLY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "LAT_MOVE",
+      "type": "stage",
+      "title": "Lateral MOS Move",
+      "elapsed_months_typical": 48,
+      "description": "Requires reenlistment for 4-year contract. Both losing and gaining MOS must approve. ASVAB mins for new MOS required.",
+      "common_targets": [
+        {
+          "mos": "0231",
+          "title": "Intelligence Specialist",
+          "asvab": "GT 110",
+          "school_weeks": 16
+        },
+        {
+          "mos": "0651",
+          "title": "Data Systems Administrator",
+          "asvab": "GT 105",
+          "school_weeks": 12
+        },
+        {
+          "mos": "5811",
+          "title": "Military Police",
+          "asvab": "GT 100",
+          "school_weeks": 20
+        },
+        {
+          "mos": "2336",
+          "title": "EOD Technician",
+          "asvab": "GT 110",
+          "school_weeks": 40
+        },
+        {
+          "mos": "0372",
+          "title": "CSO (MARSOC) \u2014 requires A&S + MRC",
+          "asvab": "GT 105",
+          "months": 15
+        }
+      ]
+    },
+    {
+      "id": "RETIREMENT_20",
+      "type": "terminal",
+      "title": "20-Year Military Retirement",
+      "elapsed_months": 240,
+      "rank_typical": "E-7 GySgt to E-8 MSgt/1stSgt",
+      "pension": {
+        "BRS_formula": "2.0% \u00d7 years_of_service \u00d7 avg_highest_36mo_base_pay",
+        "BRS_at_20yrs_pct": 40,
+        "legacy_formula": "2.5% \u00d7 years_of_service \u00d7 avg_highest_36mo_base_pay",
+        "legacy_at_20yrs_pct": 50,
+        "E7_14yrs_BRS_monthly": 2236.76,
+        "E8_12yrs_BRS_monthly": 2424.72
+      },
+      "healthcare": "TRICARE for life \u2014 retiree + family. Civilian equivalent $20,000+/yr.",
+      "gi_bill": "Post-9/11 GI Bill (Ch33) still usable 15 years post-separation. Use for bachelor's or master's.",
+      "va_loan": "Multi-use. 0% down, no PMI. Available after first honorable service.",
+      "tsp_estimated_balance": "$200,000-400,000+ (18+ yrs contributions + 5% DoD BRS match)",
+      "second_career_note": "Most 20-year retirees age 38-42. Add civilian salary ($60-100k) + pension + VA disability = $90-130k+ total annual income."
+    },
+    {
+      "id": "ADVERSITY_INJURY",
+      "type": "adversity_node",
+      "title": "Injury During Pipeline",
+      "common_injuries": [
+        "Patellar tendinopathy",
+        "Stress fractures (feet/shin/femur)",
+        "Shoulder injuries",
+        "Ear barotrauma (diving)",
+        "Back injuries"
+      ],
+      "options": [
+        {
+          "label": "Recover fully \u2014 return to pipeline",
+          "next": "Return to last stage"
+        },
+        {
+          "label": "Partial \u2014 adjusted MOS",
+          "next": "LAT_MOVE"
+        },
+        {
+          "label": "Medical separation",
+          "next": "MEDBOARD_SEP"
+        }
+      ]
+    },
+    {
+      "id": "ADVERSITY_MEDICAL_EARLY",
+      "type": "adversity_node",
+      "title": "Early Medical / Admin Separation",
+      "description": "VA disability if service-connected. GI Bill available. Honorable discharge. Document all injuries."
+    },
+    {
+      "id": "MEDBOARD_SEP",
+      "type": "terminal",
+      "title": "Medical Board / Separation",
+      "description": "IDES process. 30%+ DoD rating = medical retirement (pension + healthcare). <30% = severance + VA disability. Document EVERYTHING before separation."
+    },
+    {
+      "id": "EAS_EARLY",
+      "type": "terminal",
+      "title": "Early Separation Before 20 Years",
+      "description": "NO pension before 20 years. GI Bill, VA loan, and TSP vested balance available. Document all service-connected conditions at EAS. IRR obligation begins."
+    },
+    {
+      "id": "REENLIST_BEYOND_20",
+      "type": "stage",
+      "title": "Serve Beyond 20 \u2014 Higher Rank Retirement",
+      "description": "Each additional year adds 2% (BRS) or 2.5% (legacy) to pension. E-8 vs E-9 pension gap = $500-800/mo for life. Sometimes worth it if on promotion track."
+    }
+  ],
+  "life_layer": {
+    "marriage": {
+      "before_boot_camp": "BAH w/dependents Day 1. Significant income at E-1/E-2.",
+      "during_fleet": "BAH w/dependents kicks in. Total comp jumps $1,000-2,000/mo at LCpl level.",
+      "during_pipeline": "BAH w/dep + FSA $250/mo when deployed. On-base or off-base choice.",
+      "note": "Married Marines statistically save more and retire at higher ranks. Requires joint budget discipline."
+    },
+    "children": {
+      "dependent_bah": "Children count as dependents for BAH \u2014 same 'with dependents' rate.",
+      "tricare": "TRICARE covers all dependent children \u2014 no premium.",
+      "childcare": "On-base CDCs are subsidized \u2014 much cheaper than civilian daycare.",
+      "dep_life_ins": "Add SGLI dependent coverage \u2014 $100,000 for $5.50/mo."
+    },
+    "college": {
+      "tuition_assistance": {
+        "max_per_credit_hr": 250,
+        "max_annual": 4500,
+        "note": "Start immediately at first permanent duty station. 2 courses/semester = associate's in ~2 years."
+      },
+      "CLEP_DSST": "~$90/exam (free at many base ed offices). Can knock out 30+ credits for free. Use before or alongside TA.",
+      "gi_bill_strategy": "Do NOT use GI Bill on active duty. Save for post-EAS or post-retirement. Use TA while serving.",
+      "recommended_schools": [
+        "SNHU (online, military-friendly)",
+        "UMGC (Maryland \u2014 military pricing)",
+        "Liberty University (online)",
+        "Embry-Riddle (aeronautics/security)",
+        "American Military University (Intel/HS focus)"
+      ]
+    },
+    "financial_rules": {
+      "no_car_lot": "Never buy from a dealership next to the base. Predatory financing targets young enlisted. Buy used with cash or credit union loan.",
+      "roth_tsp": "Open Day 1. Contribute minimum 5% for full BRS match after 2 years. Roth = tax-free growth.",
+      "bah_strategy": "Rent below BAH rate \u2192 keep the difference. Over time invest that spread.",
+      "va_loan": "0% down, no PMI. Use at permanent duty station of 2+ years. Buy a small home. Rent it out at PCS. VA loan is reusable.",
+      "srb_handling": "Selective Reenlistment Bonuses \u2014 invest immediately. TSP or Roth IRA ($7,000 limit 2026).",
+      "combat_zone_tax": "All pay in designated combat zones is federal income tax-free. Max Roth IRA contributions during deployment \u2014 double tax advantage.",
+      "net_worth_target": "Disciplined Marine on Recon/MARSOC path, following all rules above: $200,000+ net worth before 20-year retirement is realistic."
+    },
+    "geopolitical_risk": {
+      "indo_pacific": "Increasing demand for Force Recon, MARSOC, SOF support \u2014 favorable for this career path.",
+      "mena_drawdown": "Some SOF billets reduced in Middle East; expanded in Africa and Pacific.",
+      "structural_changes": "Tank battalions eliminated 2021. Future changes possible. Best insurance: rank + qualifications.",
+      "mitigation": "GySgt with Recon + Sniper + MARSOC experience is virtually never at risk regardless of geopolitical shifts."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (if we add tooling later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build / cache
+dist/
+build/
+.cache/
+
+# Netlify
+.netlify/
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Claude/agent working files (preview, scratch)
+.claude/
+/tmp/

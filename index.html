@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>military-path-adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  /* US Marine Corps — Light (Sand/Khaki + Scarlet + Gold) */
+  --text-xs:clamp(.72rem,.68rem+.2vw,.85rem);--text-sm:clamp(.85rem,.78rem+.3vw,1rem);--text-base:clamp(1rem,.95rem+.25vw,1.1rem);--text-lg:clamp(1.1rem,1rem+.5vw,1.4rem);--text-xl:clamp(1.4rem,1.1rem+1vw,2rem);--text-2xl:clamp(1.8rem,1.2rem+2vw,3rem);
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;
+  --bg:#ebe5d2;--surf:#f2ede0;--surf2:#f7f2e6;--off:#dfd7c0;--border:#bfb699;--text:#1a1810;--muted:#5e5848;--faint:#9a9078;
+  --primary:#be0f34;--ph:#9a0a28;--success:#4a5d23;--warn:#a05420;--error:#8b1a1f;--blue:#2c4a6b;--gold:#bf9522;--orange:#c46a1e;
+  --r-sm:.375rem;--r-md:.625rem;--r-lg:1rem;--r-xl:1.25rem;--r-full:9999px;
+  --shadow:0 2px 8px rgba(20,18,12,.10),0 8px 24px rgba(20,18,12,.08);
+  --font:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+[data-theme="dark"]{
+  /* Black Multicam — Black + Olive + Tan + USMC Scarlet + Gold */
+  --bg:#0d0c08;--surf:#16140d;--surf2:#1f1c12;--off:#2a2618;--border:#3d3722;--text:#e8e1c8;--muted:#9c947d;--faint:#5a5440;
+  --primary:#e6294e;--ph:#ff4565;--success:#8aa356;--warn:#d49d5a;--error:#d44a52;--blue:#6b8aaa;--gold:#e9b434;--orange:#e0853a;
+  --shadow:0 2px 8px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{color:var(--text);font-family:var(--font);font-size:var(--text-base);line-height:1.55}
+/* Multicam-inspired background — subtle olive/tan/khaki blobs over the base color */
+body{
+  background:
+    radial-gradient(ellipse 60% 40% at 12% 18%, color-mix(in srgb,var(--success) 14%,transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 88% 32%, color-mix(in srgb,var(--warn) 10%,transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 30% at 25% 75%, color-mix(in srgb,var(--gold) 8%,transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 75% 88%, color-mix(in srgb,var(--success) 10%,transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 50% 50%, color-mix(in srgb,var(--orange) 6%,transparent) 0%, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+.app{max-width:1320px;margin:0 auto;padding:var(--s4);position:relative}
+/* USMC scarlet/gold accent stripe at top */
+.app::before{
+  content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:100;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary) 50%, var(--gold) 50%, var(--gold) 100%);
+}
+button{font:inherit;cursor:pointer;background:none;border:none}
+a{color:var(--primary)}
+/* ─── TOP BAR ─── */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--s4);margin-bottom:var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:var(--s3)}
+.logo{width:42px;height:42px;border:2px solid var(--gold);border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,#000 0%,#1a1a1a 100%);flex-shrink:0;box-shadow:0 0 0 1px var(--primary), 0 4px 12px rgba(190,15,52,.25)}
+.logo svg{stroke:var(--gold)}
+.logo svg .scarlet{stroke:var(--primary);fill:var(--primary)}
+.site-title{font-size:var(--text-lg);font-weight:700;line-height:1.1;letter-spacing:.02em;text-transform:uppercase;font-family:var(--mono);color:var(--text)}
+.site-title .scarlet{color:var(--primary)}
+.site-title .gold{color:var(--gold)}
+.site-sub{font-size:var(--text-xs);color:var(--muted);font-family:var(--mono);letter-spacing:.04em}
+.tbtn{border:1px solid var(--border);background:var(--surf);color:var(--text);padding:.55rem .9rem;border-radius:var(--r-full);font-size:var(--text-xs);min-height:40px;transition:background .15s}
+.tbtn:hover{background:var(--off)}
+/* ─── TABS ─── */
+.tabs{display:flex;gap:.4rem;margin-bottom:var(--s5);overflow-x:auto;padding-bottom:.2rem}
+.tab{padding:.6rem 1.1rem;border-radius:var(--r-full);border:1px solid var(--border);background:var(--surf);color:var(--muted);font-size:var(--text-sm);white-space:nowrap;transition:all .15s;min-height:40px;font-family:var(--mono);letter-spacing:.02em}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 0 0 1px var(--gold)}
+.tab:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+/* ─── CARDS ─── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow)}
+.pad{padding:var(--s6)}
+.pad-sm{padding:var(--s4)}
+/* ─── HERO ─── */
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--s5);margin-bottom:var(--s6)}
+.eyebrow{font-family:var(--mono);font-size:var(--text-xs);letter-spacing:.1em;text-transform:uppercase;color:var(--primary);margin-bottom:.4rem}
+h1{font-size:var(--text-2xl);line-height:1.05;margin-bottom:.75rem}
+.hero-desc{color:var(--muted);max-width:65ch}
+.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:var(--s4)}
+.pill{padding:.35rem .75rem;border-radius:var(--r-full);font-size:var(--text-xs);border:1px solid var(--border);background:var(--surf2);color:var(--text)}
+.stat-stack{display:grid;gap:var(--s3)}
+.stat{padding:var(--s4);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-lg)}
+.stat-val{font-size:var(--text-xl);font-weight:700;color:var(--primary)}
+.stat-label{font-size:var(--text-xs);color:var(--muted);margin-top:.2rem}
+/* ─── PAGE SECTIONS ─── */
+.section{display:none}.section.active{display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+.aside-main{display:grid;grid-template-columns:300px 1fr;gap:var(--s5)}
+h2{font-size:var(--text-xl);margin-bottom:var(--s4)}
+h3{font-size:var(--text-lg);margin-bottom:var(--s3)}
+.label{font-family:var(--mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+p{color:var(--muted);max-width:72ch}
+/* ─── TIMELINE ─── */
+.timeline{position:relative;padding:var(--s5) var(--s5) var(--s5) var(--s10)}
+.timeline::before{content:'';position:absolute;left:calc(var(--s5) + 7px);top:var(--s5);bottom:var(--s5);width:2px;background:linear-gradient(var(--primary) 60%,transparent)}
+.tnode{position:relative;margin-bottom:var(--s4);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s5)}
+.tnode::before{content:'';position:absolute;left:calc(-2.1rem);top:1.2rem;width:14px;height:14px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 22%,transparent)}
+.tnode.fork::before{background:var(--warn)}
+.tnode.gate::before{background:var(--error)}
+.tnode.win::before{background:var(--success)}
+.tnode h3{margin-bottom:.25rem;font-size:1rem}
+.tnode .meta{font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);margin-bottom:.5rem}
+.tnode p{font-size:var(--text-sm);color:var(--muted);max-width:none}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
+.tag{padding:.3rem .6rem;border-radius:var(--r-full);font-size:var(--text-xs);border:1px solid var(--border);background:var(--bg)}
+.tag.warn{border-color:var(--warn);color:var(--warn)}
+.tag.ok{border-color:var(--success);color:var(--success)}
+.tag.danger{border-color:var(--error);color:var(--error)}
+.tag.info{border-color:var(--blue);color:var(--blue)}
+/* ─── MOS TABLE ─── */
+.mos-table{overflow:auto;margin-top:var(--s4)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:.75rem var(--s3);border-bottom:1px solid var(--border);text-align:left;font-size:var(--text-sm)}
+th{color:var(--muted);font-weight:600;background:var(--off);font-family:var(--mono);font-size:var(--text-xs);letter-spacing:.05em;text-transform:uppercase}
+td:first-child{font-family:var(--mono);font-weight:600;color:var(--primary)}
+tr:hover td{background:var(--off)}
+/* ─── BADGES ─── */
+.badge{display:inline-block;padding:.25rem .6rem;border-radius:var(--r-full);font-size:var(--text-xs);font-weight:600}
+.badge.combat{background:color-mix(in srgb,var(--error) 15%,transparent);color:var(--error);border:1px solid var(--error)}
+.badge.support{background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue);border:1px solid var(--blue)}
+.badge.special{background:color-mix(in srgb,var(--primary) 15%,transparent);color:var(--primary);border:1px solid var(--primary)}
+.badge.recon{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);border:1px solid var(--warn)}
+/* ─── PAY TABLE ─── */
+.highlight{background:color-mix(in srgb,var(--primary) 10%,transparent)!important}
+/* ─── DECISION CHECKER ─── */
+.checks{display:grid;gap:.6rem;margin-top:var(--s4)}
+.chk{display:flex;gap:.75rem;align-items:flex-start;padding:.75rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surf2);cursor:pointer;transition:background .12s}
+.chk:hover{background:var(--off)}
+.chk input{margin-top:.2rem;accent-color:var(--primary)}
+.chk span{font-size:var(--text-sm)}
+.chk strong{color:var(--text)}
+/* ─── SCENARIO BOX ─── */
+.scenario-box{background:var(--off);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--s5);margin-top:var(--s5)}
+.scenario-box select{width:100%;margin-top:.5rem;padding:.75rem 1rem;border-radius:var(--r-md);background:var(--surf);color:var(--text);border:1px solid var(--border);font:inherit;font-size:var(--text-sm)}
+#scenarioText{margin-top:var(--s4);color:var(--muted);font-size:var(--text-sm);line-height:1.65}
+/* ─── PATH PROGRESS ─── */
+.path-steps{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:var(--s4) 0}
+.pstep{padding:.4rem .8rem;border-radius:var(--r-full);font-size:var(--text-xs);border:1px solid var(--border);background:var(--surf2)}
+.pstep.done{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pstep.gate{background:var(--error);color:#fff;border-color:var(--error)}
+.pstep .arr{color:var(--faint);margin:0 .2rem}
+/* ─── RISK BARS ─── */
+.risk-row{margin-bottom:.8rem}
+.risk-label{display:flex;justify-content:space-between;margin-bottom:.3rem;font-size:var(--text-sm)}
+.bar-bg{background:var(--off);border-radius:var(--r-full);height:8px;overflow:hidden}
+.bar-fill{height:8px;border-radius:var(--r-full);transition:width .6s}
+/* ─── SCHOOL CARDS ─── */
+.edu-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s4);margin-top:var(--s4)}
+.edu-card{padding:var(--s5);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-lg)}
+.edu-card h4{margin-bottom:.4rem;font-size:1rem}
+.edu-card p{font-size:var(--text-sm);color:var(--muted)}
+.edu-card .amount{font-size:var(--text-lg);font-weight:700;color:var(--primary);margin:.4rem 0}
+/* ─── ACCORDION ─── */
+.accord details{border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:.5rem;background:var(--surf2)}
+.accord summary{padding:var(--s4) var(--s5);cursor:pointer;font-weight:600;font-size:var(--text-sm);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.accord summary::after{content:'▸';color:var(--muted);transition:transform .2s}
+.accord details[open] summary::after{transform:rotate(90deg)}
+.accord .body{padding:0 var(--s5) var(--s5);font-size:var(--text-sm);color:var(--muted);line-height:1.7}
+/* ─── GAME / SIMULATOR ─── */
+.game-grid{display:grid;grid-template-columns:240px 1fr 280px;gap:var(--s4);align-items:start}
+.game-tree{position:sticky;top:var(--s4);max-height:calc(100vh - 100px);overflow-y:auto;padding:var(--s4);background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow)}
+.tree-label{font-family:var(--mono);font-size:var(--text-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:var(--s3)}
+.tree-stage{position:relative;padding:.55rem .6rem .55rem 1.6rem;margin-bottom:.25rem;border-radius:var(--r-md);font-size:var(--text-sm);color:var(--muted);cursor:default;border:1px solid transparent}
+.tree-stage::before{content:'';position:absolute;left:.55rem;top:.95rem;width:10px;height:10px;border-radius:50%;background:var(--faint);border:2px solid var(--surf)}
+.tree-stage::after{content:'';position:absolute;left:calc(.55rem + 4px);top:1.6rem;bottom:-.55rem;width:2px;background:var(--border)}
+.tree-stage:last-child::after{display:none}
+.tree-stage.done{color:var(--text)}
+.tree-stage.done::before{background:var(--success)}
+.tree-stage.current{color:var(--text);background:color-mix(in srgb,var(--primary) 12%,transparent);border-color:var(--primary);font-weight:600}
+.tree-stage.current::before{background:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 30%,transparent)}
+.tree-stage.locked{opacity:.45}
+.tree-stage.failed::before{background:var(--error)}
+.tree-stage.failed{color:var(--error)}
+.tree-branch{margin-left:1rem;padding-left:.5rem;border-left:1px dashed var(--border);font-size:var(--text-xs);color:var(--faint);margin-bottom:.25rem;padding-top:.3rem;padding-bottom:.3rem}
+/* Scene area */
+.scene{padding:var(--s5);background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);margin-bottom:var(--s4)}
+.scene-stage{font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.scene-title{font-size:var(--text-xl);margin-bottom:.5rem}
+.scene-meta{font-size:var(--text-xs);color:var(--muted);margin-bottom:var(--s4);font-family:var(--mono)}
+.scene-text{color:var(--muted);margin-bottom:var(--s5);font-size:var(--text-sm);line-height:1.7}
+.scene-text strong{color:var(--text)}
+.choices{display:grid;gap:.6rem}
+.choice{text-align:left;padding:var(--s4);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surf2);color:var(--text);transition:all .15s;width:100%}
+.choice:hover:not(:disabled){border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surf2))}
+.choice:disabled{opacity:.45;cursor:not-allowed}
+.choice-label{font-weight:600;font-size:var(--text-sm);margin-bottom:.25rem;display:flex;justify-content:space-between;gap:var(--s3)}
+.choice-cost{font-family:var(--mono);font-size:var(--text-xs);color:var(--warn);white-space:nowrap}
+.choice-desc{font-size:var(--text-xs);color:var(--muted);line-height:1.55}
+.choice-tag{display:inline-block;padding:.15rem .45rem;border-radius:var(--r-full);font-size:.7rem;background:var(--off);color:var(--muted);margin-right:.3rem;margin-top:.4rem;font-family:var(--mono)}
+.choice-tag.danger{background:color-mix(in srgb,var(--error) 18%,transparent);color:var(--error)}
+.choice-tag.ok{background:color-mix(in srgb,var(--success) 18%,transparent);color:var(--success)}
+.choice-tag.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.choice-tag.info{background:color-mix(in srgb,var(--blue) 18%,transparent);color:var(--blue)}
+/* Event banner */
+.event-banner{padding:var(--s4);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm);line-height:1.55;border:1px solid}
+.event-banner.win{background:color-mix(in srgb,var(--success) 12%,transparent);border-color:var(--success);color:var(--text)}
+.event-banner.bad{background:color-mix(in srgb,var(--error) 12%,transparent);border-color:var(--error);color:var(--text)}
+.event-banner.info{background:color-mix(in srgb,var(--blue) 12%,transparent);border-color:var(--blue);color:var(--text)}
+.event-banner.warn{background:color-mix(in srgb,var(--warn) 14%,transparent);border-color:var(--warn);color:var(--text)}
+.event-banner strong{color:var(--text)}
+/* Dashboard */
+.dash{position:sticky;top:var(--s4);max-height:calc(100vh - 100px);overflow-y:auto;display:grid;gap:var(--s3)}
+.dash-card{padding:var(--s4);background:var(--surf);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.dash-card h4{font-size:var(--text-xs);font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;font-weight:600}
+.dash-row{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--text-sm);padding:.2rem 0}
+.dash-row strong{font-weight:600;font-family:var(--mono)}
+.dash-row.big{font-size:var(--text-base)}
+.dash-row.big strong{font-size:var(--text-lg);color:var(--primary)}
+.dash-row.pos strong{color:var(--success)}
+.dash-row.neg strong{color:var(--error)}
+.dash-bar{height:6px;background:var(--off);border-radius:var(--r-full);margin-top:.25rem;overflow:hidden}
+.dash-bar-fill{height:6px;border-radius:var(--r-full);background:var(--primary);transition:width .5s}
+.quals-list{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem}
+.qual{font-size:.7rem;padding:.15rem .45rem;border-radius:var(--r-full);background:color-mix(in srgb,var(--primary) 14%,transparent);color:var(--primary);font-family:var(--mono);border:1px solid color-mix(in srgb,var(--primary) 30%,transparent)}
+/* Game controls */
+.game-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:var(--s4)}
+.gc-btn{padding:.5rem .8rem;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surf);color:var(--text);font-size:var(--text-xs);cursor:pointer;font-family:var(--mono)}
+.gc-btn:hover{background:var(--off)}
+.gc-btn.warn{border-color:var(--warn);color:var(--warn)}
+/* Character creator */
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s3);margin-top:var(--s3)}
+.cc-card{padding:var(--s4);border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surf2);cursor:pointer;text-align:center;transition:all .15s}
+.cc-card:hover,.cc-card.sel{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,transparent)}
+.cc-card h4{font-size:var(--text-base);margin-bottom:.25rem}
+.cc-card p{font-size:var(--text-xs);color:var(--muted);max-width:none}
+/* Retirement scorecard */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--s3);margin-top:var(--s4)}
+.score-card{padding:var(--s4);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-lg);text-align:center}
+.score-card .val{font-size:var(--text-xl);font-weight:700;color:var(--primary);font-family:var(--mono)}
+.score-card .lbl{font-size:var(--text-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem;font-family:var(--mono)}
+/* Budget breakdown */
+.budget-row{display:grid;grid-template-columns:1fr auto;gap:var(--s3);padding:.35rem 0;border-bottom:1px dashed var(--border);font-size:var(--text-sm)}
+.budget-row:last-child{border-bottom:none}
+.budget-row.total{border-top:2px solid var(--primary);border-bottom:none;margin-top:.4rem;padding-top:.6rem;font-weight:700}
+.budget-amt{font-family:var(--mono);text-align:right}
+.budget-amt.pos{color:var(--success)}
+.budget-amt.neg{color:var(--error)}
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){.game-grid{grid-template-columns:1fr}.game-tree,.dash{position:static;max-height:none}}
+@media(max-width:900px){.hero-grid,.two-col,.three-col,.aside-main{grid-template-columns:1fr}.timeline{padding:var(--s5) var(--s4) var(--s5) 3rem}.timeline::before{left:16px}.tnode::before{left:-1.8rem}}
+@media(max-width:600px){.tabs{gap:.25rem}.tab{padding:.5rem .75rem;font-size:.75rem}.topbar{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo" title="Semper Fidelis">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.6" aria-hidden="true">
+        <!-- Anchor + globe + eagle wings stylized — non-official EGA-inspired mark -->
+        <circle cx="12" cy="10" r="4.5" stroke="currentColor" fill="none"/>
+        <path d="M7.5 10 Q12 7 16.5 10" stroke="currentColor" fill="none" stroke-width="1"/>
+        <path d="M3 6 Q7 4 12 5 Q17 4 21 6" stroke="currentColor" stroke-width="1.4" fill="none"/>
+        <path d="M12 13 L12 19 M9 19 L15 19 M10.5 16 L13.5 16" class="scarlet" stroke-width="1.6"/>
+        <circle cx="12" cy="19.5" r="1" class="scarlet"/>
+      </svg>
+    </div>
+    <div>
+      <div class="site-title"><span class="scarlet">SEMPER</span> <span class="gold">FIDELIS</span> — Career Sim</div>
+      <div class="site-sub">My 20-Year Path · Infantry → Recon → Sniper → Raider → Retirement</div>
+    </div>
+  </div>
+  <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs" role="tablist">
+  <button class="tab active" onclick="showSection('overview',this)">📍 My Path Overview</button>
+  <button class="tab" onclick="showSection('play',this)">🎮 Play My Path</button>
+  <button class="tab" onclick="showSection('mos',this)">🔖 MOS Deep Dive</button>
+  <button class="tab" onclick="showSection('recon',this)">🌊 Path to Recon</button>
+  <button class="tab" onclick="showSection('marsoc',this)">⚡ Path to Raiders</button>
+  <button class="tab" onclick="showSection('life',this)">🏠 Life Forks</button>
+  <button class="tab" onclick="showSection('pay',this)">💰 Rank & Pay</button>
+  <button class="tab" onclick="showSection('school',this)">🎓 School While In</button>
+  <button class="tab" onclick="showSection('decisions',this)">🧭 Decision Toolkit</button>
+</div>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div id="overview" class="section active">
+  <div class="hero-grid">
+    <div class="card pad">
+      <div class="eyebrow">Mission start — first person, your life</div>
+      <h1>My road from Recruit to Retirement</h1>
+      <p class="hero-desc">This is my plan. I want Infantry, then Recon, then a Sniper qualification, then MARSOC Raider. If a gate doesn't open I have a backup. I'm planning for marriage, kids, school, housing, saving, and a 20-year pension — all at the same time.</p>
+      <div class="pills">
+        <span class="pill">🎯 Primary goal: 20-year retirement</span>
+        <span class="pill">🎖 Dream path: Infantry → Recon → Sniper → Raider</span>
+        <span class="pill">🏠 Housing: on-base while it makes sense</span>
+        <span class="pill">📚 School: TA while in, GI Bill after</span>
+        <span class="pill">💳 Money rule: invest early, no lifestyle debt</span>
+      </div>
+      <div class="path-steps" style="margin-top:var(--s5)">
+        <span class="pstep done">Boot Camp (13 wks)</span>
+        <span style="color:var(--faint)">›</span>
+        <span class="pstep done">Infantry (IRC 14 wks)</span>
+        <span style="color:var(--faint)">›</span>
+        <span class="pstep gate">Recon Screen + GRC + ARC</span>
+        <span style="color:var(--faint)">›</span>
+        <span class="pstep">Sniper School</span>
+        <span style="color:var(--faint)">›</span>
+        <span class="pstep gate">MARSOC A&amp;S → ITC (9 mo)</span>
+        <span style="color:var(--faint)">›</span>
+        <span class="pstep">20-Year Retirement</span>
+      </div>
+      <div class="scenario-box">
+        <div class="label">Try a life fork — read it aloud and talk it through</div>
+        <select id="scenario" onchange="renderScenario()">
+          <option value="ideal">I make it through Recon and later MARSOC selection</option>
+          <option value="norecon">I don't make Recon — I stay Infantry and rebuild my plan</option>
+          <option value="recon_nomarsoc">I make Recon but don't get selected for Raiders</option>
+          <option value="msg">I pursue MSG duty — overseas, embassies, a global life</option>
+          <option value="married_early">I get married right after boot camp</option>
+          <option value="injury">I get injured during training or deployment</option>
+          <option value="earlyout">I decide to get out before 20 years</option>
+        </select>
+        <div id="scenarioText"></div>
+      </div>
+    </div>
+    <div class="card pad">
+      <div class="stat-stack">
+        <div class="stat"><div class="stat-val">13 weeks</div><div class="stat-label">Boot camp — Marine Corps Recruit Depot</div></div>
+        <div class="stat"><div class="stat-val">14 weeks</div><div class="stat-label">Infantry Rifleman Course (IRC) — new 2026 requirement before Recon</div></div>
+        <div class="stat"><div class="stat-val">9 + 9 weeks</div><div class="stat-label">Ground Recon Course + Amphibious Recon Course (replaced BRC in 2026)</div></div>
+        <div class="stat"><div class="stat-val">9 months</div><div class="stat-label">MARSOC Individual Training Course (ITC) after A&amp;S selection</div></div>
+        <div class="stat"><div class="stat-val">$4,500/yr</div><div class="stat-label">Tuition Assistance cap — up to 2 classes at once, 100% of tuition</div></div>
+        <div class="stat"><div class="stat-val">20 years</div><div class="stat-label">Time-in-service required for retirement pension eligibility</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full timeline -->
+  <div class="card">
+    <div class="pad" style="border-bottom:1px solid var(--border)"><h2 style="margin:0">My Full Career Timeline</h2></div>
+    <div class="timeline">
+      <div class="tnode">
+        <h3>1. Enlistment, MEPS & contract choice</h3>
+        <div class="meta">Age ~17–18 · Before I ship</div>
+        <p>I decide which branch (Marine Corps or Army), negotiate my MOS guarantee, and understand exactly what is contractually locked vs. what is aspirational. Infantry contract is my target. I should ask: what happens if my first-choice MOS isn't available at my ship date?</p>
+        <div class="tags"><span class="tag info">Marine Corps or Army both valid</span><span class="tag">Read contract carefully</span><span class="tag ok">Start saving even now</span></div>
+      </div>
+      <div class="tnode">
+        <h3>2. Boot Camp — Marine Corps Recruit Depot</h3>
+        <div class="meta">13 weeks · Parris Island (East) or MCRD San Diego (West)</div>
+        <p>This is my first real filter. Mental toughness, physical discipline, and following orders. Injuries, misconduct, or medical issues can alter my timeline immediately. My job is simple: graduate and not get hurt.</p>
+        <div class="tags"><span class="tag">Stay injury-free</span><span class="tag warn">No dumb decisions before ship date</span><span class="tag">Rank in top of platoon if possible</span></div>
+      </div>
+      <div class="tnode">
+        <h3>3. Infantry Rifleman Course (IRC) — School of Infantry</h3>
+        <div class="meta">14 weeks · Required for all Recon hopefuls as of 2026</div>
+        <p>As of 2026, the Marine Corps changed the Recon pipeline: all Recon-track Marines now go through the full Infantry Rifleman Course (same as an 0311 rifleman) before attending Recon schools. This replaced going through Marine Combat Training alone. I will graduate as an 0311 Rifleman first — then pursue Recon.</p>
+        <div class="tags"><span class="tag info">New 2026 pipeline requirement</span><span class="tag ok">Build infantry fundamentals now</span><span class="tag">Live in barracks, save money</span></div>
+      </div>
+      <div class="tnode fork">
+        <h3>4. FORK A: Recon Screen & Training Pipeline</h3>
+        <div class="meta">Gate 1 · After qualifying as 0311</div>
+        <p>If I contracted HZ (Recon contract) I get priority. If I volunteered as UH (open infantry), I apply laterally. I have to pass the Reconnaissance Screening Aptitude Test (RSAT) — swim events, timed run, pull-ups, obstacle course — plus a GT score of 105+ and a 1st Class PFT. Then I attend the Ground Reconnaissance Course (GRC, 9 wks) and if I pass, the Amphibious Reconnaissance Course (ARC, 9 wks). I also complete Combatant Diver (8 wks), Basic Airborne (3 wks), Military Free Fall (3 wks), and SERE (3 wks).</p>
+        <div class="tags"><span class="tag danger">High washout rate at each gate</span><span class="tag">GT 105+ required</span><span class="tag">1st Class PFT required</span><span class="tag warn">Injury is the #1 career-ender here</span></div>
+      </div>
+      <div class="tnode">
+        <h3>5. First Recon unit — prove myself, build rank</h3>
+        <div class="meta">Roughly years 3–6 · MOS 0321 Reconnaissance Marine</div>
+        <p>This is where I earn trust, deployments, and recognition. I can add qualifications here: sniper track (which in a Recon unit becomes MOS 0322), advanced demolitions, comms, and more. My goal is to be competitive for MARSOC by the time I'm eligible — minimum 3 years TIS, no more than 6 years at the time I enter ITC.</p>
+        <div class="tags"><span class="tag ok">Start 1–2 online classes per semester</span><span class="tag">Build toward Cpl / Sgt promotions</span></div>
+      </div>
+      <div class="tnode fork">
+        <h3>6. Sniper qualification path</h3>
+        <div class="meta">Secondary MOS 0317 → Now reorganized as 0322 for Recon</div>
+        <p>Scout Sniper (MOS 0317) is a secondary MOS, not available to new recruits — I need to be at least E-3 (Lance Corporal) and must already be infantry or Recon qualified. In Recon, the path runs through my unit's scout-sniper platoon and an approved Scout Sniper Basic Course. As of December 2023, sniper-qualified Recon Marines reorganized under MOS 0322. GT score of 100+, expert rifleman qualification, 1st Class PFT, and 500m swim are all required.</p>
+        <div class="tags"><span class="tag">Must be 0311 or 0321 first</span><span class="tag info">GT 100+ required</span><span class="tag">Expert rifleman badge required</span></div>
+      </div>
+      <div class="tnode gate">
+        <h3>7. MARSOC Assessment & Selection (A&S)</h3>
+        <div class="meta">Gate 2 · Phase I: 3 weeks, Camp Lejeune · Phase II: undisclosed location · Conducted 3x/year</div>
+        <p>Any active-duty Marine from any MOS can apply, but I need 3 years TIS and must enter ITC within 6 years TIS. I need a GT score of 105+, a PFT of 235+, a 1st Class CFT, a Secret clearance, and strong command endorsement. A&S Phase I tests physical fitness (run 260+ PFT, 300m swim in utilities, 11-minute water tread). Phase II is mental and physical — location and full content undisclosed. Making it through A&S earns me a seat in ITC. Not making it sends me back to my parent command.</p>
+        <div class="tags"><span class="tag danger">High attrition — mental + physical</span><span class="tag">Min 3 yrs TIS, max 6 yrs at ITC entry</span><span class="tag warn">Marriage/family strain peaks here</span></div>
+      </div>
+      <div class="tnode gate">
+        <h3>8. Individual Training Course (ITC) — Marine Raider Course (MRC)</h3>
+        <div class="meta">9 months · Camp Lejeune, NC · MOS 0372 Critical Skills Operator</div>
+        <p>ITC / MRC is a 9-month program that produces MARSOC Critical Skills Operators (CSOs, MOS 0372) and Special Operations Officers. It trains special operations skills across the full spectrum — still has a significant drop rate for injury and performance. Completing it and earning MOS 0372 means I am officially a Marine Raider.</p>
+        <div class="tags"><span class="tag ok">MOS 0372 = Marine Raider / CSO</span><span class="tag danger">Still drops for injury / performance</span></div>
+      </div>
+      <div class="tnode fork">
+        <h3>9. FORK B: If I don't make Raider — B-Billet options</h3>
+        <div class="meta">After Recon if MARSOC doesn't happen</div>
+        <p>If I don't get selected or don't finish ITC, I return to my MOS. My best non-MARSOC paths include: Marine Security Guard (MSG) for embassy duty overseas; Drill Instructor duty; recruiting; or staying in Recon and becoming a senior NCO. None of these are consolation prizes — they're legitimate, respected career tracks.</p>
+        <div class="tags"><span class="tag info">MSG: overseas, embassies, prestige</span><span class="tag">DI duty: builds leadership</span><span class="tag ok">Stay Recon: still special operations</span></div>
+      </div>
+      <div class="tnode">
+        <h3>10. Mid-career: years 8–12 — the critical window</h3>
+        <div class="meta">Sergeant / Staff Sergeant · Making or breaking the 20-year plan</div>
+        <p>By now I have a career track, a rank, real deployments, and real family decisions behind me. I need to ask honestly: am I building toward 20-year retirement or am I setting up a 10-year exit into civilian life? Both are valid. But I need to stop drifting and decide intentionally.</p>
+        <div class="tags"><span class="tag warn">Avoid promotion stagnation</span><span class="tag ok">Degree should be in progress</span><span class="tag">TSP balance should be building</span></div>
+      </div>
+      <div class="tnode">
+        <h3>11. Senior NCO years: 12–20</h3>
+        <div class="meta">Staff Sergeant / Gunnery Sergeant / First Sergeant</div>
+        <p>If I'm staying to 20, these years are about leadership, key billets, mentoring Marines, and managing my transition proactively. I should start building civilian-facing skills and connections at least 3 years before my retirement date — not at the last minute.</p>
+        <div class="tags"><span class="tag ok">TAP program: actually engage it</span><span class="tag">Build LinkedIn/veteran network</span><span class="tag info">VA loan eligibility grows</span></div>
+      </div>
+      <div class="tnode win">
+        <h3>12. 20-Year Retirement</h3>
+        <div class="meta">~Age 38–42 · Phase Two begins</div>
+        <p>I retire with pension eligibility — typically 50% of base pay at 20 years under legacy system, or blended retirement benefits under BRS. I have no crushing debt, a degree or significant credits, a place to live by design, a civilian-ready skill set, and a clear next-career plan. The pension is a floor, not a finish line.</p>
+        <div class="tags"><span class="tag ok">Pension: ~50% base pay at 20 yrs</span><span class="tag ok">TRICARE health coverage continues</span><span class="tag ok">VA home loan still available</span><span class="tag info">Second career begins</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PLAY MY PATH (GAME) ==================== -->
+<div id="play" class="section">
+  <div class="game-controls">
+    <button class="gc-btn" onclick="newGame()">🔄 New Character</button>
+    <button class="gc-btn" onclick="saveGame()">💾 Save</button>
+    <button class="gc-btn" onclick="loadGame()">📂 Load Last</button>
+    <button class="gc-btn warn" onclick="resetGame()">⚠️ Reset Everything</button>
+    <span id="saveStatus" style="font-size:var(--text-xs);color:var(--muted);align-self:center;margin-left:auto"></span>
+  </div>
+
+  <div class="game-grid">
+    <!-- LEFT: Branching tree / progression map -->
+    <div class="game-tree" id="gameTree">
+      <div class="tree-label">My Journey</div>
+      <!-- populated by JS -->
+    </div>
+
+    <!-- CENTER: Current scene -->
+    <div>
+      <div class="scene" id="sceneCard">
+        <!-- populated by JS -->
+      </div>
+
+      <!-- Budget breakdown panel -->
+      <div class="scene" id="budgetCard">
+        <h3 style="margin-bottom:.5rem">Monthly Budget</h3>
+        <p style="font-size:var(--text-xs);margin-bottom:var(--s4)">What I bring home each month vs. what I spend. Whatever's left goes to savings + TSP.</p>
+        <div id="budgetBody"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live stats dashboard -->
+    <div class="dash">
+      <div class="dash-card">
+        <h4>Identity</h4>
+        <div class="dash-row"><span>Branch / MOS</span><strong id="d-branch">—</strong></div>
+        <div class="dash-row"><span>Rank</span><strong id="d-rank">E-1</strong></div>
+        <div class="dash-row"><span>Age</span><strong id="d-age">18</strong></div>
+        <div class="dash-row"><span>Time in Service</span><strong id="d-tis">0 mo</strong></div>
+      </div>
+      <div class="dash-card">
+        <h4>Money</h4>
+        <div class="dash-row big pos"><span>Savings</span><strong id="d-savings">$0</strong></div>
+        <div class="dash-row pos"><span>TSP / Retirement</span><strong id="d-tsp">$0</strong></div>
+        <div class="dash-row neg"><span>Debt</span><strong id="d-debt">$0</strong></div>
+        <div class="dash-row"><span>Net Worth</span><strong id="d-net">$0</strong></div>
+        <div class="dash-row"><span>Monthly take-home</span><strong id="d-income">$0</strong></div>
+      </div>
+      <div class="dash-card">
+        <h4>Life</h4>
+        <div class="dash-row"><span>Marital status</span><strong id="d-marital">Single</strong></div>
+        <div class="dash-row"><span>Kids</span><strong id="d-kids">0</strong></div>
+        <div class="dash-row"><span>Pets</span><strong id="d-pets">0</strong></div>
+        <div class="dash-row"><span>Housing</span><strong id="d-housing">Barracks</strong></div>
+        <div class="dash-row"><span>Vehicle</span><strong id="d-car">None</strong></div>
+      </div>
+      <div class="dash-card">
+        <h4>Readiness</h4>
+        <div class="dash-row"><span>Fitness</span><strong id="d-fitness">80</strong></div>
+        <div class="dash-bar"><div class="dash-bar-fill" id="b-fitness" style="width:80%;background:var(--success)"></div></div>
+        <div class="dash-row" style="margin-top:.5rem"><span>Reputation</span><strong id="d-rep">70</strong></div>
+        <div class="dash-bar"><div class="dash-bar-fill" id="b-rep" style="width:70%;background:var(--blue)"></div></div>
+        <div class="dash-row" style="margin-top:.5rem"><span>Morale</span><strong id="d-morale">80</strong></div>
+        <div class="dash-bar"><div class="dash-bar-fill" id="b-morale" style="width:80%;background:var(--gold)"></div></div>
+        <div class="dash-row" style="margin-top:.5rem"><span>Health</span><strong id="d-health">Healthy</strong></div>
+      </div>
+      <div class="dash-card">
+        <h4>Education</h4>
+        <div class="dash-row big"><span>College credits</span><strong id="d-credits">0</strong></div>
+        <div class="dash-row"><span>Degree status</span><strong id="d-degree">None</strong></div>
+        <div class="dash-row"><span>GI Bill</span><strong id="d-gibill">Intact</strong></div>
+      </div>
+      <div class="dash-card">
+        <h4>Qualifications</h4>
+        <div class="quals-list" id="d-quals"><em style="font-size:var(--text-xs);color:var(--muted)">None yet — earn them by passing gates.</em></div>
+      </div>
+      <div class="dash-card">
+        <h4>20-Yr Retirement Projection</h4>
+        <div class="dash-row big pos"><span>Pension est.</span><strong id="d-pension">—</strong></div>
+        <div class="dash-row"><span>TSP at 20 yrs</span><strong id="d-tsp20">—</strong></div>
+        <div class="dash-row"><span>On track?</span><strong id="d-ontrack">Too early</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MOS DEEP DIVE ==================== -->
+<div id="mos" class="section">
+  <h2>Marine Corps MOS — Infantry, Recon, and Combat Arms</h2>
+  <p style="margin-bottom:var(--s5)">Here are the key enlisted MOSs in the 03XX Infantry field and the special operations tracks, with what each requires and how it connects to my path.</p>
+
+  <div class="two-col" style="margin-bottom:var(--s6)">
+    <div class="card pad">
+      <h3>03XX Infantry Field — the foundation</h3>
+      <p>All 03XX MOSs belong to the Infantry occupational field. Some I can enlist into; others I qualify for later. My path runs through 0311 → 0321 → 0322/0372.</p>
+      <div class="mos-table">
+        <table>
+          <thead><tr><th>MOS</th><th>Title</th><th>Type</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>0311</td><td>Rifleman</td><td><span class="badge combat">Combat</span></td><td>Primary infantry MOS. Enlistable. My starting point.</td></tr>
+            <tr><td>0313</td><td>LAV Crewman</td><td><span class="badge combat">Combat</span></td><td>Light Armored Reconnaissance vehicle operator.</td></tr>
+            <tr><td>0317</td><td>Scout Sniper</td><td><span class="badge recon">Sniper</span></td><td>Secondary MOS only. Min E-3, GT 100+, expert rifleman, 1st Class PFT. Reorganizing into 0322.</td></tr>
+            <tr><td>0321</td><td>Reconnaissance Marine</td><td><span class="badge recon">Recon</span></td><td>My Recon MOS. Requires IRC, RSAT, GRC, ARC + dive/airborne/FF/SERE pipeline. GT 105+.</td></tr>
+            <tr><td>0322</td><td>Recon Marine, Sniper Qualified</td><td><span class="badge recon">Recon</span></td><td>0321 + Scout Sniper course. Subsumes old 0317 role in Recon units.</td></tr>
+            <tr><td>0323</td><td>Recon Marine, Parachute Qualified</td><td><span class="badge recon">Recon</span></td><td>0321 + airborne qualifications.</td></tr>
+            <tr><td>0324</td><td>Recon Marine, Combatant Diver Qualified</td><td><span class="badge recon">Recon</span></td><td>0321 + combatant diver certification.</td></tr>
+            <tr><td>0326</td><td>Recon Marine, Parachute &amp; Diver Qualified</td><td><span class="badge recon">Recon</span></td><td>Full pipeline qualifier. Jump + dive. The fully-rated Recon Marine.</td></tr>
+            <tr><td>0331</td><td>Machine Gunner</td><td><span class="badge combat">Combat</span></td><td>Medium/heavy machine guns. Good lateral move if Recon doesn't work out.</td></tr>
+            <tr><td>0341</td><td>Mortarman</td><td><span class="badge combat">Combat</span></td><td>Indirect fire support specialist.</td></tr>
+            <tr><td>0352</td><td>Anti-Tank Missile Gunner</td><td><span class="badge combat">Combat</span></td><td>Anti-armor systems. Enlistable.</td></tr>
+            <tr><td>0365</td><td>Infantry Squad Leader</td><td><span class="badge combat">Combat</span></td><td>Cpl–Sgt billet, not an entry-level MOS.</td></tr>
+            <tr><td>0369</td><td>Infantry Unit Leader</td><td><span class="badge combat">Combat</span></td><td>SSgt–GySgt billet. Senior NCO leadership track.</td></tr>
+            <tr><td>0372</td><td>Critical Skills Operator (CSO)</td><td><span class="badge special">Special Ops</span></td><td>Marine Raider. Requires MARSOC A&amp;S + 9-month ITC. Sgt–MGySgt.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card pad">
+      <h3>Other paths I might consider (if Infantry isn't my only option)</h3>
+      <p style="margin-bottom:var(--s4)">These aren't my primary plan, but they're worth knowing if I choose a different branch or MOS and still want a path to special operations or elite service.</p>
+      <div class="accord">
+        <details><summary>Army — 11X Infantry → Rangers → Special Forces</summary><div class="body">Army Infantry (11B/11C) leads to Ranger Assessment and Selection Program (RASP) for the 75th Ranger Regiment, or Special Forces Assessment and Selection (SFAS) for a Green Beret slot. Both are highly competitive. Rangers require about 1 year of military service minimum; SF typically 3+ years. Army also has a 3-year Ranger contract (Option 40) that guarantees a RASP attempt. SFAS is roughly 24 days; the full SF pipeline including the Qualification Course (Q-Course) is about 1.5–2 years.</div></details>
+        <details><summary>Army — 18X Special Forces Direct Enlistment</summary><div class="body">The Army allows direct enlistment as an 18X "X-Ray" contract, which guarantees a shot at Airborne School and SFAS. If I pass, I go through the full Q-Course to become a Green Beret. High attrition. If I fail any gate, I revert to another 11-series MOS. This is a fast-track option for someone who knows they want SF immediately, though Marine Recon → MARSOC is roughly comparable in prestige and capability.</div></details>
+        <details><summary>Navy — BUD/S → SEAL → DEVGRU</summary><div class="body">Navy SEALs go through Basic Underwater Demolition/SEAL training (BUD/S) — roughly 24+ weeks of the most famous military training in the world. Hell Week happens in Phase 1. After BUD/S, SQT (SEAL Qualification Training) is ~26 weeks. Then assignment to a SEAL Team. DEVGRU (SEAL Team Six) is a separate tier above standard SEAL Teams. The Navy also has Special Warfare Combatant-craft Crewmen (SWCC) for a related but different SOF role.</div></details>
+        <details><summary>Air Force — CCT / PJ / SOWT (now Special Warfare)</summary><div class="body">Air Force Special Warfare includes Combat Controllers (CCT), Pararescue (PJ), Survival, Evasion, Resistance, and Escape Specialists (SERE), and Special Operations Weather Teams. All share a challenging pipeline. The Air Force Special Warfare pipeline is now consolidated under a single assessment pipeline before diverging into career tracks. These roles are smaller communities but highly skilled.</div></details>
+        <details><summary>Marine Corps — Officer route to Recon/MARSOC</summary><div class="body">Marine officers can pursue a Ground Intelligence Officer (0203) or Infantry Officer (0302) commission, and attend Reconnaissance Officer screening. Officers interested in MARSOC attend A&amp;S and ITC just like enlisted, earning MOS 0370 (Special Operations Officer). ROTC, Naval Academy, OCS, or ECP (for prior enlisted) are the commissioning paths. Officer pay starts significantly higher than enlisted — O-1 base pay is ~$4,150/month in 2026.</div></details>
+      </div>
+      <div style="margin-top:var(--s5)">
+        <h3>Key gate requirements at a glance</h3>
+        <div class="mos-table">
+          <table>
+            <thead><tr><th>Gate</th><th>Min GT</th><th>Min PFT</th><th>Swim</th><th>TIS</th></tr></thead>
+            <tbody>
+              <tr><td>Recon Screen (RSAT)</td><td>105</td><td>1st Class</td><td>WSI required</td><td>After IRC</td></tr>
+              <tr><td>Scout Sniper School (0317/0322)</td><td>100</td><td>235+ (1st Class)</td><td>500m utility</td><td>E-3+ infantry/recon</td></tr>
+              <tr><td>MARSOC A&amp;S Phase I</td><td>105</td><td>235+</td><td>300m utilities + 11-min tread</td><td>Min 3 yrs, max ~6 yrs at ITC</td></tr>
+              <tr><td>MSG Program (Watchstander)</td><td>90</td><td>1st Class</td><td>N/A</td><td>Must be single LCpl–Sgt</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RECON ==================== -->
+<div id="recon" class="section">
+  <h2>My Path to Recon — step by step (2026 pipeline)</h2>
+  <p style="margin-bottom:var(--s4)">The Marine Corps overhauled the Recon pipeline in 2026. Here is exactly what I will face and when.</p>
+
+  <div class="aside-main" style="margin-bottom:var(--s6)">
+    <div>
+      <div class="card pad-sm" style="margin-bottom:var(--s4)">
+        <div class="label" style="margin-bottom:.5rem">Two ways in</div>
+        <div class="accord">
+          <details open><summary>HZ Contract (Recon Direct)</summary><div class="body">I enlist specifically for Recon (HZ contract). I am guaranteed a pipeline attempt. If I fail any gate, I am reclassified per needs of the Marine Corps. I will need a 5-year contract. I get fast-tracked through training vs. open volunteers.</div></details>
+          <details><summary>UH Contract (Open Infantry) + Lateral Move</summary><div class="body">I enlist as 0311 infantry (UH contract). After proving myself, I volunteer for a lateral move to Recon. I am not prioritized at holding platoons. The screening still applies. If I fail, I remain 0311. More flexibility but longer route.</div></details>
+        </div>
+      </div>
+      <div class="card pad-sm">
+        <div class="label" style="margin-bottom:.6rem">Recon physical standards</div>
+        <div style="font-size:var(--text-sm);display:grid;gap:.5rem">
+          <div>🏃 PFT: 1st Class (225+ entering; must hit higher during training)</div>
+          <div>🏊 Swim: Water Survival Intermediate (WSI) to enter; Advanced (WSA) for BRC old standard</div>
+          <div>💪 RSAT events: Max pull-ups, max push-ups (2 min), max crunches (2 min), 3-mile timed run, obstacle course x2, 500m continuous swim, 30-min water tread, underwater swim</div>
+          <div>🧠 GT score: 105 minimum — non-waiverable</div>
+          <div>🔒 Security clearance: Secret minimum</div>
+          <div>📋 No NJPs in last 12 months, no courts martial</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="pad" style="border-bottom:1px solid var(--border)"><h3 style="margin:0">2026 Recon Pipeline — total timeline after boot camp</h3></div>
+      <div class="timeline">
+        <div class="tnode">
+          <h3>Infantry Rifleman Course (IRC)</h3>
+          <div class="meta">14 weeks · New in 2026 — replaces MCT for Recon track</div>
+          <p>I complete the exact same course as an 0311 rifleman. This gives me stronger infantry fundamentals before Recon training begins. I graduate as a qualified 0311 first.</p>
+          <div class="tags"><span class="tag ok">New 2026 requirement</span><span class="tag">All Recon-track Marines complete this</span></div>
+        </div>
+        <div class="tnode gate">
+          <h3>Ground Reconnaissance Course (GRC)</h3>
+          <div class="meta">9 weeks · Replaced the old 12-week Basic Reconnaissance Course (BRC)</div>
+          <p>Individual skills phase: land navigation, demolitions, call-for-fire, radio/comms, marksmanship live-fire, patrol phase. Also incorporates robotics and sensor familiarization for emerging tech.</p>
+          <div class="tags"><span class="tag danger">High attrition gate</span><span class="tag info">Started April 2026 (first class)</span></div>
+        </div>
+        <div class="tnode gate">
+          <h3>Amphibious Reconnaissance Course (ARC)</h3>
+          <div class="meta">9 weeks · Follows GRC</div>
+          <p>Three blocks: pool phase, scout swimmer techniques, culminating exercise. Water-based recon skills. Still being developed in detail as of mid-2026.</p>
+          <div class="tags"><span class="tag danger">Swim skills critical</span></div>
+        </div>
+        <div class="tnode">
+          <h3>Combatant Diver Course</h3>
+          <div class="meta">~8 weeks</div>
+          <p>Open-circuit SCUBA and closed-circuit rebreather qualifications for underwater combat swimming and infiltration.</p>
+        </div>
+        <div class="tnode">
+          <h3>Basic Airborne Course</h3>
+          <div class="meta">3 weeks · Fort Liberty, NC (Army course)</div>
+          <p>Static-line parachute qualification. Required for full 0326 designation.</p>
+        </div>
+        <div class="tnode">
+          <h3>Military Free Fall (MFF / HALO)</h3>
+          <div class="meta">3 weeks</div>
+          <p>High altitude low opening (HALO) and HAHO free-fall qualification.</p>
+        </div>
+        <div class="tnode win">
+          <h3>SERE School</h3>
+          <div class="meta">~3 weeks</div>
+          <p>Survival, Evasion, Resistance, and Escape. Level C for special operations personnel. Completes the full pipeline qualification.</p>
+          <div class="tags"><span class="tag ok">MOS 0326 fully qualified</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk chart -->
+  <div class="card pad">
+    <h3>Where I'm most likely to hit a wall</h3>
+    <p style="margin-bottom:var(--s5)">These are the most common reasons Recon-track Marines don't make it through. Knowing them early means I can build against them.</p>
+    <div>
+      <div class="risk-row"><div class="risk-label"><span>Injury (stress fractures, overuse, acute trauma)</span><span style="color:var(--error)">Very High</span></div><div class="bar-bg"><div class="bar-fill" style="width:88%;background:var(--error)"></div></div></div>
+      <div class="risk-row"><div class="risk-label"><span>Swim / water events (cold water, endurance, form)</span><span style="color:var(--warn)">High</span></div><div class="bar-bg"><div class="bar-fill" style="width:72%;background:var(--warn)"></div></div></div>
+      <div class="risk-row"><div class="risk-label"><span>Academic / navigation failures (land nav, comms)</span><span style="color:var(--gold)">Moderate</span></div><div class="bar-bg"><div class="bar-fill" style="width:48%;background:var(--gold)"></div></div></div>
+      <div class="risk-row"><div class="risk-label"><span>Discipline or administrative issues</span><span style="color:var(--gold)">Moderate</span></div><div class="bar-bg"><div class="bar-fill" style="width:40%;background:var(--gold)"></div></div></div>
+      <div class="risk-row"><div class="risk-label"><span>Mental fatigue / quitting under pressure</span><span style="color:var(--blue)">Significant</span></div><div class="bar-bg"><div class="bar-fill" style="width:60%;background:var(--blue)"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MARSOC ==================== -->
+<div id="marsoc" class="section">
+  <h2>My Path to Marine Raiders (MARSOC)</h2>
+  <div class="two-col" style="margin-bottom:var(--s5)">
+    <div class="card pad">
+      <h3>Who can apply</h3>
+      <p style="margin-bottom:var(--s4)">Any active-duty Marine from any MOS — but my Recon background puts me in the strongest possible position. Key requirements:</p>
+      <div style="display:grid;gap:.6rem;font-size:var(--text-sm)">
+        <div>✅ US citizen, active duty Marine</div>
+        <div>✅ Minimum <strong>3 years TIS</strong> — no more than ~<strong>6 years TIS</strong> at the time I enter ITC</div>
+        <div>✅ GT score <strong>105 or higher</strong> on the ASVAB</div>
+        <div>✅ PFT score of <strong>235 or higher</strong> (run a 260+ to be competitive)</div>
+        <div>✅ 1st Class CFT score</div>
+        <div>✅ Pass MARSOC physical screening and swim assessment</div>
+        <div>✅ Secret security clearance (ability to obtain)</div>
+        <div>✅ No more than <strong>2 NJPs</strong> total</div>
+        <div>✅ Strong command endorsement and moral character</div>
+        <div>✅ Medically qualified for arduous duty</div>
+      </div>
+    </div>
+    <div class="card pad">
+      <h3>The MARSOC pipeline — total commitment</h3>
+      <div class="accord">
+        <details open><summary>FY26 HQMC MARSOC Screening Team (HMST) visits</summary><div class="body">MARSOC runs screening team visits to bases throughout the fiscal year. I should find when the HMST is visiting my installation and attend the brief even before I formally apply. This is where I learn the current standards, talk to Raider recruiters, and start the packet process. FY26 guidance was published September 2025.</div></details>
+        <details><summary>A&amp;S Phase I — 3 weeks, Camp Lejeune</summary><div class="body">Physical fitness events around the MARSOC PERRES program. I must score 235+ PFT on day one. Swim: 300m in utilities (no boots) using side or breast stroke, then 11-minute water tread in full utilities, then 4 minutes of blouse or trouser flotation. Phase I does not guarantee a Phase II seat — I am being assessed the entire time.</div></details>
+        <details><summary>A&amp;S Phase II — location undisclosed, ~3x per year</summary><div class="body">Mentally and physically challenging — both the content and location are not publicly disclosed. Marines who finish Phase I are not guaranteed a seat. Those selected move forward to reenlist for 6 years and receive orders to ITC.</div></details>
+        <details><summary>Individual Training Course (ITC) / Marine Raider Course (MRC) — 9 months</summary><div class="body">Conducted at Camp Lejeune. Produces MARSOC Special Operations Officers (SOO, MOS 0370) and Critical Skills Operators (CSO, MOS 0372). Physically and mentally demanding throughout with significant drop rates for injury and performance even this late in the pipeline. Completing ITC earns me the Raider designation and MOS 0372.</div></details>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <h3>What if I don't get selected — my backup B-Billet options</h3>
+    <p style="margin-bottom:var(--s5)">Not making MARSOC doesn't define me. Here are my best next moves if that gate stays closed, each of which is a legitimate career path:</p>
+    <div class="three-col">
+      <div class="edu-card">
+        <h4>Marine Security Guard (MSG)</h4>
+        <p>Embassy security duty at 150+ locations worldwide — Paris, Hong Kong, Bogotá, Pretoria. Three tours of 12 months each in three different countries. Must be single (LCpl–Sgt watchstander), 1st Class PFT, GT 90+, Secret clearance, financially stable, no NJPs in the past year. Staff NCOs (E-6+) can serve as detachment commanders (18-month tours) and can be married.</p>
+        <div class="tags" style="margin-top:var(--s3)"><span class="tag ok">Overseas adventure</span><span class="tag info">Embassy prestige</span><span class="tag">Diplomatic world exposure</span></div>
+      </div>
+      <div class="edu-card">
+        <h4>Drill Instructor (DI)</h4>
+        <p>Become the person who shapes new Marines. DI duty is one of the most prestigious B-billets. It is hard on families and personal tempo, but it is a major career accelerator and develops elite leadership skills. Typically 3-year tour.</p>
+        <div class="tags" style="margin-top:var(--s3)"><span class="tag ok">Career accelerator</span><span class="tag warn">High family stress</span></div>
+      </div>
+      <div class="edu-card">
+        <h4>Stay in Recon / Senior NCO</h4>
+        <p>Remain in a Recon battalion as a senior leader. Become a platoon sergeant, team leader, or operations chief. This is not falling back — this is becoming one of the Marines who develops the next generation of Recon operators.</p>
+        <div class="tags" style="margin-top:var(--s3)"><span class="tag ok">Still special operations</span><span class="tag">Leadership impact</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LIFE FORKS ==================== -->
+<div id="life" class="section">
+  <h2>Life forks: marriage, kids, housing, overseas, injury</h2>
+  <p style="margin-bottom:var(--s5)">These aren't interruptions to my career plan — they are part of my career plan. I need to think them through on purpose.</p>
+
+  <div class="two-col" style="gap:var(--s5)">
+    <div>
+      <div class="card pad" style="margin-bottom:var(--s5)">
+        <h3>Marriage — the timing question</h3>
+        <div class="accord">
+          <details><summary>Option A: Stay single through first enlistment</summary><div class="body">Simplest option for chasing Recon and MARSOC. I live in barracks, save money, and stay mission-focused. High-tempo training and deployments are much easier without a spouse waiting at home. Downside: I may feel isolated; relationships started during this time face distance and op-tempo stress.</div></details>
+          <details><summary>Option B: Get married after boot camp / early in first tour</summary><div class="body">I'm entitled to BAH (Basic Allowance for Housing) as a married junior enlisted Marine. This means I move off-base or into family housing. My monthly income effectively goes up with BAH added. But: I am now managing a household, a spouse's expectations and career, possibly kids, all while trying to pass Recon screening. This adds real weight. I should ask: does my partner understand the deployment and training tempo of Recon/MARSOC specifically?</div></details>
+          <details><summary>Option C: Marry mid-career (after first enlistment)</summary><div class="body">I have proven myself, have rank and income, and I'm past the most uncertain gates. My spouse enters knowing my path, not hoping it'll calm down. This is often the most stable timing for both the relationship and my career trajectory.</div></details>
+        </div>
+      </div>
+      <div class="card pad">
+        <h3>Kids — the planning question</h3>
+        <p style="margin-bottom:var(--s4)">I should think about this before it happens, not after. Having kids while pursuing Recon or MARSOC creates a legitimate tension that isn't solved by ignoring it.</p>
+        <div style="font-size:var(--text-sm);display:grid;gap:.6rem">
+          <div>📋 TRICARE covers prenatal, delivery, and pediatric care — strong benefit</div>
+          <div>🏠 Family housing or BAH for off-base housing becomes available when I have dependents</div>
+          <div>✈️ Deployments with young kids: communication plans, family support network, and a spouse who can operate independently are non-negotiable</div>
+          <div>💰 Childcare on a junior enlisted salary is real money — plan for it before it happens</div>
+          <div>📚 MyCAA gives up to $4,000 in tuition assistance for eligible military spouses — a real benefit if my spouse wants school too</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card pad" style="margin-bottom:var(--s5)">
+        <h3>Housing — the financial decision</h3>
+        <div class="accord">
+          <details open><summary>Barracks (single, junior enlisted)</summary><div class="body">Usually mandatory when single and junior enlisted. Essentially free housing — my biggest financial advantage early in my career. Every dollar I save here compounds. I should treat barracks as a savings accelerator, not a problem to escape ASAP.</div></details>
+          <details><summary>On-base family housing</summary><div class="body">If I'm married with dependents, I may be offered on-base family housing. My BAH goes directly to pay for it. Shorter commute, base amenities, community support, and a built-in social network of other military families. The tradeoff is less privacy and less control over the home.</div></details>
+          <details><summary>Off-base with BAH</summary><div class="body">BAH (Basic Allowance for Housing) is based on my rank, dependency status, and duty station's zip code. Living off-base gives me more freedom but comes with: commuting time, maintenance costs, utility bills, and the temptation to overspend on a nicer place than I need. I should ask: can I live off-base AND save meaningful money every month? If not, on-base is smarter.</div></details>
+          <details><summary>VA Loan — buying a house</summary><div class="body">I am eligible for a VA home loan after 90 days active duty during wartime or 181 days during peacetime. No down payment required, no PMI, competitive rates. I can use it multiple times. The smart play: use it when I am confident I'll be in the same duty station for 3+ years, not at my first assignment. Moving and selling too soon can cost more than renting would have.</div></details>
+        </div>
+      </div>
+      <div class="card pad">
+        <h3>Living overseas</h3>
+        <p style="margin-bottom:var(--s4)">Whether it's MSG duty, Okinawa, Europe, or a MARSOC deployment abroad, overseas life has unique financial and family implications.</p>
+        <div style="font-size:var(--text-sm);display:grid;gap:.6rem">
+          <div>💰 Overseas COLA (Cost of Living Allowance) added to my pay in high-cost locations</div>
+          <div>🚗 Military car-buying programs available in some overseas locations (e.g., SOFA agreements in Japan, Germany)</div>
+          <div>🏫 If I have school-age kids, DoDEA (Department of Defense Education Activity) schools are available on most overseas installations</div>
+          <div>✈️ My spouse can travel with me, but some MSG tours restrict accompanying family — I need to check specific program rules</div>
+          <div>🌍 MSG watchstander tours: 3 tours × 12 months each in 3 different countries — single Marines only at watchstander level</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad" style="margin-top:var(--s5)">
+    <h3>Injury — the path I can't fully control</h3>
+    <p style="margin-bottom:var(--s5)">The Recon and MARSOC pipelines have the highest injury rates in the Marine Corps. I need a plan for this scenario — not because I plan to fail, but because having a plan means I won't panic if it happens.</p>
+    <div class="three-col">
+      <div class="edu-card"><h4>Training injury during pipeline</h4><p>Stress fractures, shoulder tears, knee damage, and swim-related injuries are common. Some Marines go through the pipeline multiple times. An injury may mean a medical hold and a re-attempt, not permanent elimination. The key question: did I maintain fitness, grades, and discipline leading up to it?</p></div>
+      <div class="edu-card"><h4>Combat injury or illness during deployment</h4><p>If I'm medically evaluated and can return to duty, my career continues. If I'm medically separated, I receive disability pay based on rating, TRICARE, and veteran benefits. My savings and education progress at that point determine how hard the landing is.</p></div>
+      <div class="edu-card"><h4>My injury-proof floor</h4><p>No matter what, by year 4 I want: at least 30 college credits done (via TA), 3–6 months of expenses saved, no car loan over my means, and TSP contributions started. If I get hurt at any point, these assets give me a runway instead of a cliff.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAY ==================== -->
+<div id="pay" class="section">
+  <h2>Rank, promotion timeline &amp; 2026 pay</h2>
+  <p style="margin-bottom:var(--s5)">This is what my earnings look like as I rank up — basic pay only. My actual monthly take-home also includes BAH (housing allowance), BAS (food allowance), and potential special pays for hazardous duty, jump pay, dive pay, and more.</p>
+
+  <div class="card" style="margin-bottom:var(--s5)">
+    <div class="mos-table">
+      <table>
+        <thead>
+          <tr><th>Rank (Grade)</th><th>Title</th><th>&lt;2 yrs</th><th>4 yrs</th><th>8 yrs</th><th>12 yrs</th><th>20 yrs</th><th>Typical TIS to reach</th><th>My career stage</th></tr>
+        </thead>
+        <tbody>
+          <tr class="highlight"><td>E-1</td><td>Private (Pvt)</td><td>$2,217</td><td>$2,217</td><td>—</td><td>—</td><td>—</td><td>Entry</td><td>Boot camp</td></tr>
+          <tr><td>E-2</td><td>Private First Class (PFC)</td><td>$2,698</td><td>$2,698</td><td>—</td><td>—</td><td>—</td><td>~6 months TIS</td><td>Early service</td></tr>
+          <tr><td>E-3</td><td>Lance Corporal (LCpl)</td><td>$2,837</td><td>$3,198</td><td>—</td><td>—</td><td>—</td><td>~14 months TIS</td><td>IRC / early unit</td></tr>
+          <tr class="highlight"><td>E-4</td><td>Corporal (Cpl)</td><td>$3,130</td><td>$3,644</td><td>$3,800</td><td>—</td><td>—</td><td>~2 yrs TIS</td><td>Recon pipeline / first unit</td></tr>
+          <tr class="highlight"><td>E-5</td><td>Sergeant (Sgt)</td><td>$3,343</td><td>$3,947</td><td>$4,110</td><td>$4,422</td><td>—</td><td>~4–5 yrs TIS</td><td>Recon unit / MARSOC eligible</td></tr>
+          <tr><td>E-6</td><td>Staff Sergeant (SSgt)</td><td>$3,401</td><td>$4,069</td><td>$4,613</td><td>$5,044</td><td>$5,268</td><td>~8–10 yrs TIS</td><td>Mid-career / B-billet / ITC exit</td></tr>
+          <tr><td>E-7</td><td>Gunnery Sergeant (GySgt)</td><td>$3,932</td><td>$4,673</td><td>$5,136</td><td>$5,592</td><td>$6,246</td><td>~12–14 yrs TIS</td><td>Senior NCO / leadership</td></tr>
+          <tr><td>E-8</td><td>First Sergeant / Master Sgt</td><td>—</td><td>—</td><td>$7,908</td><td>$8,009</td><td>$8,756</td><td>~16–18 yrs TIS</td><td>Senior leader</td></tr>
+          <tr><td>E-9</td><td>Sergeant Major / MGySgt</td><td>—</td><td>—</td><td>—</td><td>—</td><td>$8,105</td><td>20+ yrs</td><td>Top enlisted leadership</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pad-sm" style="border-top:1px solid var(--border)">
+      <p style="font-size:var(--text-xs);color:var(--muted)">2026 basic pay (3.8% increase vs 2025). Monthly before taxes. Does not include BAH, BAS, jump pay (~$150/mo), dive pay (~$340/mo), special duty assignment pay, hazardous duty pay, or enlistment/reenlistment bonuses. An E-5 with dependents at a high-cost duty station can easily see total monthly compensation of $6,000–$7,000+.</p>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card pad">
+      <h3>Special pays on top of base pay</h3>
+      <div style="font-size:var(--text-sm);display:grid;gap:.6rem">
+        <div>🪂 <strong>Jump pay:</strong> ~$150/month (hazardous duty — airborne qualified)</div>
+        <div>🤿 <strong>Dive pay:</strong> ~$340/month (for qualified combatant divers)</div>
+        <div>⚡ <strong>Special Duty Assignment Pay (SDAP):</strong> Extra monthly pay for select billets including Recon and MARSOC positions</div>
+        <div>💣 <strong>Hostile Fire / Imminent Danger Pay:</strong> $225/month when deployed to hazard areas</div>
+        <div>🏕 <strong>Combat Zone Tax Exclusion:</strong> Pay earned while deployed to a designated combat zone is tax-free</div>
+        <div>💰 <strong>Reenlistment bonuses:</strong> Varies widely by MOS, grade, and service needs — can be significant for high-demand MOSs like 0372</div>
+      </div>
+    </div>
+    <div class="card pad">
+      <h3>My 20-year retirement math</h3>
+      <div style="font-size:var(--text-sm);display:grid;gap:.6rem">
+        <div>📊 <strong>Legacy/High-3 system:</strong> 50% of average of highest 36 months base pay. Example: if I retire as an E-8 with 20 years (~$7,908/mo), pension ≈ $3,954/month.</div>
+        <div>📊 <strong>Blended Retirement System (BRS):</strong> If I joined after Jan 1, 2018, I'm under BRS. Pension is 40% of base pay at 20 years, but I also get TSP matching contributions (up to 5%) during service. Potentially better total compensation if I invest TSP contributions well.</div>
+        <div>🏥 <strong>TRICARE:</strong> Subsidized health coverage continues after retirement — a major benefit worth thousands per year in the civilian world.</div>
+        <div>🏠 <strong>VA loan:</strong> Still available after retirement. Can still buy a home with no down payment.</div>
+        <div>🎓 <strong>GI Bill:</strong> Can transfer remaining benefits to spouse or dependents after 6+ years of service.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCHOOL ==================== -->
+<div id="school" class="section">
+  <h2>School while in the military — my options and strategy</h2>
+  <p style="margin-bottom:var(--s5)">I don't have to choose between the military and a degree. I can build toward a degree throughout my career — slowly but steadily — so that by the time I separate or retire, I either have a degree or am close enough that the GI Bill can finish it.</p>
+
+  <div class="edu-cards">
+    <div class="edu-card">
+      <h4>Tuition Assistance (TA)</h4>
+      <div class="amount">$4,500/yr · up to 100% of tuition</div>
+      <p>Available to all active-duty Marines. Up to $250/semester credit hour, $4,500/fiscal year. Max 2 courses at a time. Must apply through WebTA before the class starts with command approval. Cannot use during MOS school, PME courses, or SkillBridge. I keep my GI Bill intact for later.</p>
+      <div class="tags"><span class="tag ok">Best tool while on active duty</span><span class="tag">GT 100+ to take 2 courses at once</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>Post-9/11 GI Bill (Chapter 33)</h4>
+      <div class="amount">100% tuition after 36 months active duty</div>
+      <p>Covers full in-state tuition at public schools, fees, books up to ~$1,000/yr, and a housing allowance while in school. 36 months of benefits (max). After 6+ years of service, I can transfer benefits to a spouse or dependent child. Best used after I separate or retire for full-time school.</p>
+      <div class="tags"><span class="tag ok">Housing allowance while in school</span><span class="tag info">Transferable to family after 6 yrs</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>Montgomery GI Bill (MGIB)</h4>
+      <div class="amount">$100/mo for 12 mo = $1,200 contribution; up to 36 months benefits</div>
+      <p>I contribute $100/month for my first year of service (auto-deducted). Available after 24 months of active duty. Less generous than Post-9/11 GI Bill but can be used part-time during service for a small monthly stipend.</p>
+      <div class="tags"><span class="tag">Part-time supplement while in</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>DANTES / DSST Exams</h4>
+      <div class="amount">Free exam fees for active duty</div>
+      <p>DANTES Subject Standardized Tests let me test out of college-level courses for credit. A single exam can earn 3–6 college credits and takes one sitting. A great way to build credits during slow periods without time in a classroom.</p>
+      <div class="tags"><span class="tag ok">Fast credit accumulation</span><span class="tag">Study independently, test once</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>CLEP Exams</h4>
+      <div class="amount">Free for active duty under MyCLEP</div>
+      <p>College Level Examination Program. 34 subject areas. Pass a 90-minute exam, earn 3–12 credits. Free for active duty via the MyCLEP program. I can build a transcript significantly just from passing CLEP exams in subjects I already know.</p>
+      <div class="tags"><span class="tag ok">Zero cost while active duty</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>Marine Corps University (MCU/CDET)</h4>
+      <div class="amount">Free online PME with transferable credits</div>
+      <p>The College of Distance Education and Training (CDET) at MCU offers professional military education online. Some courses are transferable as college credits. Also counts toward promotion. Two birds, one stone.</p>
+      <div class="tags"><span class="tag ok">Counts for promotion</span><span class="tag info">Can earn transferable credits</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>SNCO Degree Completion Program</h4>
+      <div class="amount">Full-time school on active duty for SNCOs</div>
+      <p>Staff NCOs (E-6+) can be selected to attend full-time college while on active duty to complete a bachelor's degree — no leave required. This is a competitive program but a powerful option if I'm mid-career and haven't finished a degree.</p>
+      <div class="tags"><span class="tag warn">Competitive selection</span><span class="tag ok">Full pay while in school</span></div>
+    </div>
+    <div class="edu-card">
+      <h4>MyCAA (for my spouse)</h4>
+      <div class="amount">Up to $4,000 in tuition assistance for spouse</div>
+      <p>If I get married, my spouse may qualify for My Career Advancement Account (MyCAA) — up to $4,000 toward an associate degree, certification, or licensure program. This means my household can have two educations building at once, both partly funded by the military.</p>
+      <div class="tags"><span class="tag info">Spouse education benefit</span><span class="tag ok">Reduces dual-income strain</span></div>
+    </div>
+  </div>
+
+  <div class="card pad" style="margin-top:var(--s5)">
+    <h3>My school strategy — slow and steady wins</h3>
+    <div class="two-col">
+      <div>
+        <div class="label" style="margin-bottom:.5rem">What I should aim for by year</div>
+        <div style="font-size:var(--text-sm);display:grid;gap:.5rem">
+          <div>📚 <strong>By year 2:</strong> 15–20 credits (CLEP + DSST exams, 1 TA course)</div>
+          <div>📚 <strong>By year 4:</strong> 40–60 credits (associate's degree possible or 2-yr progress toward bachelor's)</div>
+          <div>📚 <strong>By year 8:</strong> 80–90 credits — within 30 of a bachelor's</div>
+          <div>📚 <strong>By year 12:</strong> Bachelor's degree completed via TA, or nearly complete</div>
+          <div>📚 <strong>After 20:</strong> GI Bill still available for graduate school, career certification, or finishing anything remaining</div>
+        </div>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:.5rem">Degree choices that work for my path</div>
+        <div style="font-size:var(--text-sm);display:grid;gap:.5rem">
+          <div>🔒 Cybersecurity / Information Systems (strong civilian demand)</div>
+          <div>🏗 Project Management / Business (PMP pairs perfectly)</div>
+          <div>💼 Criminal Justice / Law Enforcement (natural bridge for veterans)</div>
+          <div>⚕️ Emergency Management / Homeland Security (recon/special ops background is a qualifier)</div>
+          <div>🧠 Psychology / Leadership (strong for anyone leaving special ops)</div>
+          <div>🛠 Skilled trades + certifications (plumbing, electrical, HVAC — high-income with no debt)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DECISIONS ==================== -->
+<div id="decisions" class="section">
+  <h2>My decision toolkit — the questions I ask at every fork</h2>
+  <p style="margin-bottom:var(--s5)">At every major life or career decision, I run through this checklist before I commit. I answer out loud and write my answer down.</p>
+
+  <div class="two-col">
+    <div class="card pad">
+      <h3>The 4-lens test</h3>
+      <p style="margin-bottom:var(--s4)">Every option gets evaluated on these four lenses before I decide. If I can't write at least one pro and one con per lens, I don't understand the option well enough yet.</p>
+      <div class="checks" id="lensChecks">
+        <label class="chk"><input type="checkbox"><span><strong>Money:</strong> How does this choice affect my money right now, and in 5 years? Does it help or hurt my savings, debt, and retirement?</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>Time / Energy:</strong> How much does this demand from me each day? Does it fit with my current training or unit tempo?</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>Relationships:</strong> How does this affect my family, my spouse, my kids if I have them, and my unit relationships?</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>Future me:</strong> At age 38–40, what does 20-year-older me think of this choice? Does it keep doors open or close them?</span></label>
+      </div>
+    </div>
+    <div class="card pad">
+      <h3>My standing rules</h3>
+      <div class="checks">
+        <label class="chk"><input type="checkbox"><span><strong>No car loan I can't absorb if it breaks down.</strong> A car payment that eats my savings is a trap — not a flex.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>TSP contributions start in month 1.</strong> Even 5% of base pay. Never cash it out early.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>Emergency fund first.</strong> Before I buy anything optional, I want 3 months of expenses saved in cash.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>One TA course per semester while in fleet.</strong> Slow but unstoppable.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>Every big decision has a written backup plan.</strong> What do I do if this fails? I write it down before I commit.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>I don't marry for BAH. I marry for keeps.</strong> The financial incentive is real, but it is not a reason.</span></label>
+        <label class="chk"><input type="checkbox"><span><strong>My civilian resume starts at year 2, not year 18.</strong> Translate my military skills into civilian language continuously.</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card pad" style="margin-top:var(--s5)">
+    <h3>"Future me" interview</h3>
+    <p style="margin-bottom:var(--s4)">Imagine I'm 40 years old, retired or a senior NCO, and I'm talking to my 18-year-old self on his first day. What does 40-year-old me say?</p>
+    <div class="three-col">
+      <div class="edu-card"><h4>✅ Definitely do this</h4><p>Start TSP immediately. Take even one class per semester. Stay in barracks longer than feels comfortable — the savings are real. Pick mentors in your unit who are where you want to be. Ask hard questions before signing anything.</p></div>
+      <div class="edu-card"><h4>⚠️ Watch out for this</h4><p>The E-4 car trap: getting your first Corporal paycheck and financing a truck. Marrying someone who doesn't understand military life. Burning bridges in your unit over small things. Skipping PT during training breaks. Letting pride stop you from asking for help after a failure.</p></div>
+      <div class="edu-card"><h4>💡 The thing nobody tells you</h4><p>Failure at a gate is not the end — it is data. The Marines who keep showing up after a failure are often the ones who eventually make it. The pipeline weeds out people who quit, not just people who aren't physically perfect. Show up. Every time.</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<script>
+// ── Scenarios ──
+const scenarios = {
+  ideal: "Ideal path: I stay focused and single (or keep life manageable early), dominate infantry, earn a Recon slot, keep college to one class at a time using TA, build a reputation at my Recon battalion, and earn a competitive MARSOC packet. I attempt A&S at around year 4–5, pass ITC, and become MOS 0372 — a Marine Raider. I chase a 20-year retirement with a degree in progress, no major debt, and a second-career plan already forming.",
+  norecon: "I don't make Recon. Maybe I didn't pass the RSAT swim events. Maybe injury took me out of the pipeline. Maybe the timing wasn't right. Here's what I do now: I return to my 0311 billet, I stay excellent, I look at other paths that interest me — 0317/0322 sniper track, Machine Gunner, a different MOS lateral move, or simply becoming the best 0311 NCO in my battalion. I keep taking TA classes. My 20-year retirement is still absolutely achievable from this track.",
+  recon_nomarsoc: "I made Recon — that alone is a major accomplishment. I served, deployed, and earned my qualifications. Now MARSOC didn't select me or I didn't finish ITC. I return to my Recon battalion or move to a B-billet. My best options: Marine Security Guard for an overseas diplomatic career, Drill Instructor to accelerate promotion and leadership, or staying in Recon as a senior NCO and shaping the next generation. I keep my school progress going and stay on the 20-year path.",
+  msg: "MSG is not a fallback — it's a real opportunity. I'll serve embassy security duty in 3 countries over roughly 3 years. Single at the watchstander level (LCpl–Sgt). I need: 1st Class PFT, GT 90+, no NJPs in the past year, Secret clearance, financially stable, and 38 months obligated service when I report to MSG school. I'll see the world through Paris, Hong Kong, Pretoria, Bogotá, or any of 150+ posts. Staff NCOs (E-6+) can serve as detachment commanders and can be married. This builds a unique global résumé and I'm still on track for 20 years.",
+  married_early: "I get married right after boot camp or early in my first tour. This immediately triggers: BAH (housing allowance) added to my pay, eligibility for on-base family housing or off-base rental, and the need for a joint budget. My spouse and I need a shared plan for: where we live, whether they work, what happens during deployments and training, and when (if ever) we have kids. The Recon and MARSOC paths are still possible, but my spouse must understand the intensity of that pipeline. My financial floor matters even more now — I need both of us to understand the budget.",
+  injury: "I get injured during training or a deployment. This is not automatically a career-ender — many Marines go through the pipeline multiple times after a medical hold and recovery. But it is a moment of choice: do I recover, get evaluated, and attempt again? Or has this changed what I want? Either way, what I did before the injury determines how hard the landing is. If I have TA credits, TSP savings, and no crushing debt, I have time and options. If I have none of those, an injury is a financial emergency on top of a medical one. Build the floor early so an injury is a setback, not a collapse.",
+  earlyout: "I decide to leave before 20. Whether it's year 4, 8, or 12, my exit scorecard looks like: How much have I saved? Do I have a degree or significant credits to finish with the GI Bill? What's my civilian job target — and does my MOS translate? Where does my family want to live? The earlier I get out, the more the GI Bill matters. The Post-9/11 GI Bill covers 100% of in-state public tuition, fees, housing allowance, and books — one of the best benefits in America. I use it to finish school, not to drift. Then I move into a second career with veteran hiring advantages, no student loan debt, and real leadership experience."
+};
+function renderScenario(){document.getElementById('scenarioText').textContent=scenarios[document.getElementById('scenario').value];}
+renderScenario();
+
+// ── Tabs ──
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Theme ──
+(function(){
+  const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+  let d='dark'; r.setAttribute('data-theme',d);
+  t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);t.textContent=d==='dark'?'🌙 Theme':'☀️ Theme';});
+})();
+
+/* ════════════════════════════════════════════════════════════
+   🎮  CAREER SIMULATOR — STATE MACHINE + MONEY MODEL
+   ═══════════════════════════════════════════════════════════ */
+
+const SAVE_KEY = 'usmc_path_game_v1';
+
+// ── 2026 pay tables (monthly base pay) ──
+const PAY = {
+  'E-1':{0:2217},
+  'E-2':{0:2698},
+  'E-3':{0:2837,2:3198},
+  'E-4':{0:3130,2:3375,4:3644,6:3800},
+  'E-5':{0:3343,2:3573,4:3947,6:4110,8:4422},
+  'E-6':{0:3401,4:4069,6:4256,8:4613,10:4900,12:5044,14:5268},
+  'E-7':{4:4673,6:4855,8:5136,10:5343,12:5592,14:5849,16:6042,18:6151,20:6246},
+  'E-8':{8:7908,10:8009,12:8240,14:8493,16:8756,18:9007,20:9197},
+  'E-9':{10:9405,12:9621,14:9892,16:10202,18:10522,20:10818}
+};
+const RANK_ORDER=['E-1','E-2','E-3','E-4','E-5','E-6','E-7','E-8','E-9'];
+const RANK_TITLE={'E-1':'Pvt','E-2':'PFC','E-3':'LCpl','E-4':'Cpl','E-5':'Sgt','E-6':'SSgt','E-7':'GySgt','E-8':'1stSgt/MSgt','E-9':'SgtMaj/MGySgt'};
+
+// BAH (rough 2026 with-dependents average; without ≈ 75%). Real BAH varies wildly by zip.
+const BAH={'E-1':1450,'E-2':1500,'E-3':1620,'E-4':1780,'E-5':2050,'E-6':2280,'E-7':2480,'E-8':2700,'E-9':2900};
+const BAS = 460; // monthly food allowance, enlisted
+
+function basePay(rank, tisMonths){
+  const tisYrs = tisMonths/12;
+  const tbl = PAY[rank]; if(!tbl) return 2217;
+  const yrs = Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  let p = tbl[yrs[0]];
+  for(const y of yrs){ if(tisYrs>=y) p=tbl[y]; }
+  return p;
+}
+
+// ── Default character ──
+function defaultState(){
+  return {
+    name:'Marine', age:18, branch:'usmc',
+    rank:'E-1', tis_months:0, stage:'start',
+    mos:'', path:[], // log of completed stages
+    failed_stages:[],
+    // money
+    savings:1500, tsp:0, debt:0, tsp_pct:5,
+    // life
+    married:false, kids:0, pets:0,
+    housing:'barracks', // barracks | on_base | off_base | own
+    car:'none', // none | used_cash | financed | upgrade
+    car_payment:0, car_value:0, mortgage:0,
+    rent_extra:0, // extra paid above BAH for off-base
+    // stats
+    fitness:80, reputation:70, morale:80, health:'healthy',
+    edu_credits:0, degree:'none', gibill:'intact',
+    // quals & flags
+    quals:[], // 'IRC','GRC','ARC','Diver','Airborne','MFF','SERE','Scout Sniper','MARSOC'
+    has_clearance:false, marsoc_eligible:false,
+    deployments:0,
+    // bookkeeping
+    log:[], event:null
+  };
+}
+
+let G = defaultState();
+
+// ── SCENES (state machine) — LINEAR STORY MODE ──
+// Each scene is a moment in time. Player advances chronologically through ~40 stages.
+// State carries forward; money auto-settles between scenes via settleCashFlow().
+const SCENES = {
+  // ════════ ACT 1 — BECOMING A MARINE ════════
+  // ════════ ACT 1 — BECOMING A MARINE ════════
+  'start':{
+    stage:'Enlistment',
+    title:'Day 1 — At the Recruiter\'s Office',
+    text:`Age 18. I\'m sitting across from a Marine recruiter. He has my paperwork open. The dream is <strong>Infantry → Recon → Sniper → Raider</strong>. The first decision is real: what branch and what contract?`,
+    choices:[
+      {label:'Marine Corps — HZ Contract (Recon guarantee)',
+       desc:'5-year contract. Recon pipeline guaranteed. If I fail a gate I get reclassed. Starting E-1 base pay: $2,217/mo (~$2,000/mo after federal tax + FICA).',
+       tags:['ok:Guaranteed Recon shot','warn:5-yr commit'],
+       apply:g=>{g.branch='usmc';g.mos='0321 (HZ)';g.path.push('Enlisted: USMC HZ');},
+       next:'meps'},
+      {label:'Marine Corps — UH Contract (Open Infantry, 0311)',
+       desc:'4-year contract. I become 0311 first, then volunteer for Recon laterally. More flexible, but Recon not guaranteed.',
+       tags:['info:4-yr commit','warn:Recon not guaranteed'],
+       apply:g=>{g.branch='usmc';g.mos='0311';g.path.push('Enlisted: USMC UH (0311)');},
+       next:'meps'},
+      {label:'Army — 11X with Option 40 (Ranger contract)',
+       desc:'4-year contract. RASP attempt guaranteed for 75th Ranger Regiment.',
+       tags:['info:Different branch','ok:Ranger-guaranteed'],
+       apply:g=>{g.branch='army';g.mos='11B (Option 40)';g.path.push('Enlisted: Army Option 40');},
+       next:'meps'},
+      {label:'Delay 1 year — Junior college first',
+       desc:'Bank 30 credits, raise GT score, save $2k. Then enlist with stronger academics.',
+       tags:['ok:+30 credits','ok:+5 rep','warn:1-yr delay'],
+       apply:g=>{g.age=19;g.edu_credits=30;g.reputation+=5;g.savings+=2000;g.path.push('Pre-enlist: 1 yr CC');},
+       next:'start'}
+    ]
+  },
+  'meps':{
+    stage:'MEPS',
+    title:'MEPS — Medical, Paperwork, Oath',
+    text:`Two days at the Military Entrance Processing Station. Physical, paperwork, ASVAB review. I take the Oath of Enlistment. Ship date is set 4 weeks out. <strong>I get paid starting the day I ship</strong> — E-1 base pay: $2,217/mo. No expenses yet; this is the first real money I\'ll see.`,
+    choices:[
+      {label:'Ship to Parris Island / San Diego',
+       apply:g=>{g.tis_months+=1;g.savings=Math.max(g.savings,1500);},
+       next:'boot_arrive'}
+    ]
+  },
+  'boot_arrive':{
+    stage:'Boot Camp',
+    title:'Boot Camp — Day 1 (Week 1 of 13)',
+    text:`Yellow Footprints. Receiving Week. The next 13 weeks I get paid full E-1 ($2,217/mo) but I can barely spend anything. Free housing, free chow. <strong>Most recruits leave boot camp with $3-5k saved</strong> if they don\'t pre-spend it. My job: graduate uninjured.`,
+    choices:[
+      {label:'Lock in — push for meritorious E-2',
+       desc:'Crush PT, max the rifle range, volunteer for everything. Higher chance of meritorious promotion at graduation. Small injury risk.',
+       tags:['ok:+E-2 chance','warn:Injury risk'],
+       apply:g=>{
+         g.tis_months+=3;g.reputation+=8;g.fitness=Math.min(100,g.fitness+10);
+         if(rng()<0.85){g.rank='E-2';g.event={type:'win',text:'Meritoriously promoted to E-2 (PFC) at graduation. Pay jumps to $2,698/mo.'};}
+         else {g.event={type:'info',text:'I graduated solid but not meritorious. Still E-1.'};}
+         if(rng()<0.10){g.health='minor-injury';}
+         g.path.push('Boot Camp: top performer');
+       },
+       next:'boot_grad'},
+      {label:'Stay solid — graduate clean',
+       desc:'Do what\'s asked. Graduate as E-1. No injury risk.',
+       tags:['ok:Healthy','info:Stay E-1'],
+       apply:g=>{g.tis_months+=3;g.path.push('Boot Camp: clean grad');g.event={type:'info',text:'Graduated boot camp. Welcome to the Marine Corps.'};},
+       next:'boot_grad'}
+    ]
+  },
+  'boot_grad':{
+    stage:'Boot Camp',
+    title:'EGA Ceremony — I\'m a United States Marine',
+    text:`13 weeks done. I get the Eagle, Globe, and Anchor. 10 days of leave to see family. My new base pay: <strong>{{base}}/mo</strong>. After 3 months of zero expenses, my savings: <strong>{{savings}}</strong>. No debt. No bills yet. This is the cleanest financial baseline I\'ll ever have.`,
+    choices:[
+      {label:'Take 10 days leave, ship to School of Infantry',
+       desc:'Standard. Visit home, decompress, then report to SOI.',
+       apply:g=>{g.tis_months+=1;g.morale+=10;},
+       next:'soi_arrive'},
+      {label:'Take leave AND spend $3k on something nice',
+       desc:'Truck down payment? New phone? Expensive trip? Felt good — but is it worth it?',
+       tags:['warn:-$3k savings','info:+Morale'],
+       apply:g=>{g.tis_months+=1;g.savings=Math.max(0,g.savings-3000);g.morale+=15;},
+       next:'soi_arrive'}
+    ]
+  },
+  // ════════ ACT 2 — SCHOOL OF INFANTRY ════════
+  'soi_arrive':{
+    stage:'School of Infantry',
+    title:`School of Infantry — Infantry Rifleman Course (14 weeks)`,
+    text:`I report to SOI East (NC) or West (CA). 14 weeks of infantry tactics — the same course every 0311 takes. Even HZ Recon Marines complete this first (2026 pipeline change). Still in transient barracks. Still free housing/food. Banking ~$2,500/mo since expenses are basically zero.`,
+    choices:[
+      {label:'Send it — earn 0311 qualification',
+       desc:'14 weeks of infantry training. By the end I qualify as 0311 Rifleman.',
+       apply:g=>{
+         g.tis_months+=4;g.quals.push('0311 Rifleman');g.fitness=Math.min(100,g.fitness+5);
+         if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI/IRC graduate');
+         g.event={type:'win',text:'Qualified as 0311 Rifleman. I also auto-qualify for Lance Corporal at ~14 months TIS.'};
+       },
+       next:'first_unit_arrive'}
+    ]
+  },
+  // ════════ ACT 3 — FIRST UNIT LIFE ════════
+  'first_unit_arrive':{
+    stage:'First Unit',
+    title:`Arrival at First Unit — Age {{age}}, {{tis}}`,
+    text:`I check into my first battalion. Single, junior enlisted (E-2). Assigned to barracks — 2-man room, shared bathroom, on-base. <strong>Housing: FREE. Chow hall: FREE.</strong> The reality I never knew: as a single junior Marine, I have almost no required expenses. My monthly base pay is {{base}}, and I keep nearly all of it.`,
+    choices:[
+      {label:'Settle in, meet my roommate',
+       apply:g=>{g.tis_months+=1;g.housing='barracks';},
+       next:'first_paycheck'}
+    ]
+  },
+  'first_paycheck':{
+    stage:'First Unit',
+    title:`First Real Paycheck — Reading the LES`,
+    text:`My Leave and Earnings Statement (LES) shows:<br>• Base Pay: {{base}}/mo (taxable)<br>• BAS (food allowance): $460/mo (non-taxable — I still get it even eating at chow)<br>• Federal Tax: ~{{ftax}}/mo<br>• FICA: ~{{fica}}/mo<br>• TSP: 5% of base = {{tspc}}/mo<br><br><strong>Take-home: {{net}}/mo</strong><br><br>Since I live in barracks and eat at chow, I have ALMOST NO BILLS. If I bank everything I could save <strong>{{netsave}}/month</strong>. Most Marines don\'t. The choice is mine. <em>(See the budget panel below for the full breakdown.)</em>`,
+    choices:[
+      {label:'Continue to my first big financial decision',
+       apply:g=>{g.tis_months+=1;},
+       next:'car_choice'}
+    ]
+  },
+  'car_choice':{
+    stage:'First Unit',
+    title:`Month 5 — The Truck Question`,
+    text:`Everyone in my squad has a truck. I don\'t even have a car. The base shuttle runs to the BX and chow hall, but I can\'t leave base without a ride. <strong>What do I do?</strong>`,
+    choices:[
+      {label:'Buy nothing — use rides and the shuttle',
+       desc:'Total monthly car cost: $0. Less freedom, but I bank an extra $830/mo vs the truck guys.',
+       tags:['ok:Max savings','warn:-Some freedom'],
+       apply:g=>{g.car='none';g.car_payment=0;g.car_value=0;g.tis_months+=1;},
+       next:'school_choice'},
+      {label:'Buy a $5,000 used Civic in cash',
+       desc:'I spend $5k from savings, but I own it free and clear. Insurance + gas ~$180/mo. No payment.',
+       tags:['ok:No debt','info:-$5k savings'],
+       apply:g=>{g.car='used_cash';g.car_value=5000;g.car_payment=0;g.savings=Math.max(0,g.savings-5000);g.tis_months+=1;},
+       next:'school_choice'},
+      {label:'Finance a $42,000 lifted Tacoma at 14% APR',
+       desc:'$0 down, 84-month loan. Monthly: $760 payment + $200 ins + $250 gas = <strong>$1,210/mo</strong>. The "E-4 Mafia" special. Crushes savings rate for 7 years.',
+       tags:['danger:$760/mo payment','danger:7-yr loan'],
+       apply:g=>{g.car='financed';g.car_value=42000;g.car_payment=760;g.debt+=42000;g.tis_months+=1;g.morale+=10;g.reputation-=2;g.event={type:'warn',text:'Drove off the lot in a $42k truck. Felt incredible. The dealer cheered. The cost compounds for 84 months.'};},
+       next:'school_choice'}
+    ]
+  },
+  'school_choice':{
+    stage:'First Unit',
+    title:`Month 6 — Tuition Assistance: Do I Sign Up?`,
+    text:`The Education Center is in my battalion area. Tuition Assistance pays 100% of college tuition up to $4,500/yr, max 2 classes at a time. Free CLEP/DSST exams. Each class is ~3-12 hrs/week of work outside duty. <strong>This is the single best benefit I\'ll ignore if I\'m not careful.</strong>`,
+    choices:[
+      {label:'Aggressive: 2 TA classes + CLEP every semester',
+       desc:'~12-24 credits/yr. By 4 yrs I have an associate\'s. By 8 yrs I\'m close to a bachelor\'s.',
+       tags:['ok:+24 credits/yr','warn:Less free time'],
+       apply:g=>{g._school='aggressive';g.edu_credits+=4;g.tis_months+=2;g.morale-=3;},
+       next:'social_choice'},
+      {label:'Steady: 1 class per semester',
+       desc:'~6 credits/yr. Sustainable through high op-tempo.',
+       tags:['ok:Sustainable'],
+       apply:g=>{g._school='steady';g.edu_credits+=2;g.tis_months+=2;},
+       next:'social_choice'},
+      {label:'Pause school — 100% focus on Marine performance',
+       desc:'No classes. All energy on PT and MOS. GI Bill saved for after.',
+       tags:['warn:No credit progress'],
+       apply:g=>{g._school='none';g.tis_months+=2;g.fitness=Math.min(100,g.fitness+3);},
+       next:'social_choice'}
+    ]
+  },
+  'social_choice':{
+    stage:'First Unit',
+    title:`Month 8 — Weekend Life Off Base`,
+    text:`A bunch of guys hit the bars every Friday in town. $80-150 a weekend, easy. Some put cash into "investments" (crypto, day trading). Some sleep in and study. <strong>What\'s my pattern?</strong>`,
+    choices:[
+      {label:'Be a monk — save 80% of take-home',
+       desc:'Fast food, gym, classes, weekend reading. Boring but my net worth compounds.',
+       tags:['ok:Max savings'],
+       apply:g=>{g.savings+=400;g.tis_months+=2;g.morale=Math.max(40,g.morale-3);},
+       next:'six_month_check'},
+      {label:'Balanced — go out 2x/month, save 50%',
+       desc:'Reasonable social life. Drink in moderation. Still bank meaningful money.',
+       tags:['ok:Balanced','info:+Morale'],
+       apply:g=>{g.tis_months+=2;g.morale+=5;},
+       next:'six_month_check'},
+      {label:'Every weekend — bars, takeout, impulse buys',
+       desc:'$700/mo bleeds out. Hangovers hurt PT. NJP risk if I do something dumb.',
+       tags:['danger:-$700/mo','warn:Lower PT'],
+       apply:g=>{g.savings=Math.max(0,g.savings-1400);g.tis_months+=2;g.fitness=Math.max(50,g.fitness-5);g.morale+=8;if(rng()<0.08){g.reputation-=15;g.event={type:'bad',text:'Got an NJP for a DUI/barracks fight. Reputation hit. Won\'t end my career but it costs me.'};}},
+       next:'six_month_check'}
+    ]
+  },
+  'six_month_check':{
+    stage:'Year 1 Recap',
+    title:`Year 1 Recap — Where I Stand`,
+    text:`12 months in. I\'m {{age}} years old, rank {{rank}}, with {{tis}} TIS.<br>• Savings: <strong>{{savings}}</strong><br>• TSP balance: <strong>{{tsp}}</strong><br>• Debt: <strong>{{debt}}</strong><br>• College credits: <strong>{{credits}}</strong><br>• Fitness: <strong>{{fit}}</strong> · Reputation: <strong>{{rep}}</strong><br><br>The choices I just made compound for the next 19 years.`,
+    choices:[
+      {label:'Auto-promotion to Lance Corporal (E-3)',
+       desc:'Auto-promo at ~14 months TIS. Pay jumps to $2,837/mo base.',
+       apply:g=>{g.rank='E-3';g.tis_months+=2;g.event={type:'win',text:'Promoted to Lance Corporal. Base pay now {{base}}/mo.'};},
+       next:'recon_volunteer'}
+    ]
+  },
+  // ════════ ACT 4 — PATH TO RECON ════════
+  'recon_volunteer':{
+    stage:'Recon Volunteer',
+    title:`Volunteering for Recon — Submitting the Package`,
+    text:`If I\'m HZ contract, my pipeline slot is locked in. If I\'m UH (lateral move), I have to volunteer and compete. Either way, the Recon Screening Aptitude Test (RSAT) is next. Required: PFT 1st Class, GT 105+, no NJPs, command endorsement. I have 3-6 months to prep.`,
+    choices:[
+      {label:'Train hard for 6 months — push fitness up',
+       desc:'Daily 2-a-day workouts, swim 4x/week, max pull-ups. Fitness rises significantly. Higher RSAT odds.',
+       tags:['ok:+Fitness','warn:+6 mo'],
+       apply:g=>{g.tis_months+=6;g.fitness=Math.min(100,g.fitness+10);g.reputation+=3;if(g._school==='aggressive')g.edu_credits+=8;else if(g._school==='steady')g.edu_credits+=4;},
+       next:'recon_screen'},
+      {label:'Attempt RSAT now — confidence is high',
+       desc:'Lower odds since I haven\'t specifically prepped.',
+       tags:['warn:Lower odds'],
+       apply:g=>{g.tis_months+=1;},
+       next:'recon_screen'}
+    ]
+  },
+  'recon_screen':{
+    stage:'RSAT',
+    title:`RSAT — Game Day`,
+    text:`Two days of physical hell. Max pull-ups, max push-ups (2 min), max crunches, 3-mile timed run, obstacle course x2, 500m continuous swim, 30-min water tread in utilities, underwater swim. <strong>Pass odds based on my current fitness ({{fit}}) and reputation ({{rep}}): roughly {{reconpct}}.</strong>`,
+    choices:[
+      {label:'Send it — give RSAT everything',
+       apply:g=>{g.tis_months+=1;},
+       next:s=>{
+         const p = reconChance(s);
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`✅ Passed RSAT. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}.) Pipeline starts in 2 weeks.`};return 'recon_grc';}
+         s.failed_stages.push('RSAT');s.event={type:'bad',text:`❌ Did not pass RSAT. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}.) I can re-train and try again, or pivot.`};
+         return 'no_recon_pivot';
+       }}
+    ]
+  },
+  'no_recon_pivot':{
+    stage:'No Recon Pivot',
+    title:`Recon Didn\'t Open — My Pivot Options`,
+    text:`Not the path I wanted, but not the end. Many great Marines never make Recon and still build incredible careers.`,
+    choices:[
+      {label:'Re-train 8 months and re-attempt RSAT',
+       desc:'I get hyper-specific. Swim coach, run intervals, calisthenics. Big fitness gain.',
+       tags:['ok:+Fitness','warn:+8 mo'],
+       apply:g=>{g.tis_months+=8;g.fitness=Math.min(100,g.fitness+12);g.reputation+=5;},
+       next:'recon_screen'},
+      {label:'Stay 0311 — chase Scout Sniper (0317) instead',
+       desc:'Different elite pipeline. Similar prestige.',
+       tags:['ok:Sniper qual'],
+       apply:g=>{g.tis_months+=6;g.fitness=Math.min(100,g.fitness+3);},
+       next:s=>gateRoll('Scout Sniper Course', 0.55 + (s.fitness-70)/250, 'sniper_qualified', 'standard_infantry_career', s, 'Scout Sniper School')},
+      {label:'Lateral move to Intel / Cyber / Aviation MOS',
+       desc:'Pivot to high-value MOS. Stronger civilian translation.',
+       apply:g=>{g.mos='Cyber/Intel/Aviation';g.tis_months+=8;g.edu_credits+=6;g.path.push('Lateral moved MOS');},
+       next:'promo_e4'}
+    ]
+  },
+  'recon_grc':{
+    stage:'Ground Recon Course',
+    title:`GRC — 9 weeks (Camp Pendleton)`,
+    text:`Land navigation, demolitions, call-for-fire, comms, marksmanship live-fire, multi-day patrol phase. Highest-attrition single school in the Recon pipeline. Paid as E-3 ({{base}}/mo). Free housing on schoolhouse.`,
+    choices:[
+      {label:'Grind through GRC',
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.12){g.health='minor-injury';g.event={type:'warn',text:'Stress fracture in week 5. Pushed through but limped at graduation.'};g.fitness=Math.max(60,g.fitness-5);}
+         else {g.quals.push('GRC');g.event={type:'win',text:'GRC complete. On to ARC.'};}
+       },
+       next:'recon_arc'}
+    ]
+  },
+  'recon_arc':{
+    stage:'Amphibious Recon Course',
+    title:`ARC — 9 weeks (Pool + Open Water)`,
+    text:`Pool phase, scout swimmer, culminating exercise. If GRC was about land, ARC is about water and cold. Many candidates drop here from hypothermia or technique fails.`,
+    choices:[
+      {label:'Send it',
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.10){g.health='major-injury';g.event={type:'bad',text:'Tore labrum on a boat extract. Medical hold. Big decision ahead.'};}
+         else {g.quals.push('ARC');g.event={type:'win',text:'ARC complete. On to dive school.'};}
+       },
+       next:s=>s.health==='major-injury'?'injury_choice':'dive_school'}
+    ]
+  },
+  'injury_choice':{
+    stage:'Major Injury',
+    title:`Medical Hold — Career Inflection`,
+    text:`Surgery, 6 months rehab. The choice that defines the next decade.`,
+    choices:[
+      {label:'Rehab fully, re-attempt the pipeline',
+       desc:'Many Marines come back stronger. +1 yr to timeline but I keep the dream.',
+       tags:['ok:+Toughness','warn:+1 yr'],
+       apply:g=>{g.tis_months+=12;g.fitness=Math.min(100,g.fitness+5);g.reputation+=5;g.health='healthy';},
+       next:'recon_grc'},
+      {label:'Pivot — stable MOS, finish enlistment',
+       desc:'Lateral-move out. Heal. Use the time for college and savings.',
+       apply:g=>{g.mos='Stable MOS (post-injury)';g.tis_months+=6;g.health='recovering';g.failed_stages.push('Recon pipeline');},
+       next:'promo_e4'},
+      {label:'Medical separation — exit early with VA',
+       desc:'Honorable discharge with disability rating. GI Bill intact. VA loan eligibility.',
+       apply:g=>{g.tis_months+=4;g.event={type:'info',text:'Honorable discharge. The military isn\'t my whole story.'};},
+       next:'early_exit'}
+    ]
+  },
+  'dive_school':{
+    stage:'Combatant Diver',
+    title:`Combatant Diver Course — 8 weeks (Panama City, FL)`,
+    text:`Open-circuit SCUBA + closed-circuit rebreather. Highest attrition is "pool comp" — instructors mess with your gear underwater while you keep your composure. Pass = dive pay (+$340/mo) for the rest of my career.`,
+    choices:[
+      {label:'Pass dive school',
+       apply:g=>{g.tis_months+=2;g.quals.push('Combatant Diver');g.event={type:'win',text:'I am dive-qualified. Earning +$340/mo dive pay from now on.'};},
+       next:'airborne'}
+    ]
+  },
+  'airborne':{
+    stage:'Basic Airborne',
+    title:`Basic Airborne — 3 weeks (Fort Liberty, NC)`,
+    text:`Ground Week, Tower Week, Jump Week. Army-run course. Five static-line jumps from a C-130. Earn jump wings + jump pay (+$150/mo for the rest of my career).`,
+    choices:[
+      {label:'Get my wings',
+       apply:g=>{g.tis_months+=1;g.quals.push('Airborne');g.event={type:'win',text:'Five jumps complete. Jump wings earned. +$150/mo jump pay.'};},
+       next:'mff'}
+    ]
+  },
+  'mff':{
+    stage:'Military Free Fall',
+    title:`MFF / HALO School — 3 weeks (Yuma, AZ)`,
+    text:`High Altitude Low Opening jumps. Civilian skydiving on steroids. Some of the most fun training in the military. I exit a plane at 25,000 feet.`,
+    choices:[
+      {label:'Send it from 25k feet',
+       apply:g=>{g.tis_months+=1;g.quals.push('MFF');},
+       next:'sere'}
+    ]
+  },
+  'sere':{
+    stage:'SERE',
+    title:`SERE School — 3 weeks (Survival, Evasion, Resistance, Escape)`,
+    text:`Level C. The week-long resistance phase is famous and classified. I come out a different person.`,
+    choices:[
+      {label:'Complete SERE',
+       apply:g=>{g.tis_months+=1;g.quals.push('SERE');g.mos='0321 Recon Marine';g.has_clearance=true;g.event={type:'win',text:'🎖 MOS 0321 — Reconnaissance Marine. Full pipeline complete. Time to report to a Recon battalion.'};},
+       next:'recon_unit_arrive'}
+    ]
+  },
+  'sniper_qualified':{
+    stage:'Scout Sniper',
+    title:`Scout Sniper Qualified — MOS 0317`,
+    text:`I passed Sniper School. One of the most elite shooting qualifications in the military.`,
+    choices:[{label:'Continue career',apply:g=>{g.quals.push('Scout Sniper');g.has_clearance=true;g.mos='0317 Scout Sniper';},next:'promo_e4'}]
+  },
+  'standard_infantry_career':{
+    stage:'Standard Infantry',
+    title:`Sniper School Didn\'t Take`,
+    text:`Back to 0311. Still a Marine. Still on a career trajectory.`,
+    choices:[{label:'Continue career',apply:g=>{g.failed_stages.push('Scout Sniper');},next:'promo_e4'}]
+  },
+  // ════════ ACT 5 — FIRST RECON BATTALION ════════
+  'recon_unit_arrive':{
+    stage:'First Recon Battalion',
+    title:`Recon Battalion — Reporting In`,
+    text:`I check into 1st, 2nd, or 3rd Recon Battalion. Promoted to <strong>E-4 Corporal</strong>. Pay jumps to {{base}}/mo + dive + jump = {{gross}}/mo gross. My team will deploy in 8-10 months. Combat zone tax-free pay incoming.`,
+    choices:[
+      {label:'Pinned Corporal (E-4)',
+       apply:g=>{g.rank='E-4';g.tis_months+=2;g.event={type:'win',text:'Promoted to Corporal. Squad-level NCO. Pay now {{base}}/mo + special pays.'};},
+       next:'dating_question'}
+    ]
+  },
+  'dating_question':{
+    stage:'Relationships',
+    title:`Relationship Pivot Point`,
+    text:`I\'m 21-22, deployed soon, away from home a lot. The relationships I start now shape the next decade. <strong>What\'s my approach?</strong>`,
+    choices:[
+      {label:'Stay focused — no serious relationships until after deployment',
+       desc:'Keep it simple. Focus on Recon, train, deploy, come home with money saved.',
+       tags:['ok:Simpler life'],
+       apply:g=>{g.tis_months+=3;g.savings+=2000;},
+       next:'first_deployment_prep'},
+      {label:'Date seriously — could lead to marriage',
+       desc:'Real partners absolutely can handle this life — but only if it\'s real. BAH-marriage is a known trap.',
+       tags:['info:Marriage possible'],
+       apply:g=>{g.tis_months+=3;g.morale+=8;},
+       next:'first_deployment_prep'}
+    ]
+  },
+  'first_deployment_prep':{
+    stage:'Pre-Deployment',
+    title:`Workup — 8 Months Pre-Deployment Training`,
+    text:`Heavy training cycle. Live-fire ranges, CAX, MOUT, lots of field time. Almost no spending — gear up, sleep in the dirt, eat MREs. Savings rate spikes. Body wear starts.`,
+    choices:[
+      {label:'Complete workup, deploy',
+       apply:g=>{g.tis_months+=8;g.fitness=Math.max(60,g.fitness-3);g.savings+=4000;g.reputation+=5;},
+       next:'first_deployment'}
+    ]
+  },
+  'first_deployment':{
+    stage:'First Deployment',
+    title:`Combat Deployment — 7 Months Forward`,
+    text:`I\'m forward-deployed. Combat zone designation means: <strong>my base pay is FEDERAL TAX-FREE every month I\'m there</strong>. I also collect $225/mo Hostile Fire/Imminent Danger Pay. Total bump: ~+$700/mo for 7 months. Nothing to spend money on. Savings explode.`,
+    choices:[
+      {label:'Complete deployment, return home',
+       apply:g=>{g.tis_months+=7;g.deployments+=1;g.savings+=18000;g.reputation+=10;g.morale-=8;g.fitness=Math.max(55,g.fitness-3);g.event={type:'win',text:'Back home. Tax-free combat pay + nothing to spend on means savings jumped ~$18k. What do I do with it?'};},
+       next:'post_deployment_money'}
+    ]
+  },
+  'post_deployment_money':{
+    stage:'Post-Deployment',
+    title:`Post-Deployment Cash — $18k Decision`,
+    text:`I\'m home with a fat bank account. Total savings now: <strong>{{savings}}</strong>. Every Marine in my unit is making a different choice with this money. <strong>What do I do?</strong>`,
+    choices:[
+      {label:'Bank it all — emergency fund + max Roth IRA',
+       desc:'$7,000 maxed in Roth IRA (S&P 500 index). Rest to high-yield savings. Boring. Future me thanks present me.',
+       tags:['ok:Compounds 40 yrs'],
+       apply:g=>{g.tsp+=7000;g.tis_months+=1;g.morale-=3;g.event={type:'win',text:'Maxed Roth IRA. $7k at 22 grows to ~$215k by retirement.'};},
+       next:'car_upgrade_temptation'},
+      {label:'Pay off truck early',
+       requires:g=>g.debt>10000,
+       desc:'$15k at the truck loan. Cuts years of interest. Frees up monthly cash flow.',
+       tags:['ok:Frees $760/mo'],
+       apply:g=>{g.savings=Math.max(0,g.savings-15000);g.debt=Math.max(0,g.debt-15000);if(g.debt<5000){g.car_payment=0;g.debt=0;g.event={type:'win',text:'Truck paid off. $760/mo back in my pocket forever.'};}g.tis_months+=1;},
+       next:'car_upgrade_temptation'},
+      {label:'Upgrade — buy a $60k Jeep, jewelry, vacation',
+       desc:'$18k vanishes. Felt amazing for 3 weeks. Now I have a depreciating asset and no emergency fund.',
+       tags:['danger:All $ gone'],
+       apply:g=>{g.savings=Math.max(0,g.savings-15000);g.car='upgrade';g.car_value=60000;g.debt+=30000;g.car_payment=820;g.morale+=15;g.event={type:'bad',text:'Upgraded. Jeep is gorgeous. So is the new $820/mo payment.'};g.tis_months+=1;},
+       next:'car_upgrade_temptation'}
+    ]
+  },
+  'car_upgrade_temptation':{
+    stage:'Mid-Tour Life',
+    title:`Age 22-23 — A Buddy Wants Me to Co-Sign`,
+    text:`A friend wants me to co-sign a $30k jet ski / boat / motorcycle / RZR. Real story across every base. Most guys say yes. <strong>What do I do?</strong>`,
+    choices:[
+      {label:'Hard no. I don\'t co-sign anything.',
+       desc:'Co-signing is on the loan as if it\'s mine. If he stops paying, I owe it.',
+       tags:['ok:Smart'],
+       apply:g=>{g.tis_months+=2;g.reputation+=2;},
+       next:'marriage_question'},
+      {label:'Sure, what could go wrong',
+       desc:'6 months later he wrecks it, stops paying, gets kicked out. The loan is mine.',
+       tags:['danger:$30k debt'],
+       apply:g=>{g.debt+=30000;g.tis_months+=4;g.event={type:'bad',text:'Buddy bailed on the loan. I now owe $30k for a jet ski I don\'t have.'};},
+       next:'marriage_question'}
+    ]
+  },
+  'marriage_question':{
+    stage:'Marriage Decision',
+    title:`Age ~23 — The Marriage Question`,
+    text:`If I\'ve been dating seriously, this is the real moment. <strong>Getting married triggers BAH</strong> — housing allowance added to my pay (~{{bah}}/mo at my rank). It also triggers a new household budget.`,
+    choices:[
+      {label:'Get married, move off-base',
+       desc:'BAH added (~{{bah}}/mo). $1,800/mo rental + utilities. Spouse may or may not work.',
+       tags:['info:+BAH','warn:New expenses'],
+       apply:g=>{g.married=true;g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.event={type:'info',text:'Got married. BAH starts (~{{bah}}/mo). Rent + utilities ~$2,200/mo. Net is positive but smaller than people think.'};},
+       next:'housing_choice_married'},
+      {label:'Get married, take on-base family housing',
+       desc:'BAH paid directly to housing office. No surprises. Less privacy.',
+       tags:['ok:Predictable cost'],
+       apply:g=>{g.married=true;g.housing='on_base';g.tis_months+=1;g.event={type:'info',text:'Got married. On-base housing. BAH covers it 1:1. Predictable.'};},
+       next:'housing_choice_married'},
+      {label:'Stay single — focus on MARSOC',
+       desc:'Recon→MARSOC tempo punishes relationships. Consider marriage post-ITC.',
+       apply:g=>{g.tis_months+=1;},
+       next:'sniper_or_promo'}
+    ]
+  },
+  'housing_choice_married':{
+    stage:'Married Year 1',
+    title:`Married Life — Year 1`,
+    text:`First year of marriage. Budget has shifted. Now: kids? Pet? Wife\'s career?`,
+    choices:[
+      {label:'Get a dog',
+       desc:'~$80/mo in food/vet. Companionship during deployments. Worth it.',
+       apply:g=>{g.pets+=1;g.tis_months+=2;g.morale+=5;},
+       next:'kids_question'},
+      {label:'Skip the dog — save for a house',
+       apply:g=>{g.tis_months+=2;},
+       next:'kids_question'}
+    ]
+  },
+  'kids_question':{
+    stage:'Kids Decision',
+    title:`The Kids Question`,
+    text:`Wife wants to talk kids. TRICARE covers prenatal/delivery. Each kid adds ~$600/mo household expense, more with childcare. Deployments with young kids are hard.`,
+    choices:[
+      {label:'Yes — start trying now',
+       desc:'Kids reshape my MARSOC calculus around deployments and tempo.',
+       apply:g=>{g.kids+=1;g.tis_months+=12;g.morale+=10;g.event={type:'info',text:'New kid. +$600/mo in expenses. Worth it. MARSOC tempo just got harder.'};},
+       next:'va_house_question'},
+      {label:'Wait — MARSOC first, kids after',
+       apply:g=>{g.tis_months+=6;},
+       next:'va_house_question'}
+    ]
+  },
+  'va_house_question':{
+    stage:'VA Home Loan',
+    title:`The VA Home Loan — Buy or Rent?`,
+    text:`I\'m eligible for a VA loan: <strong>$0 down, no PMI, competitive rate</strong>. A $350k starter home = ~$2,400/mo PITI. Smart if I\'m here 3+ years. Costly if I PCS in 18 months.`,
+    choices:[
+      {label:'Buy with VA loan ($0 down, $350k home)',
+       desc:'$350k mortgage. Mortgage replaces rent. Build equity. Tax deduction.',
+       tags:['ok:Build equity','warn:+$350k debt'],
+       apply:g=>{g.housing='own';g.mortgage=2400;g.debt+=350000;g.rent_extra=0;g.path.push('Bought first home (VA)');g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down. PITI $2,400/mo. BAH covers most.'};},
+       next:'sniper_or_promo'},
+      {label:'Keep renting — buy later when more stable',
+       desc:'Less risk if I PCS soon.',
+       apply:g=>{g.tis_months+=2;},
+       next:'sniper_or_promo'}
+    ]
+  },
+  // ════════ ACT 6 — PATH TO RAIDERS ════════
+  'sniper_or_promo':{
+    stage:'Sniper Choice',
+    title:`Sniper School — Add 0322?`,
+    text:`In Recon I can attend Scout Sniper Basic Course. Adds MOS 0322 (Recon Sniper). Boosts MARSOC selection odds.`,
+    choices:[
+      {label:'Attempt Sniper School',
+       desc:'Tough school. Pass odds based on fitness + reputation.',
+       apply:g=>{g.tis_months+=2;},
+       next:s=>gateRoll('Scout Sniper Course', 0.55 + (s.fitness-70)/250, 'sniper_recon', 'promo_e5', s, 'Scout Sniper Course')},
+      {label:'Skip — straight to MARSOC packet',
+       desc:'Get to A&S faster. One less qualification.',
+       apply:g=>{g.tis_months+=1;},
+       next:'promo_e5'}
+    ]
+  },
+  'sniper_recon':{
+    stage:'0322 Recon Sniper',
+    title:`MOS 0322 — Recon Marine, Sniper Qualified`,
+    text:`Full stack: 0321 + Scout Sniper.`,
+    choices:[{label:'Continue to Sergeant',apply:g=>{g.quals.push('Scout Sniper');g.mos='0322 Recon Sniper';g.tis_months+=3;},next:'promo_e5'}]
+  },
+  'promo_e4':{
+    stage:'Promotion to Cpl',
+    title:`Promotion — Corporal (E-4)`,
+    text:`Promoted. Base pay {{base}}/mo. I\'m an NCO. Squad leadership.`,
+    choices:[{label:'Continue',apply:g=>{g.rank='E-4';g.tis_months+=6;},next:'promo_e5'}]
+  },
+  'promo_e5':{
+    stage:'Promotion to Sgt',
+    title:`Promotion — Sergeant (E-5)`,
+    text:`Sergeant. Base pay {{base}}/mo. ~4-5 yrs TIS. MARSOC eligibility window is now open.`,
+    choices:[{label:'Continue to MARSOC prep',apply:g=>{g.rank='E-5';g.tis_months+=3;},next:'marsoc_prep'}]
+  },
+  'marsoc_prep':{
+    stage:'MARSOC Prep',
+    title:`MARSOC Packet — Final Prep`,
+    text:`3-6 yrs TIS, GT 105+, PFT 235+ required. I attend a MARSOC Screening Team brief. Packet: command endorsement, PFT, swim retake, review. <strong>This is the moment.</strong>`,
+    choices:[
+      {label:'Train another 4 months — push PFT to 280+',
+       desc:'Hit weight targets, max pull-ups, run sub-19. Maximum prep.',
+       apply:g=>{g.tis_months+=4;g.fitness=Math.min(100,g.fitness+10);g.reputation+=5;},
+       next:'marsoc_phase1'},
+      {label:'Submit packet now — trust the baseline',
+       apply:g=>{g.tis_months+=2;},
+       next:'marsoc_phase1'}
+    ]
+  },
+  'marsoc_phase1':{
+    stage:'A&S Phase I',
+    title:`A&S Phase I — 3 Weeks, Camp Lejeune`,
+    text:`Physical screening. Day 1 PFT 235+. Swim: 300m utilities, 11-min tread, 4-min flotation. Land nav, ruck events, gut checks. <strong>Pass odds at my current state: {{marsocpct}}.</strong>`,
+    choices:[
+      {label:'Send it',
+       apply:g=>{g.tis_months+=1;},
+       next:s=>{
+         const p = marsocChance(s);
+         const r = rng();
+         if(r<p){s.event={type:'win',text:`Passed A&S Phase I. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}.)`};return 'marsoc_phase2';}
+         s.failed_stages.push('A&S Phase I');s.event={type:'bad',text:`Didn\'t make it through Phase I. (Odds ~${Math.round(p*100)}%, rolled ${Math.round(r*100)}.) Back to parent unit.`};
+         return 'marsoc_fallback';
+       }}
+    ]
+  },
+  'marsoc_phase2':{
+    stage:'A&S Phase II',
+    title:`A&S Phase II — Location Undisclosed`,
+    text:`Even content is restricted. Mentally and physically grueling. No guarantee of selection.`,
+    choices:[
+      {label:'Push through Phase II',
+       apply:g=>{g.tis_months+=2;},
+       next:s=>gateRoll('A&S Phase II', 0.55 + (s.fitness-75)/250 + (s.reputation-70)/300, 'itc', 'marsoc_fallback', s, 'A&S Phase II')}
+    ]
+  },
+  'itc':{
+    stage:'ITC',
+    title:`Individual Training Course (ITC) — 9 Months`,
+    text:`Camp Lejeune. Land warfare, irregular warfare, comms, languages. Drop rate for injury and performance remains real. Completion = MOS 0372, Marine Raider.`,
+    choices:[
+      {label:'Grind ITC — 9 months',
+       apply:g=>{
+         g.tis_months+=9;g.fitness=Math.min(100,g.fitness+3);
+         const r = rng();
+         if(r<0.05){g.event={type:'bad',text:'Did not finish ITC. Back to Recon battalion as senior NCO.'};g.failed_stages.push('ITC');return;}
+         if(r<0.10){g.event={type:'warn',text:'Recycled in ITC due to injury. Graduated late but graduated.'};g.tis_months+=4;}
+         g.quals.push('MARSOC Raider');g.mos='0372 Critical Skills Operator';g.rank='E-6';
+         g.event={type:'win',text:'🎉 ITC complete. MOS 0372 — Marine Raider. SDAP starts (+$450/mo).'};
+       },
+       next:s=>s.failed_stages.includes('ITC')?'marsoc_fallback':'raider_unit'}
+    ]
+  },
+  'raider_unit':{
+    stage:'Marine Raider',
+    title:`I\'m a Raider — MOS 0372`,
+    text:`Assigned to a Marine Special Operations Team (MSOT). Multiple high-tempo deployments. SDAP + dive + jump = significant boost. Body takes wear; career peaks.`,
+    choices:[
+      {label:'Operate for 5 years (yrs 6-11 TIS)',
+       desc:'4 deployments. SSgt→GySgt range. Big savings build-up.',
+       apply:g=>{g.tis_months+=60;g.deployments+=3;g.reputation+=15;g.morale-=8;g.fitness=Math.max(55,g.fitness-3);g.savings+=20000;g.rank='E-7';g.event={type:'win',text:'5 years as active Raider. GySgt now. Body shows wear. Career as hoped.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  'marsoc_fallback':{
+    stage:'Post-MARSOC',
+    title:`MARSOC Didn\'t Take — B-Billet Pick`,
+    text:`Not making MARSOC isn\'t the end. Best moves: MSG, DI, or Senior NCO in Recon.`,
+    choices:[
+      {label:'MSG — Embassy Duty, 3 countries, 3 yrs',
+       desc:'Watch standing or detachment commander (if SSgt+). See the world.',
+       tags:['ok:Global','info:Resume'],
+       apply:g=>{g.tis_months+=36;g.rank='E-6';g.savings+=20000;g.morale+=10;g.path.push('MSG: 3 countries');g.event={type:'win',text:'3 years across Paris, Hong Kong, Pretoria. Different Marine coming home.'};},
+       next:'mid_career_check'},
+      {label:'Drill Instructor — 3 yrs at MCRD',
+       desc:'Hardest billet for families. Career accelerator.',
+       tags:['ok:Promo accelerator','warn:Family stress'],
+       apply:g=>{g.tis_months+=36;g.rank='E-7';g.reputation+=15;g.morale-=10;g.path.push('DI Duty');g.event={type:'info',text:'3 years on the parade deck. Promoted fast.'};},
+       next:'mid_career_check'},
+      {label:'Senior NCO in Recon — Stay Operational',
+       desc:'Stay Recon as Platoon Sergeant. Mentor next class.',
+       apply:g=>{g.tis_months+=30;g.rank='E-6';g.deployments+=2;g.path.push('Senior Recon NCO');},
+       next:'mid_career_check'}
+    ]
+  },
+  // ════════ ACT 7 — STAY TO 20 OR EXIT ════════
+  'mid_career_check':{
+    stage:'Mid-Career',
+    title:`Year 12 — Stay to 20 or Get Out?`,
+    text:`12 years in. Savings: <strong>{{savings}}</strong>. TSP: <strong>{{tsp}}</strong>. Rank: {{rank}}. <strong>The big decision:</strong> 8 more years for full pension (50% of high-3 base pay for life + TRICARE), or exit now with GI Bill + savings?`,
+    choices:[
+      {label:'Stay to 20 — go for the pension',
+       desc:'8 more years. Pension at 20: ~$3,500-$5,000/mo for life + TRICARE for life.',
+       tags:['ok:Pension','ok:TRICARE'],
+       apply:g=>{g.path.push('Committed to 20');},
+       next:'degree_finish'},
+      {label:'Get out now — GI Bill + second career',
+       desc:'Separate. Use Post-9/11 GI Bill for full-time school. Veteran hiring preferences.',
+       apply:g=>{g.path.push('Separated at 12');},
+       next:'early_exit'}
+    ]
+  },
+  'degree_finish':{
+    stage:'Degree Completion',
+    title:`Finish My Degree on Active Duty?`,
+    text:`I\'m E-7+. I qualify for SNCO Degree Completion — full-time school on active duty. Or keep grinding TA. Or save GI Bill for after.`,
+    choices:[
+      {label:'Apply for SNCO Degree Completion',
+       desc:'Selected SNCOs go to college full-time on active duty. Competitive. Powerful.',
+       tags:['ok:+Bachelor\'s'],
+       apply:g=>{g.tis_months+=24;g.edu_credits=Math.max(120,g.edu_credits+60);g.degree='bachelor\'s';g.event={type:'win',text:'Bachelor\'s complete on active duty. Game changer for transition.'};},
+       next:'last_tour'},
+      {label:'Keep using TA + CLEP',
+       apply:g=>{g.tis_months+=12;g.edu_credits+=20;},
+       next:'last_tour'},
+      {label:'Skip — use GI Bill after retirement',
+       apply:g=>{g.tis_months+=12;},
+       next:'last_tour'}
+    ]
+  },
+  'last_tour':{
+    stage:'Last Tour',
+    title:`Last Tour — Years 16-19`,
+    text:`I\'m GySgt or higher. Leadership billets. Final deployments. <strong>Start civilian transition NOW</strong> — not year 19. Treat TAP like a deployment.`,
+    choices:[
+      {label:'Engage TAP fully + build LinkedIn + network',
+       desc:'Translate MOS to civilian language. Reach out to vets in target fields. Apply to SkillBridge.',
+       tags:['ok:Strong landing'],
+       apply:g=>{g.tis_months+=36;g.rank='E-8';g.event={type:'win',text:'3 years of intentional transition planning. Multiple offers before EAS.'};},
+       next:'retirement'},
+      {label:'Coast — figure it out at the end',
+       desc:'Focus on Marines under me. Trust the network. Some land OK; some don\'t.',
+       apply:g=>{g.tis_months+=36;g.rank='E-8';g.morale-=5;},
+       next:'retirement'}
+    ]
+  },
+  'early_exit':{
+    stage:'Civilian Transition',
+    title:`Civilian Life — Phase Two Begins`,
+    text:`Separated. Scorecard: savings, GI Bill, degree, qualifications, family stability. What do I do first?`,
+    choices:[
+      {label:'Post-9/11 GI Bill — finish bachelor\'s full-time',
+       desc:'100% tuition + $1,000 books + housing allowance (BAH-equivalent). 36 months max.',
+       tags:['ok:Free school + stipend'],
+       apply:g=>{g.tis_months+=24;g.edu_credits=Math.max(120,g.edu_credits+60);g.degree='bachelor\'s';g.gibill='used';g.savings+=20000;},
+       next:'retirement'},
+      {label:'Skilled trade + start a business',
+       desc:'Plumbing, electrical, HVAC. High income, low overhead.',
+       apply:g=>{g.tis_months+=12;g.edu_credits+=15;g.savings+=30000;},
+       next:'retirement'},
+      {label:'Defense contractor / federal LEO',
+       desc:'Veteran hiring preferences. Strong salaries with clearance + MOS.',
+       apply:g=>{g.tis_months+=6;g.savings+=40000;},
+       next:'retirement'}
+    ]
+  },
+
+  // ──────── RETIREMENT / END ────────
+
+  // ──────── RETIREMENT / END ────────
+  'retirement':{
+    stage:'Retirement',
+    title:'🎖️ End State — How did I do?',
+    text:`The scorecard below shows where I landed. Pension (if 20 yrs), savings, TSP, debt, education, family, qualifications. <strong>This isn\'t the end of life — this is phase two starting.</strong>`,
+    choices:[
+      {label:'Start over with a different path',
+       apply:()=>{},
+       next:s=>{newGame();return 'start';}}
+    ]
+  }
+};
+
+// ── Helper functions used by scenes ──
+function rng(){ return Math.random(); }
+function rankIdx(r){ return RANK_ORDER.indexOf(r); }
+function advance(g, addMonths, minRank){
+  // raise rank if at or above minRank, time permitting
+  const cur = rankIdx(g.rank), target = rankIdx(minRank);
+  if(target>cur) g.rank = minRank;
+}
+function reconChance(g){
+  let p = 0.45;
+  p += (g.fitness-70)/250;
+  p += (g.reputation-65)/300;
+  if(g.edu_credits>20) p += 0.04;
+  if(g.health!=='healthy') p -= 0.15;
+  return Math.max(0.1, Math.min(0.92, p));
+}
+function marsocChance(g){
+  let p = 0.30;
+  p += (g.fitness-75)/250;
+  p += (g.reputation-70)/250;
+  p += (g.deployments)*0.03;
+  if(g.quals.includes('Scout Sniper')) p+=0.05;
+  if(g.quals.includes('0321 Recon Marine')||g.quals.includes('GRC')) p+=0.06;
+  if(g.health!=='healthy') p -= 0.12;
+  return Math.max(0.1, Math.min(0.85, p));
+}
+function gateRoll(name, chance, passId, failId, g, prettyName){
+  const roll = rng();
+  if(roll < chance){
+    g.event={type:'win',text:`✅ I passed ${prettyName}. (Odds were ~${Math.round(chance*100)}%, rolled ${Math.round(roll*100)}.)`};
+    return passId;
+  } else {
+    g.failed_stages.push(name);
+    g.event={type:'bad',text:`❌ I didn't make it through ${prettyName} this attempt. (Odds were ~${Math.round(chance*100)}%, rolled ${Math.round(roll*100)}.) Setback, not the end.`};
+    return failId;
+  }
+}
+function branchAfterBoot(g){
+  return g.branch==='army' ? 'rasp' : 'irc';
+}
+
+// ── Money model ──
+function calcBudget(g){
+  const bp = basePay(g.rank, g.tis_months);
+  const bah = g.married || g.kids>0 ? BAH[g.rank] : (g.housing==='off_base' || g.housing==='own' ? BAH[g.rank] : 0);
+  const bas = BAS;
+  // special pays (taxable portion)
+  let special = 0;
+  if(g.quals.includes('Airborne')) special += 150;
+  if(g.quals.includes('Combatant Diver')) special += 340;
+  if(g.quals.includes('MARSOC Raider')) special += 450; // SDAP
+  if(g.quals.includes('Scout Sniper')) special += 100;
+  const gross = bp + bah + bas + special;
+  // Taxable income = base pay + special pays (BAH and BAS are non-taxable)
+  const taxable = bp + special;
+  // Federal income tax estimate (rough effective rate for enlisted)
+  const ftax = taxable * 0.10;
+  // FICA (Social Security 6.2% + Medicare 1.45%) — applies to base pay only for military
+  const fica = bp * 0.0765;
+  // State tax — many states exempt military pay; estimate 3% on taxable income for non-exempt states
+  const stax = taxable * 0.03;
+  // TSP contribution (out of base pay)
+  const tsp_contrib = bp * (g.tsp_pct/100);
+  // Net take-home after taxes + TSP
+  const net = gross - ftax - fica - stax - tsp_contrib;
+  // Expenses (bills)
+  let housing_cost = 0;
+  if(g.housing==='barracks') housing_cost = 0;
+  else if(g.housing==='on_base') housing_cost = bah;
+  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
+  else if(g.housing==='own') housing_cost = g.mortgage;
+  const food = g.housing==='barracks' ? 0 : 600 + (g.kids*200) + (g.married?250:0);
+  const car_total = g.car_payment + (g.car==='none'?0:180);
+  const kids_cost = g.kids * 600;
+  const pet_cost = g.pets * 80;
+  const misc = 350;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + misc;
+  // Savings = net take-home minus bills
+  const net_to_savings = net - total_bills;
+  return {
+    bp, bah, bas, special, gross,
+    taxable, ftax, fica, stax,
+    tsp_contrib, net,
+    housing_cost, food, car_total, kids_cost, pet_cost, misc, total_bills,
+    net_to_savings
+  };
+}
+
+// Apply monthly cash flow for elapsed months between scenes
+let _lastTisCheckpoint = 0;
+function settleCashFlow(){
+  const elapsed = G.tis_months - _lastTisCheckpoint;
+  if(elapsed<=0){ _lastTisCheckpoint = G.tis_months; return; }
+  const b = calcBudget(G);
+  G.savings += b.net_to_savings * elapsed;
+  G.tsp += b.tsp_contrib * elapsed * 1.05; // rough growth + 5% match if BRS-like
+  // debt paydown if has debt and has positive cashflow
+  if(G.debt>0){
+    G.debt = Math.max(0, G.debt - (b.net_to_savings*0.3*elapsed));
+  }
+  // age
+  G.age = 18 + Math.floor(G.tis_months/12);
+  _lastTisCheckpoint = G.tis_months;
+}
+
+// ── Rendering ──
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function renderDash(){
+  document.getElementById('d-branch').textContent = (G.branch==='army'?'Army · ':G.branch==='usmc'?'USMC · ':'') + (G.mos||'—');
+  document.getElementById('d-rank').textContent = `${G.rank} (${RANK_TITLE[G.rank]||''})`;
+  document.getElementById('d-age').textContent = G.age;
+  document.getElementById('d-tis').textContent = `${Math.floor(G.tis_months/12)}y ${G.tis_months%12}mo`;
+  document.getElementById('d-savings').textContent = fmt(G.savings);
+  document.getElementById('d-tsp').textContent = fmt(G.tsp);
+  document.getElementById('d-debt').textContent = fmt(G.debt);
+  document.getElementById('d-net').textContent = fmt(G.savings + G.tsp - G.debt);
+  const b = calcBudget(G);
+  document.getElementById('d-income').textContent = fmt(b.gross);
+  document.getElementById('d-marital').textContent = G.married?'Married':'Single';
+  document.getElementById('d-kids').textContent = G.kids;
+  document.getElementById('d-pets').textContent = G.pets;
+  document.getElementById('d-housing').textContent = {barracks:'Barracks',on_base:'On-base family',off_base:'Off-base (BAH)',own:'Own (VA loan)'}[G.housing];
+  document.getElementById('d-car').textContent = {none:'None',used_cash:'Used (paid cash)',financed:'Financed',upgrade:'Upgraded'}[G.car];
+  document.getElementById('d-fitness').textContent = G.fitness;
+  document.getElementById('d-rep').textContent = G.reputation;
+  document.getElementById('d-morale').textContent = G.morale;
+  document.getElementById('d-health').textContent = G.health;
+  document.getElementById('b-fitness').style.width=G.fitness+'%';
+  document.getElementById('b-rep').style.width=G.reputation+'%';
+  document.getElementById('b-morale').style.width=G.morale+'%';
+  document.getElementById('d-credits').textContent = G.edu_credits;
+  document.getElementById('d-degree').textContent = G.degree==='none'?'In progress':G.degree;
+  document.getElementById('d-gibill').textContent = G.gibill;
+  const quals = document.getElementById('d-quals');
+  if(G.quals.length===0) quals.innerHTML='<em style="font-size:var(--text-xs);color:var(--muted)">None yet — earn them by passing gates.</em>';
+  else quals.innerHTML = G.quals.map(q=>`<span class="qual">${q}</span>`).join('');
+  // pension projection
+  const tisYrs = G.tis_months/12;
+  if(tisYrs >= 15){
+    const bp = basePay(G.rank, G.tis_months);
+    const mult = (tisYrs>=20)?0.50:(tisYrs*0.025);
+    const pension = bp * mult;
+    document.getElementById('d-pension').textContent = fmt(pension)+'/mo';
+    document.getElementById('d-tsp20').textContent = fmt(G.tsp);
+    document.getElementById('d-ontrack').textContent = tisYrs>=20?'✅ Retired':'On track';
+  } else {
+    document.getElementById('d-pension').textContent = '—';
+    document.getElementById('d-tsp20').textContent = '—';
+    document.getElementById('d-ontrack').textContent = tisYrs>0?`${(20-tisYrs).toFixed(1)} yrs to go`:'Too early';
+  }
+}
+
+function renderBudget(){
+  const b = calcBudget(G);
+  const body = document.getElementById('budgetBody');
+  const savingsRate = b.gross>0 ? Math.round((b.net_to_savings/b.gross)*100) : 0;
+  body.innerHTML = `
+    <div style="margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);text-transform:uppercase;letter-spacing:.08em">━ Income (Gross) ━</div>
+    <div class="budget-row"><span>Base Pay <span style="color:var(--muted);font-size:.85em">(${G.rank}, ${Math.floor(G.tis_months/12)}yr · taxable)</span></span><span class="budget-amt pos">+${fmt(b.bp)}</span></div>
+    ${b.bah?`<div class="budget-row"><span>BAH <span style="color:var(--muted);font-size:.85em">(housing allowance · tax-free)</span></span><span class="budget-amt pos">+${fmt(b.bah)}</span></div>`:''}
+    <div class="budget-row"><span>BAS <span style="color:var(--muted);font-size:.85em">(food allowance · tax-free)</span></span><span class="budget-amt pos">+${fmt(b.bas)}</span></div>
+    ${b.special?`<div class="budget-row"><span>Special pays <span style="color:var(--muted);font-size:.85em">(jump/dive/SDAP · taxable)</span></span><span class="budget-amt pos">+${fmt(b.special)}</span></div>`:''}
+    <div class="budget-row total"><span>Gross Income</span><span class="budget-amt"><strong>${fmt(b.gross)}/mo</strong></span></div>
+
+    <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--error);text-transform:uppercase;letter-spacing:.08em">━ Taxes & Pre-Tax Deductions ━</div>
+    <div class="budget-row"><span>Federal income tax <span style="color:var(--muted);font-size:.85em">(~10% of taxable)</span></span><span class="budget-amt neg">−${fmt(b.ftax)}</span></div>
+    <div class="budget-row"><span>FICA <span style="color:var(--muted);font-size:.85em">(SS 6.2% + Medicare 1.45%)</span></span><span class="budget-amt neg">−${fmt(b.fica)}</span></div>
+    <div class="budget-row"><span>State tax <span style="color:var(--muted);font-size:.85em">(~3% · many states exempt military)</span></span><span class="budget-amt neg">−${fmt(b.stax)}</span></div>
+    <div class="budget-row"><span>TSP contribution <span style="color:var(--muted);font-size:.85em">(${G.tsp_pct}% of base · invested)</span></span><span class="budget-amt neg">−${fmt(b.tsp_contrib)}</span></div>
+    <div class="budget-row total"><span>Net Take-Home</span><span class="budget-amt pos"><strong>${fmt(b.net)}/mo</strong></span></div>
+
+    <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--warn);text-transform:uppercase;letter-spacing:.08em">━ Monthly Bills ━</div>
+    ${b.housing_cost?`<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(${G.housing.replace('_',' ')})</span></span><span class="budget-amt neg">−${fmt(b.housing_cost)}</span></div>`:'<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(barracks — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${b.food?`<div class="budget-row"><span>Food / groceries</span><span class="budget-amt neg">−${fmt(b.food)}</span></div>`:'<div class="budget-row"><span>Food <span style="color:var(--muted);font-size:.85em">(chow hall — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${b.car_total?`<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(pmt + ins + gas)</span></span><span class="budget-amt neg">−${fmt(b.car_total)}</span></div>`:'<div class="budget-row"><span>Vehicle <span style="color:var(--muted);font-size:.85em">(none)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${b.kids_cost?`<div class="budget-row"><span>Kids <span style="color:var(--muted);font-size:.85em">(${G.kids} × $600)</span></span><span class="budget-amt neg">−${fmt(b.kids_cost)}</span></div>`:''}
+    ${b.pet_cost?`<div class="budget-row"><span>Pets <span style="color:var(--muted);font-size:.85em">(${G.pets})</span></span><span class="budget-amt neg">−${fmt(b.pet_cost)}</span></div>`:''}
+    <div class="budget-row"><span>Misc / personal <span style="color:var(--muted);font-size:.85em">(phone, gym, etc.)</span></span><span class="budget-amt neg">−${fmt(b.misc)}</span></div>
+    <div class="budget-row total"><span>Total Bills</span><span class="budget-amt neg"><strong>−${fmt(b.total_bills)}/mo</strong></span></div>
+
+    <div style="margin-top:1rem;padding:var(--s4);background:${b.net_to_savings>=0?'color-mix(in srgb,var(--success) 12%,transparent)':'color-mix(in srgb,var(--error) 12%,transparent)'};border-radius:var(--r-md);border:1px solid ${b.net_to_savings>=0?'var(--success)':'var(--error)'}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong style="font-size:var(--text-base)">${b.net_to_savings>=0?'💰 To Savings / Investment':'⚠️ Negative Cash Flow'}</strong>
+        <strong style="font-size:var(--text-lg);font-family:var(--mono);color:${b.net_to_savings>=0?'var(--success)':'var(--error)'}">${b.net_to_savings>=0?'+':'−'}${fmt(Math.abs(b.net_to_savings))}/mo</strong>
+      </div>
+      <div style="font-size:var(--text-xs);color:var(--muted);margin-top:.4rem">
+        Savings rate: <strong>${savingsRate}%</strong> of gross.
+        ${b.net_to_savings>=0 ? `At this rate I save <strong>${fmt(b.net_to_savings*12)}/yr</strong> on top of my <strong>${fmt(b.tsp_contrib*12)}/yr</strong> going into TSP.` : 'I\'m burning savings each month. Something has to change.'}
+      </div>
+    </div>
+  `;
+}
+
+// Order matters — this is the linear story progression
+const TREE_STAGES = [
+  'Enlistment','MEPS','Boot Camp','School of Infantry',
+  'First Unit','Year 1 Recap',
+  'Recon Volunteer','RSAT','Ground Recon Course','Amphibious Recon Course',
+  'Combatant Diver','Basic Airborne','Military Free Fall','SERE',
+  'First Recon Battalion','Relationships','Pre-Deployment','First Deployment','Post-Deployment',
+  'Mid-Tour Life','Marriage Decision','Married Year 1','Kids Decision','VA Home Loan',
+  'Sniper Choice','Promotion to Sgt','MARSOC Prep','A&S Phase I','A&S Phase II','ITC','Marine Raider',
+  'Mid-Career','Degree Completion','Last Tour','Civilian Transition','Retirement'
+];
+function renderTree(){
+  const cur = SCENES[G.stage]?.stage || '—';
+  // Determine which stages have been visited based on SCENES path
+  const visitedStages = new Set();
+  const curIdx = TREE_STAGES.indexOf(cur);
+  for(let i=0;i<curIdx;i++) visitedStages.add(TREE_STAGES[i]);
+  const tree = document.getElementById('gameTree');
+  tree.innerHTML = '<div class="tree-label">My Journey</div>' + TREE_STAGES.map(s=>{
+    let cls = 'tree-stage';
+    if(visitedStages.has(s)) cls += ' done';
+    if(s===cur) cls += ' current';
+    if(G.failed_stages.some(f=>f.toLowerCase().includes(s.toLowerCase().split(' ')[0]))) cls += ' failed';
+    return `<div class="${cls}">${s}</div>`;
+  }).join('');
+}
+
+function renderScene(){
+  settleCashFlow();
+  const s = SCENES[G.stage];
+  if(!s){ document.getElementById('sceneCard').innerHTML = '<div>Unknown scene: '+G.stage+'</div>'; return; }
+  // Build token map first so we can substitute in event + choices + text
+  const b = calcBudget(G);
+  const tokens = {
+    '{{base}}': fmt(b.bp),
+    '{{bah}}': fmt(b.bah || BAH[G.rank] || 0),
+    '{{bas}}': fmt(b.bas),
+    '{{gross}}': fmt(b.gross),
+    '{{ftax}}': fmt(b.ftax),
+    '{{fica}}': fmt(b.fica),
+    '{{stax}}': fmt(b.stax),
+    '{{net}}': fmt(b.net),
+    '{{tspc}}': fmt(b.tsp_contrib),
+    '{{netsave}}': fmt(b.net_to_savings),
+    '{{savings}}': fmt(G.savings),
+    '{{tsp}}': fmt(G.tsp),
+    '{{debt}}': fmt(G.debt),
+    '{{rank}}': `${G.rank} (${RANK_TITLE[G.rank]||''})`,
+    '{{tis}}': `${Math.floor(G.tis_months/12)}y ${G.tis_months%12}mo`,
+    '{{tisy}}': (G.tis_months/12).toFixed(1)+' yrs',
+    '{{age}}': G.age,
+    '{{mos}}': G.mos || '—',
+    '{{credits}}': G.edu_credits,
+    '{{fit}}': G.fitness,
+    '{{rep}}': G.reputation,
+    '{{reconpct}}': Math.round(reconChance(G)*100)+'%',
+    '{{marsocpct}}': Math.round(marsocChance(G)*100)+'%'
+  };
+  const sub = (str)=>{ if(!str) return str; let o=str; Object.entries(tokens).forEach(([k,v])=>{o=o.split(k).join(v);}); return o; };
+
+  let eventHtml = '';
+  if(G.event){
+    eventHtml = `<div class="event-banner ${G.event.type}">${sub(G.event.text)}</div>`;
+    G.event=null;
+  }
+  // build choices
+  const choicesHtml = s.choices.map((c,i)=>{
+    if(c.requires && !c.requires(G)) return '';
+    const tags = (c.tags||[]).map(t=>{
+      const [type,...rest]=t.split(':'); const text=rest.join(':');
+      return `<span class="choice-tag ${type}">${sub(text)}</span>`;
+    }).join('');
+    return `<button class="choice" onclick="chooseChoice(${i})">
+      <div class="choice-label"><span>${sub(c.label)}</span></div>
+      ${c.desc?`<div class="choice-desc">${sub(c.desc)}</div>`:''}
+      <div>${tags}</div>
+    </button>`;
+  }).join('');
+  document.getElementById('sceneCard').innerHTML = `
+    <div class="scene-stage">${s.stage}</div>
+    <div class="scene-title">${sub(s.title)}</div>
+    ${eventHtml}
+    <div class="scene-text">${sub(s.text)}</div>
+    <div class="choices">${choicesHtml}</div>
+  `;
+  // retirement scorecard at end
+  if(G.stage==='retirement'){ renderRetirementScorecard(); }
+  renderDash();
+  renderBudget();
+  renderTree();
+  autoSave();
+}
+
+function renderRetirementScorecard(){
+  const tisYrs = G.tis_months/12;
+  const bp = basePay(G.rank, G.tis_months);
+  const mult = tisYrs>=20 ? 0.50 : tisYrs>=15? tisYrs*0.025 : 0;
+  const pension = bp * mult;
+  const annualPension = pension*12;
+  const netWorth = G.savings + G.tsp - G.debt;
+  const card = document.getElementById('sceneCard');
+  card.innerHTML += `
+    <div class="score-grid">
+      <div class="score-card"><div class="val">${tisYrs.toFixed(1)}</div><div class="lbl">Years served</div></div>
+      <div class="score-card"><div class="val">${G.rank}</div><div class="lbl">Final rank</div></div>
+      <div class="score-card"><div class="val">${fmt(pension)}/mo</div><div class="lbl">Pension</div></div>
+      <div class="score-card"><div class="val">${fmt(annualPension)}</div><div class="lbl">Pension/yr</div></div>
+      <div class="score-card"><div class="val">${fmt(G.savings)}</div><div class="lbl">Cash savings</div></div>
+      <div class="score-card"><div class="val">${fmt(G.tsp)}</div><div class="lbl">TSP balance</div></div>
+      <div class="score-card"><div class="val">${fmt(netWorth)}</div><div class="lbl">Net worth</div></div>
+      <div class="score-card"><div class="val">${G.edu_credits}</div><div class="lbl">College credits</div></div>
+      <div class="score-card"><div class="val">${G.degree}</div><div class="lbl">Degree</div></div>
+      <div class="score-card"><div class="val">${G.deployments}</div><div class="lbl">Deployments</div></div>
+      <div class="score-card"><div class="val">${G.kids}</div><div class="lbl">Kids</div></div>
+      <div class="score-card"><div class="val">${G.quals.length}</div><div class="lbl">Quals earned</div></div>
+    </div>
+    <div style="margin-top:var(--s5);padding:var(--s4);background:var(--off);border-radius:var(--r-md)">
+      <h4 style="font-size:var(--text-sm);margin-bottom:.5rem">Path I took</h4>
+      <ol style="font-size:var(--text-xs);color:var(--muted);padding-left:1.2rem;line-height:1.7">
+        ${G.path.map(p=>`<li>${p}</li>`).join('')}
+      </ol>
+      ${G.failed_stages.length?`<h4 style="font-size:var(--text-sm);margin:.8rem 0 .4rem">Setbacks I worked through</h4>
+        <ul style="font-size:var(--text-xs);color:var(--error);padding-left:1.2rem;line-height:1.7">${G.failed_stages.map(p=>`<li>${p}</li>`).join('')}</ul>`:''}
+    </div>
+  `;
+}
+
+function chooseChoice(i){
+  const s = SCENES[G.stage];
+  const c = s.choices[i];
+  if(!c) return;
+  if(c.apply) c.apply(G);
+  let next = c.next;
+  if(typeof next==='function') next = next(G);
+  if(next){ G.stage = next; }
+  renderScene();
+}
+
+// ── localStorage ──
+function autoSave(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(G)); document.getElementById('saveStatus').textContent = 'Saved • '+new Date().toLocaleTimeString(); }catch(e){}
+}
+function saveGame(){ autoSave(); document.getElementById('saveStatus').textContent = '💾 Saved manually • '+new Date().toLocaleTimeString(); }
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw){ alert('No saved game found.'); return; }
+    G = Object.assign(defaultState(), JSON.parse(raw));
+    _lastTisCheckpoint = G.tis_months;
+    renderScene();
+  }catch(e){ alert('Save corrupted, starting fresh.'); newGame(); }
+}
+function newGame(){
+  G = defaultState();
+  _lastTisCheckpoint = 0;
+  renderScene();
+}
+function resetGame(){
+  if(confirm('Delete saved game and start over?')){ localStorage.removeItem(SAVE_KEY); newGame(); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   📦  DATA LOADER — wires /data/*.json into the simulator
+   ═══════════════════════════════════════════════════════════ */
+
+let DATA = { pay:null, mos:null, stages:null, timeline:null, tree:null, loaded:false };
+
+async function loadGameData(){
+  const files = ['pay_2026','mos_complete','career_stages','timeline','decision_tree'];
+  const tryFetch = async (name)=>{
+    try{
+      const r = await fetch(`data/${name}.json`, {cache:'no-cache'});
+      if(!r.ok) throw new Error(r.status);
+      return await r.json();
+    }catch(e){ console.warn(`Could not load data/${name}.json:`, e.message, '— using hardcoded fallback'); return null; }
+  };
+  const [pay, mos, stages, timeline, tree] = await Promise.all(files.map(tryFetch));
+  DATA = { pay, mos, stages, timeline, tree, loaded: !!(pay||mos||stages||timeline||tree) };
+  // Update the save status indicator
+  const status = document.getElementById('saveStatus');
+  if(status && DATA.loaded){
+    const which = [pay&&'pay',mos&&'mos',stages&&'stages',timeline&&'timeline',tree&&'tree'].filter(Boolean);
+    status.innerHTML = `<span style="color:var(--success)">●</span> Data loaded: ${which.join(', ')}`;
+  } else if(status){
+    status.innerHTML = `<span style="color:var(--warn)">●</span> Using built-in defaults (data/ not reachable — view via http://localhost or Netlify)`;
+  }
+  // Re-render anything data-driven
+  if(DATA.mos) renderMosFromData();
+  if(DATA.stages) renderStagesFromData();
+  if(DATA.timeline) renderTimelineGantt();
+  if(DATA.pay) renderPayTableFromData();
+  // Trigger a scene re-render so live numbers use new data
+  if(typeof renderScene === 'function') renderScene();
+}
+
+/* Parse "E5_4yr" style keys from pay_2026.json into a tier list per grade */
+function _payTiers(rank){
+  if(!DATA.pay || !DATA.pay.base_pay_monthly) return null;
+  const grade = rank.replace('-','');
+  const tbl = DATA.pay.base_pay_monthly;
+  const tiers = [];
+  Object.entries(tbl).forEach(([k,v])=>{
+    if(!k.startsWith(grade+'_') && k !== grade) return;
+    const suffix = k.replace(grade+'_','').replace(grade,'');
+    let yrs = 0;
+    if(suffix === '' || suffix === 'lt2yr') yrs = 0;
+    else if(suffix === 'lt4mo') yrs = 0;
+    else if(suffix === 'gt4mo') yrs = 0.34;
+    else {
+      const m = suffix.match(/(\d+)yr/);
+      if(m) yrs = parseInt(m[1]);
+    }
+    tiers.push({yrs, pay:v});
+  });
+  return tiers.sort((a,b)=>a.yrs-b.yrs);
+}
+
+/* Override basePay to use DATA.pay when available */
+const _hardcodedBasePay = basePay;
+basePay = function(rank, tisMonths){
+  const tiers = _payTiers(rank);
+  if(!tiers || tiers.length===0) return _hardcodedBasePay(rank, tisMonths);
+  const yrs = tisMonths/12;
+  let pay = tiers[0].pay;
+  for(const t of tiers){ if(yrs >= t.yrs) pay = t.pay; }
+  return pay;
+};
+
+/* Override calcBudget pieces — BAS + special pays + BAH from data */
+const _hardcodedCalcBudget = calcBudget;
+calcBudget = function(g){
+  // Patch globals BEFORE delegating
+  if(DATA.pay){
+    if(DATA.pay.BAS_enlisted_monthly) window._BAS_override = DATA.pay.BAS_enlisted_monthly;
+    if(DATA.pay.special_pays_monthly) window._SPECIAL = DATA.pay.special_pays_monthly;
+    // BAH: try to match grade from examples (Lejeune with-dep used as default)
+    if(DATA.pay.BAH_2026_examples){
+      const lejWith = DATA.pay.BAH_2026_examples.find(b=>b.location && b.location.includes('Lejeune') && b.grade===g.rank && b.with_dep);
+      if(lejWith){
+        BAH[g.rank] = (g.married||g.kids>0) ? lejWith.with_dep : (lejWith.without_dep||lejWith.with_dep*0.75);
+      }
+    }
+  }
+  // Build budget using the now-patched values
+  const bp = basePay(g.rank, g.tis_months);
+  const bah = g.married || g.kids>0 ? (BAH[g.rank]||0) : (g.housing==='off_base' || g.housing==='own' ? (BAH[g.rank]||0) : 0);
+  const bas = window._BAS_override || 460;
+  const sp = window._SPECIAL || {};
+  let special = 0;
+  if(g.quals.includes('Airborne')) special += sp.jump_pay || 150;
+  if(g.quals.includes('Combatant Diver')) special += sp.dive_pay_high || 340;
+  if(g.quals.includes('MARSOC Raider')) special += sp.SODI_MARSOC || 1000; // 2026 SODI rate
+  if(g.quals.includes('Scout Sniper')) special += 100;
+  const gross = bp + bah + bas + special;
+  const taxable = bp + special;
+  const ftax = taxable * 0.10;
+  const fica = bp * 0.0765;
+  const stax = taxable * 0.03;
+  const tsp_contrib = bp * (g.tsp_pct/100);
+  const net = gross - ftax - fica - stax - tsp_contrib;
+  let housing_cost = 0;
+  if(g.housing==='barracks') housing_cost = 0;
+  else if(g.housing==='on_base') housing_cost = bah;
+  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
+  else if(g.housing==='own') housing_cost = g.mortgage;
+  const food = g.housing==='barracks' ? 0 : 600 + (g.kids*200) + (g.married?250:0);
+  const car_total = g.car_payment + (g.car==='none'?0:180);
+  const kids_cost = g.kids * 600;
+  const pet_cost = g.pets * 80;
+  const misc = 350;
+  const total_bills = housing_cost + food + car_total + kids_cost + pet_cost + misc;
+  const net_to_savings = net - total_bills;
+  return { bp, bah, bas, special, gross, taxable, ftax, fica, stax, tsp_contrib, net, housing_cost, food, car_total, kids_cost, pet_cost, misc, total_bills, net_to_savings };
+};
+
+/* Render MOS Deep Dive table dynamically from data */
+function renderMosFromData(){
+  if(!DATA.mos || !DATA.mos.fields) return;
+  // Find the existing MOS table tbody to swap in
+  const mosSection = document.getElementById('mos');
+  if(!mosSection) return;
+  // Build a section per occupational field
+  const fields = DATA.mos.fields;
+  const fieldHtml = Object.entries(fields).map(([fieldName, mosList])=>{
+    const rows = Object.entries(mosList).map(([code, info])=>`
+      <tr>
+        <td>${code}</td>
+        <td>${info.title||''}</td>
+        <td>${info.asvab||''}</td>
+        <td>${info.enlistable?'<span class="badge support">Enlistable</span>':'<span class="badge recon">Lat-move</span>'}</td>
+        <td style="font-size:.85em;color:var(--muted)">${info.notes||''}</td>
+      </tr>
+    `).join('');
+    return `<div class="card pad" style="margin-bottom:var(--s4)">
+      <h3 style="font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">${fieldName.replace(/_/g,' ')}</h3>
+      <div class="mos-table">
+        <table>
+          <thead><tr><th>MOS</th><th>Title</th><th>ASVAB</th><th>Type</th><th>Notes</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+  // Inject a new "Live data" section at top of the MOS tab
+  let dynamicWrap = document.getElementById('mos-live');
+  if(!dynamicWrap){
+    dynamicWrap = document.createElement('div');
+    dynamicWrap.id = 'mos-live';
+    dynamicWrap.style.marginTop = 'var(--s5)';
+    mosSection.appendChild(dynamicWrap);
+  }
+  dynamicWrap.innerHTML = `
+    <div style="padding:var(--s4);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm)">
+      <strong>🔄 Live from /data/mos_complete.json</strong> · Source: ${DATA.mos.source} · Updated: ${DATA.mos.last_updated}
+    </div>
+    ${fieldHtml}
+  `;
+}
+
+/* Render career stages from data — added as a new card in the Recon tab */
+function renderStagesFromData(){
+  if(!DATA.stages || !DATA.stages.stages) return;
+  const reconSection = document.getElementById('recon');
+  if(!reconSection) return;
+  const rows = DATA.stages.stages.map(s=>`
+    <tr>
+      <td><strong>${s.title||s.id}</strong></td>
+      <td>${s.weeks||'—'} wk</td>
+      <td style="font-size:.85em">${s.location||'—'}</td>
+      <td>${s.rank_entry||'—'}</td>
+      <td>${s.base_pay?'$'+s.base_pay.toLocaleString():'—'}/mo</td>
+      <td style="font-size:.85em;color:var(--muted)">${(s.attrition_rate_pct||s.attrition||'')}</td>
+    </tr>
+  `).join('');
+  let dynamic = document.getElementById('stages-live');
+  if(!dynamic){
+    dynamic = document.createElement('div');
+    dynamic.id = 'stages-live';
+    dynamic.style.marginTop = 'var(--s6)';
+    reconSection.appendChild(dynamic);
+  }
+  dynamic.innerHTML = `
+    <h2 style="margin-top:var(--s6)">Pipeline Stages — Authoritative Data</h2>
+    <div style="padding:var(--s4);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm)">
+      <strong>🔄 Live from /data/career_stages.json</strong> · Source: ${DATA.stages.source}
+    </div>
+    <div class="card pad">
+      <div class="mos-table">
+        <table>
+          <thead><tr><th>Stage</th><th>Weeks</th><th>Location</th><th>Rank at Entry</th><th>2026 Pay</th><th>Attrition</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* Render a Gantt-style timeline visualization */
+function renderTimelineGantt(){
+  if(!DATA.timeline || !DATA.timeline.primary_path) return;
+  const overview = document.getElementById('overview');
+  if(!overview) return;
+  const path = DATA.timeline.primary_path;
+  const totalMonths = Math.max(...path.map(p=>p.months_end||0));
+  const barHtml = path.map((p,i)=>{
+    const startPct = (p.months_start/totalMonths)*100;
+    const widthPct = Math.max(((p.months_end-p.months_start)/totalMonths)*100, 1);
+    const color = ['var(--primary)','var(--gold)','var(--success)','var(--blue)','var(--warn)','var(--orange)'][i%6];
+    return `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;font-size:var(--text-xs)">
+      <div style="width:200px;font-family:var(--mono);color:var(--muted);text-overflow:ellipsis;overflow:hidden;white-space:nowrap" title="${p.stage}">${p.stage}</div>
+      <div style="flex:1;position:relative;height:18px;background:var(--off);border-radius:3px">
+        <div style="position:absolute;left:${startPct}%;width:${widthPct}%;height:100%;background:${color};border-radius:3px" title="Mo ${p.months_start}-${p.months_end}, ${p.rank||''}, $${(p.pay_monthly||0).toLocaleString()}/mo"></div>
+      </div>
+      <div style="width:60px;text-align:right;font-family:var(--mono);color:var(--faint)">m${p.months_start}-${p.months_end}</div>
+    </div>`;
+  }).join('');
+  let gantt = document.getElementById('gantt-live');
+  if(!gantt){
+    gantt = document.createElement('div');
+    gantt.id = 'gantt-live';
+    gantt.style.marginTop = 'var(--s6)';
+    overview.appendChild(gantt);
+  }
+  gantt.innerHTML = `
+    <h2 style="margin-top:var(--s6)">📊 Primary Path — Timeline (Months from Day 0)</h2>
+    <div style="padding:var(--s4);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm)">
+      <strong>🔄 Live from /data/timeline.json</strong> · ${path.length} stages · ${totalMonths} months total (~${(totalMonths/12).toFixed(1)} years)
+    </div>
+    <div class="card pad">${barHtml}</div>
+  `;
+}
+
+/* Update Pay tab table dynamically */
+function renderPayTableFromData(){
+  if(!DATA.pay || !DATA.pay.base_pay_monthly) return;
+  const paySection = document.getElementById('pay');
+  if(!paySection) return;
+  let dynamic = document.getElementById('pay-live');
+  if(!dynamic){
+    dynamic = document.createElement('div');
+    dynamic.id = 'pay-live';
+    dynamic.style.marginTop = 'var(--s6)';
+    paySection.insertBefore(dynamic, paySection.firstChild.nextSibling);
+  }
+  const sp = DATA.pay.special_pays_monthly||{};
+  dynamic.innerHTML = `
+    <div style="padding:var(--s4);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm)">
+      <strong>🔄 Live from /data/pay_2026.json</strong> · Effective ${DATA.pay.effective_date} · +${DATA.pay.pay_increase_pct}% increase
+    </div>
+    <div class="card pad" style="margin-bottom:var(--s4)">
+      <h3>Special Pays (2026 Authoritative)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s3);margin-top:var(--s3);font-size:var(--text-sm)">
+        <div>🪂 <strong>Jump pay:</strong> $${sp.jump_pay}/mo</div>
+        <div>🤿 <strong>Dive pay:</strong> $${sp.dive_pay_low}–$${sp.dive_pay_high}/mo</div>
+        <div>⚡ <strong>SODI (MARSOC):</strong> $${sp.SODI_MARSOC}/mo</div>
+        <div>💣 <strong>Hostile Fire/IDP:</strong> $${sp.hostile_fire_IDP}/mo</div>
+        <div>✈️ <strong>Family Sep Allowance:</strong> $${sp.family_sep_allowance}/mo</div>
+        <div>🍽️ <strong>BAS (enlisted):</strong> $${DATA.pay.BAS_enlisted_monthly}/mo</div>
+      </div>
+    </div>
+  `;
+}
+
+// Initialize game on first render
+(function initGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(raw){ G = Object.assign(defaultState(), JSON.parse(raw)); _lastTisCheckpoint = G.tis_months; }
+  }catch(e){}
+  renderScene();
+  // Load data after first paint so the app is interactive immediately
+  loadGameData();
+})();
+</script>
+</body>
+</html>

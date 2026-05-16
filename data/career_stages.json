@@ -1,0 +1,284 @@
+{
+  "source": "marines.mil, marsoc.marines.mil, mcesg.marines.mil, mcrdpi.marines.mil, MARADMIN FY2026",
+  "last_updated": "May 2026",
+  "stages": [
+    {
+      "id": "BOOT_CAMP",
+      "title": "Recruit Training (Boot Camp)",
+      "weeks": 13,
+      "months": 3.25,
+      "location": "MCRD San Diego CA or MCRD Parris Island SC",
+      "rank_entry": "E-1 Pvt",
+      "rank_exit": "E-2 PFC",
+      "pay_entry": 2216.69,
+      "pay_exit": 2261.0,
+      "phases": [
+        {
+          "phase": 1,
+          "weeks": "1-2",
+          "key": "IST, receiving gear, meeting DIs, basic drill"
+        },
+        {
+          "phase": 2,
+          "weeks": "3-8",
+          "key": "Conditioning, swim qual (3rd class min), first aid, USMC history"
+        },
+        {
+          "phase": 3,
+          "weeks": "9-12",
+          "key": "Rifle qual (expert target 220+/250), land nav, gas chamber"
+        },
+        {
+          "phase": 4,
+          "weeks": "13",
+          "key": "Crucible (54-hr FTX, minimal food/sleep), EGA ceremony, graduation"
+        }
+      ],
+      "note_marriage": "Married before shipping: BAH with dependents starts Day 1. San Diego E-1 w/dep BAH: ~$2,934/mo. Does NOT mean family can live at MCRD during training."
+    },
+    {
+      "id": "SOI_IRC",
+      "title": "School of Infantry \u2014 Infantry Rifleman Course (IRC)",
+      "weeks": 14,
+      "months": 3.5,
+      "location": "Camp Pendleton CA (west) or Camp Geiger/Lejeune NC (east)",
+      "rank": "E-2 PFC",
+      "pay": 2261.0,
+      "note": "HZ Recon contract Marines diverge here directly to RSAT. 0311-contract Marines proceed to fleet."
+    },
+    {
+      "id": "RSAT",
+      "title": "Recon Selection and Aptitude Test (RSAT)",
+      "weeks": "1-2",
+      "rank_typical": "E-3 LCpl",
+      "pay": 2378.0,
+      "requirements": [
+        "GT 105+",
+        "PFT 235+",
+        "WSI swim",
+        "Secret clearance",
+        "No NJP last 12mo",
+        "Volunteer",
+        "Command endorsement"
+      ],
+      "pass_rate": "20-40%",
+      "note": "Fail: return to 03XX, re-screen in 6-12 months. Can re-screen 1-2 times typically."
+    },
+    {
+      "id": "GRC",
+      "title": "Ground Reconnaissance Course (GRC)",
+      "weeks": 9,
+      "months": 2.25,
+      "location": "Amphibious Reconnaissance School, Camp Pendleton or Lejeune",
+      "rank_typical": "LCpl-Cpl",
+      "attrition": "40-60%",
+      "content": "Small unit Recon tactics, patrol base ops, advanced land nav, comms, patrol reports, photography, combat sketch, rappelling."
+    },
+    {
+      "id": "ARC",
+      "title": "Amphibious Reconnaissance Course (ARC) / BRC",
+      "weeks": 9,
+      "months": 2.25,
+      "rank_typical": "LCpl-Cpl",
+      "attrition": "30-50%",
+      "content": "Subsurface recon, open-ocean swimming, advanced patrol, HRST, immediate action drills.",
+      "mos_awarded": "0321 upon completion"
+    },
+    {
+      "id": "CDC",
+      "title": "Combatant Diver Course (CDC)",
+      "weeks": 8,
+      "months": 2,
+      "location": "Navy Diving and Salvage Training Center, Panama City FL",
+      "content": "Open circuit SCUBA, closed circuit LAR-V Drager, underwater navigation, combat dive ops.",
+      "common_DQ": "Ear barotrauma, lung squeeze \u2014 common medical DQ. Can re-attempt after medical clearance."
+    },
+    {
+      "id": "BAC",
+      "title": "Basic Airborne Course (BAC)",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Fort Liberty (formerly Fort Bragg) NC",
+      "content": "5 qualifying jumps. US Army jump school. Low attrition. Earns airborne wings.",
+      "pay_add": "Jump pay: $150/mo while in jump status"
+    },
+    {
+      "id": "MFF",
+      "title": "Military Free Fall (MFF/HALO/HAHO)",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Fort Liberty NC or Yuma Proving Ground AZ",
+      "prerequisites": "BAC airborne wings required",
+      "content": "High altitude low/high opening parachute ops. Advanced SOF insertion."
+    },
+    {
+      "id": "SERE",
+      "title": "SERE Level C",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Brunswick ME or Fairchild AFB WA",
+      "content": "Survival, Evasion, Resistance, Escape. Includes realistic captivity resistance training. Classified curriculum. Mandatory for all Recon/SOF Marines."
+    },
+    {
+      "id": "SSBC",
+      "title": "Scout Sniper Basic Course (SSBC)",
+      "weeks": "10-13",
+      "months": "2.5-3.25",
+      "location": "Weapons Training Battalion Quantico VA or 1st/2nd/3rd Marine Division schools",
+      "rank_required": "E-3 LCpl through E-5 Sgt with 03XX MOS",
+      "attrition": "~50%",
+      "prerequisites": [
+        "Expert rifleman qualification (mandatory)",
+        "1st Class PFT (225+ unadjusted)",
+        "GT 100+",
+        "No NJPs in last 12 months",
+        "Secret clearance eligible",
+        "Medically qualified \u2014 heat injury susceptibility screened",
+        "24 months remaining in USMC at completion",
+        "Volunteer serving in designated sniper billet within operating forces",
+        "Battalion CO endorsement",
+        "Pre-course: 10 evaluated stalks + ghillie suit constructed",
+        "Pre-course: 10 surveillance events",
+        "Pre-course: 12 hrs land nav practical application",
+        "Pre-course: 5 hrs range estimation practical application"
+      ],
+      "content": "Advanced marksmanship (M40A6, M110 SASS), stalking/ghillie concealment, range estimation, observation and surveillance, 2-man sniper team mission planning, ballistics data books, target acquisition.",
+      "weapons": [
+        "M40A6 bolt .308 (300m-1000m)",
+        "M110 SASS semi-auto .308",
+        "M107 .50cal anti-materiel rifle"
+      ],
+      "mos_awarded": "0317 (in 03XX unit) or 0322 (in Recon unit)"
+    },
+    {
+      "id": "MARSOC_AS_PHASE1",
+      "title": "MARSOC A&S Phase I",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Camp Lejeune NC",
+      "frequency": "3 cycles per year",
+      "min_pft_day1": 235,
+      "recommended_pft": 260,
+      "swim_requirement": "300m in utility uniform (side or breast stroke) + 11-min water tread in full utilities + 4-min blouse/trouser flotation",
+      "content": "PERRES program (Performance and Resiliency). Fitness events, nutrition, mental resiliency. CSO mentor exposure. Attendance does NOT guarantee Phase II seat.",
+      "attrition_before_phase2": "30-60%"
+    },
+    {
+      "id": "MARSOC_AS_PHASE2",
+      "title": "MARSOC A&S Phase II",
+      "weeks": 3,
+      "months": 0.75,
+      "location": "Undisclosed",
+      "content": "Full SOF selection. Mentally and physically extreme. Team and individual assessment by experienced CSOs. Passing secures MRC seat.",
+      "attrition": "50-70% of Phase II entrants do not receive MRC seats",
+      "overall_as_pass_rate": "~20-30% of all Phase I entrants"
+    },
+    {
+      "id": "MRC",
+      "title": "Marine Raider Course (MRC)",
+      "weeks": 39,
+      "months": 9,
+      "location": "Marine Raider Training Center (MRTC), Camp Lejeune NC",
+      "mos_awarded": "0372 Critical Skills Operator (CSO)",
+      "phases": [
+        {
+          "phase": 1,
+          "name": "Basic Skills",
+          "weeks": 10,
+          "content": "Physical fitness (endurance/functional/amphibious), swimming, hand-to-hand combat, land nav, patrolling, SERE intro, TCCC, fire support, comms."
+        },
+        {
+          "phase": 2,
+          "name": "Small Unit Tactics",
+          "weeks": 8,
+          "content": "Small boat and scout swimmer ops, crew served weapons, demolitions (C4, Claymore, det cord), photography, information collection, direct action raids, special reconnaissance."
+        },
+        {
+          "phase": 3,
+          "name": "Special Operations",
+          "weeks": 10,
+          "content": "DA, SR, IW (Irregular Warfare), working by/with/through partner forces, language/culture intro, SOF fire support, SOCOM weapons qualification."
+        },
+        {
+          "phase": 4,
+          "name": "Mission Execution",
+          "weeks": 11,
+          "content": "Full-mission profiles in realistic environments. FTX culminating exercise. Individual and team assessment throughout."
+        }
+      ]
+    },
+    {
+      "id": "MSG_SCHOOL",
+      "title": "Marine Security Guard (MSG) School",
+      "weeks": 8,
+      "months": 2,
+      "location": "MCB Quantico VA",
+      "rank_eligible": "LCpl through Sgt (watchstander); SSgt-MGySgt (Det Commander)",
+      "mos_added": "8156 (secondary)",
+      "prerequisites": [
+        "US citizen",
+        "LCpl-Sgt (PFC with CMC waiver)",
+        "GT 90 minimum",
+        "Service Pro/Cons 4.2/4.2 or higher (Cpl and below)",
+        "Secret clearance (favorably adjudicated)",
+        "2nd Class PFT within 60 days of school",
+        "Height/weight standards compliant",
+        "No visible dental fixtures while speaking or smiling",
+        "No eye surgery within 6 months",
+        "Tattoos within USMC policy \u2014 content screened by MSG team",
+        "No NJP within 1 year (1 lifetime NJP may be waiverable)",
+        "No courts-martial (GCM is never waived)",
+        "Not in stress/anger management or marital counseling",
+        "Minimum $500 available funds after CO financial worksheet",
+        "38 months obligated service at time of reporting",
+        "6 months TOS at current unit before applying",
+        "24 months TOS at current unit to execute orders to MSG school"
+      ],
+      "tour": "3 posts over 4-year program. 12-24 months per post. Europe, Middle East, Africa, Asia, Latin America.",
+      "housing": "Government quarters provided at every post. No rent. COLA at most overseas posts.",
+      "financial_note": "MSG Marines abroad typically save $600-1500/mo more than equivalent stateside Marines. Free housing + COLA = strong savings."
+    },
+    {
+      "id": "DI_SCHOOL",
+      "title": "Drill Instructor School",
+      "weeks": 11,
+      "months": 2.75,
+      "location": "MCRD Parris Island SC or MCRD San Diego CA",
+      "formally_established": "October 1952",
+      "rank_eligible": "Cpl (minimum) through SSgt",
+      "prerequisites": [
+        "Active duty Marine",
+        "Minimum Corporal (E-4)",
+        "1st Class PFT",
+        "Completed first enlistment (4 years)",
+        "Minimum 2 years service remaining",
+        "Strong pros/cons marks",
+        "No NJPs",
+        "Command endorsement"
+      ],
+      "total_di_tour_months": "24-36",
+      "note": "Hat (Campaign Cover) ceremony is one of the most significant moments in a Marine's career. Highly prestigious. Career-enhancing for E-5/E-6 promotion. Intense \u2014 limited time for college during active DI duty."
+    },
+    {
+      "id": "RETIREMENT_20",
+      "title": "20-Year Military Retirement",
+      "months_TIS": 240,
+      "rank_typical": "E-7 GySgt to E-8 MSgt/1stSgt",
+      "BRS_pension": {
+        "formula": "2.0% x YOS x avg_highest_36mo_base_pay",
+        "at_20yr": "40% of avg high-36 base pay",
+        "example_E7_14yr_monthly": 2236.76,
+        "example_E8_12yr_monthly": 2424.72
+      },
+      "legacy_pension": {
+        "formula": "2.5% x YOS x avg_highest_36mo_base_pay",
+        "at_20yr": "50% of avg high-36 base pay"
+      },
+      "healthcare": "TRICARE for life. Retiree + family. No premium. Civilian equivalent $20,000+/yr.",
+      "gi_bill": "Post-9/11 (Ch33) usable 15 years post-separation. Use for BA or master's.",
+      "va_loan": "0% down, no PMI, competitive rate. Multi-use. Available after first honorable service period.",
+      "tsp_est_balance": "$200,000-400,000+ (18+ yrs contributions + DoD BRS 5% match)",
+      "second_career": "Age at 20yr retirement: typically 38-42. Pension + civilian salary ($60-100k) + VA disability = $90-130k+ total annual income typical."
+    }
+  ]
+}

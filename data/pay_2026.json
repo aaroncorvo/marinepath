@@ -1,0 +1,133 @@
+{
+  "source": "DFAS dfas.mil 2026, vaclaimsinsider.com/2026-military-pay-chart, military.com",
+  "effective_date": "January 1, 2026",
+  "pay_increase_pct": 3.8,
+  "BAS_enlisted_monthly": 460.25,
+  "base_pay_monthly": {
+    "E1_lt4mo": 2216.69,
+    "E1_gt4mo": 2397.46,
+    "E2": 2261.0,
+    "E3_lt2yr": 2378.0,
+    "E3_2yr": 2530.0,
+    "E3_3yr": 2680.0,
+    "E4_lt2yr": 2634.0,
+    "E4_2yr": 2769.0,
+    "E4_4yr": 3010.0,
+    "E4_6yr": 3197.0,
+    "E5_lt2yr": 2872.0,
+    "E5_4yr": 3358.0,
+    "E5_8yr": 3805.0,
+    "E5_12yr": 4076.0,
+    "E6_lt2yr": 3136.0,
+    "E6_4yr": 3908.0,
+    "E6_8yr": 4235.0,
+    "E6_12yr": 4759.0,
+    "E6_18yr": 5194.0,
+    "E7_lt2yr": 3626.0,
+    "E7_4yr": 4456.21,
+    "E7_8yr": 4843.77,
+    "E7_14yr": 5591.9,
+    "E7_20yr": 6177.31,
+    "E8_8yr": 5656.65,
+    "E8_12yr": 6061.79,
+    "E8_18yr": 6811.22,
+    "E8_20yr": 6995.4,
+    "E9_14yr": 7263.87,
+    "E9_20yr": 8105.06
+  },
+  "BAH_2026_examples": [
+    {
+      "location": "San Diego CA",
+      "grade": "E3",
+      "without_dep": 2214,
+      "with_dep": 2934
+    },
+    {
+      "location": "San Diego CA",
+      "grade": "E5",
+      "without_dep": 2676,
+      "with_dep": 3282
+    },
+    {
+      "location": "Jacksonville NC",
+      "grade": "E3",
+      "without_dep": 1236,
+      "with_dep": 1944
+    },
+    {
+      "location": "Jacksonville NC",
+      "grade": "E5",
+      "without_dep": 1596,
+      "with_dep": 2136
+    },
+    {
+      "location": "Jacksonville NC",
+      "grade": "E7",
+      "without_dep": 1908,
+      "with_dep": 2424
+    },
+    {
+      "location": "Quantico VA",
+      "grade": "E5",
+      "without_dep": 2646,
+      "with_dep": 3378
+    }
+  ],
+  "special_pays_monthly": {
+    "jump_pay": 150,
+    "dive_pay_low": 150,
+    "dive_pay_high": 340,
+    "hostile_fire_IDP": 225,
+    "SODI_MARSOC": 1000,
+    "family_sep_allowance": 250
+  },
+  "tuition_assistance": {
+    "max_per_credit_hr": 250,
+    "max_per_fiscal_year": 4500,
+    "note": "Available at first permanent duty station. Does not require reenlistment. Use instead of GI Bill while on active duty."
+  },
+  "GI_Bill_Ch33": {
+    "strategy": "Do NOT use on active duty \u2014 use TA. Save for post-EAS/retirement.",
+    "usable_window_years": 15,
+    "max_benefit": "100% in-state tuition + BAH E5-w-dep + $1000/yr books"
+  },
+  "BRS_retirement": {
+    "formula": "2.0% x years_of_service x avg_highest_36mo_base_pay",
+    "at_20yr_pct": 40,
+    "tsp_dod_match": "DoD matches up to 5% of base pay after 2 yrs TIS",
+    "E7_14yr_pension_BRS": 2236.76,
+    "E8_12yr_pension_BRS": 2424.72
+  },
+  "total_comp_examples_married_lejeune": {
+    "E3_LCpl": {
+      "base": 2378,
+      "BAH_dep": 1944,
+      "BAS": 460.25,
+      "total_mo": 4782.25
+    },
+    "E5_Sgt_4yr": {
+      "base": 3358,
+      "BAH_dep": 2136,
+      "BAS": 460.25,
+      "total_mo": 5954.25
+    },
+    "E7_GySgt_14yr_MARSOC": {
+      "base": 5592,
+      "BAH_dep": 2424,
+      "BAS": 460.25,
+      "SODI": 1000,
+      "jump": 150,
+      "dive": 150,
+      "total_mo_home": 9776.25
+    }
+  },
+  "financial_rules": {
+    "rule1": "No car lots near base. Buy used with cash or credit union loan.",
+    "rule2": "Open Roth TSP Day 1. Contribute 5%+ for full BRS match after 2 yrs.",
+    "rule3": "BAH strategy: rent below BAH rate, keep the difference, invest it.",
+    "rule4": "VA loan: 0% down, no PMI. Use at 2+ yr duty station. Buy, build equity, rent out at PCS.",
+    "rule5": "SRB bonuses go straight to TSP or Roth IRA ($7,000 limit 2026).",
+    "rule6": "Combat zone: all pay is fed income tax-free. Max Roth IRA during deployment.",
+    "target": "Disciplined enlisted Marine on Recon/MARSOC path: $200,000+ net worth before 20yr retirement is realistic."
+  }
+}

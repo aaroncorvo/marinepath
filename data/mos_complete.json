@@ -1,0 +1,125 @@
+{
+  "source": "mosdb.com, operationmilitarykids.org 2026, marines.mil",
+  "last_updated": "May 2026",
+  "fields": {
+    "03_Infantry": {
+      "0311": {
+        "title": "Rifleman",
+        "asvab": "GT 80-90",
+        "enlistable": true,
+        "notes": "Primary infantry MOS. Boot camp + 14-wk IRC at SOI. Gateway to all 03XX advanced paths."
+      },
+      "0313": {
+        "title": "LAV Crewman",
+        "asvab": "GT 90",
+        "enlistable": true,
+        "notes": "Light Armored Recon vehicle crew."
+      },
+      "0317": {
+        "title": "Scout Sniper",
+        "asvab": "GT 100",
+        "enlistable": false,
+        "notes": "Secondary MOS. E-3+ in 03XX. Expert rifleman, 1st Class PFT, GT100+, no NJP last 12mo, Secret clearance, 24mo remaining. SSBC 10-13 wks. ~50% attrition."
+      },
+      "0321": {
+        "title": "Reconnaissance Man",
+        "asvab": "GT 105",
+        "enlistable": true,
+        "notes": "HZ contract or volunteer. Pipeline: GRC(9wk)+ARC(9wk)+CDC(8wk)+BAC(3wk)+MFF(3wk)+SERE(3wk). GT105+, 1st Class PFT, WSI swim, Secret clearance."
+      },
+      "0322": {
+        "title": "Recon Man Sniper Qualified",
+        "asvab": "GT 105",
+        "enlistable": false,
+        "notes": "0321 + SSBC."
+      },
+      "0326": {
+        "title": "Recon Man Para-Diver",
+        "asvab": "GT 105",
+        "enlistable": false,
+        "notes": "0321 + BAC + CDC. Full Recon designation."
+      },
+      "0331": {
+        "title": "Machine Gunner",
+        "asvab": "GT 90",
+        "enlistable": true,
+        "notes": "M240G, M2, Mk19."
+      },
+      "0341": {
+        "title": "Mortarman",
+        "asvab": "GT 90",
+        "enlistable": true,
+        "notes": "60mm/81mm indirect fire."
+      },
+      "0352": {
+        "title": "Anti-tank Missileman",
+        "asvab": "GT 100",
+        "enlistable": true,
+        "notes": "TOW and Javelin."
+      },
+      "0372": {
+        "title": "Critical Skills Operator (Marine Raider)",
+        "asvab": "GT 105",
+        "enlistable": false,
+        "notes": "MARSOC. GT105+, PFT235+ (260+ rec), Secret clearance, \u22642 NJPs. A&S Phase I (3wk Lejeune)+Phase II (3wk undisclosed)+MRC (39wk/9mo). Phases: P1 Basic Skills 10wk, P2 Small Unit Tactics 8wk, P3 Special Ops 10wk, P4 Mission Exec 11wk. Additional pays: SODI $1000/mo, jump $150, dive $150."
+      }
+    },
+    "02_Intelligence": {
+      "0211": {
+        "title": "CI/HUMINT Specialist",
+        "asvab": "GT 110",
+        "enlistable": false,
+        "notes": "Lat-move. Secret clearance."
+      },
+      "0231": {
+        "title": "Intelligence Specialist",
+        "asvab": "GT 110",
+        "enlistable": false,
+        "notes": "Lat-move. Fort Huachuca AZ ~16wk school."
+      }
+    },
+    "06_Communications": {
+      "0621": {
+        "title": "Field Radio Operator",
+        "asvab": "EL 105",
+        "enlistable": true
+      },
+      "0651": {
+        "title": "Data Systems Administrator",
+        "asvab": "GT 105",
+        "enlistable": true,
+        "notes": "Strong IT civilian bridge."
+      }
+    },
+    "23_EOD": {
+      "2336": {
+        "title": "EOD Technician",
+        "asvab": "GT 110",
+        "enlistable": false,
+        "notes": "Lat-move only. Redstone Arsenal ~40wk. GT110 non-waiverable."
+      }
+    },
+    "58_MP": {
+      "5811": {
+        "title": "Military Police",
+        "asvab": "GT 100",
+        "enlistable": true,
+        "notes": "Fort Leonard Wood ~20wk. Bridge: FBI, DEA, city PD, US Marshals. Veterans preference."
+      },
+      "5821": {
+        "title": "Criminal Investigator (CID)",
+        "asvab": "GT 100",
+        "enlistable": false,
+        "notes": "Lat-move from 5811."
+      }
+    },
+    "MSG_Embassy": {
+      "8156": {
+        "title": "Marine Security Guard",
+        "asvab": "GT 90",
+        "enlistable": false,
+        "notes": "Secondary MOS. LCpl-Sgt. 8wk MSG School Quantico. 38mo obligated service. Secret clearance. 2nd Class PFT. No NJP within 1yr. Embassy duty worldwide. Free housing + COLA. 3 posts over 4yr program."
+      }
+    }
+  }
+}

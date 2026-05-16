@@ -1,0 +1,20 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[redirects]]
+  from = "/play"
+  to = "/index.html#play"
+  status = 200
+
+[[redirects]]
+  from = "/sim"
+  to = "/index.html#play"
+  status = 200

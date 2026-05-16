@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>military-path-adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --text-xs:clamp(.75rem,.7rem+.25vw,.875rem);--text-sm:clamp(.875rem,.8rem+.35vw,1rem);--text-base:clamp(1rem,.95rem+.25vw,1.125rem);--text-lg:clamp(1.125rem,1rem+.75vw,1.5rem);--text-xl:clamp(1.5rem,1.2rem+1.25vw,2.25rem);--text-2xl:clamp(2rem,1.2rem+2.5vw,3.5rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;--color-surface-offset:#f3f0ec;--color-border:#d4d1ca;--color-text:#28251d;--color-text-muted:#6d6b66;--color-primary:#01696f;--color-primary-hover:#0c4e54;--color-success:#437a22;--color-warning:#964219;--color-error:#a12c7b;--color-blue:#006494;--radius-sm:.375rem;--radius-md:.75rem;--radius-lg:1rem;--radius-xl:1.25rem;--shadow:0 12px 32px rgba(20,20,20,.08);--font-body:'IBM Plex Sans',sans-serif;--font-display:'IBM Plex Sans',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+    }
+    [data-theme="dark"]{--color-bg:#151515;--color-surface:#1c1c1c;--color-surface-2:#232323;--color-surface-offset:#1a2224;--color-border:#333;--color-text:#ece8df;--color-text-muted:#b1aba0;--color-primary:#4f98a3;--color-primary-hover:#77b8c0;--color-success:#7bbb55;--color-warning:#cf8a5a;--color-error:#d672b1;--color-blue:#71a8d3;--shadow:0 16px 40px rgba(0,0,0,.35)}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);line-height:1.5} a{color:inherit} button{font:inherit}
+    .app{max-width:1400px;margin:0 auto;padding:var(--space-4)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)}
+    .brand{display:flex;align-items:center;gap:var(--space-3)}
+    .logo{width:40px;height:40px;border:1px solid var(--color-border);border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--color-surface),var(--color-surface-offset))}
+    .logo svg{width:22px;height:22px}
+    .title{font-size:var(--text-lg);font-weight:700}
+    .subtitle{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .btn{border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);padding:.75rem 1rem;border-radius:999px;cursor:pointer;min-height:44px}
+    .btn.primary{background:var(--color-primary);color:white;border-color:transparent}.btn.primary:hover{background:var(--color-primary-hover)}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-6);margin-bottom:var(--space-6)}
+    .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow)}
+    .hero-main{padding:var(--space-8)}
+    .eyebrow{font-family:var(--font-mono);font-size:var(--text-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--color-primary)}
+    h1{font-size:var(--text-2xl);line-height:1.05;margin:.4rem 0 1rem}.hero p{max-width:65ch;color:var(--color-text-muted)}
+    .hero-actions,.legend{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.25rem}.pill{padding:.45rem .7rem;border-radius:999px;font-size:var(--text-xs);border:1px solid var(--color-border);background:var(--color-surface-2)}
+    .hero-side{padding:var(--space-6);display:grid;gap:var(--space-4);align-content:start}
+    .stat{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid var(--color-border)}
+    .stat strong{display:block;font-size:var(--text-xl)}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:var(--space-6)}
+    .panel{padding:var(--space-5)}
+    .panel h2{margin:0 0 .8rem;font-size:var(--text-lg)}
+    .small{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .check{display:grid;gap:.75rem;margin-top:1rem}
+    .check label{display:flex;gap:.7rem;align-items:flex-start;padding:.75rem;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2)}
+    .check input{margin-top:.2rem}
+    .timeline{position:relative;padding:var(--space-5)}
+    .timeline:before{content:'';position:absolute;left:28px;top:30px;bottom:30px;width:2px;background:linear-gradient(var(--color-primary),transparent)}
+    .node{position:relative;margin-left:3.3rem;margin-bottom:1.15rem;padding:1rem 1rem 1rem 1.1rem;border:1px solid var(--color-border);background:var(--color-surface-2);border-radius:var(--radius-lg)}
+    .node:before{content:'';position:absolute;left:-2.2rem;top:1.25rem;width:14px;height:14px;border-radius:50%;background:var(--color-primary);box-shadow:0 0 0 5px color-mix(in srgb, var(--color-primary) 20%, transparent)}
+    .node h3{margin:0 0 .3rem;font-size:1.02rem}.meta{font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:.45rem}
+    .tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.65rem}.tag{font-size:var(--text-xs);padding:.35rem .5rem;border-radius:999px;background:var(--color-bg);border:1px solid var(--color-border)}
+    .outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-6)}
+    .outcome{padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface-2)}
+    .section-title{margin:var(--space-6) 0 var(--space-4);font-size:var(--text-xl)}
+    .money{overflow:auto}.money table{width:100%;border-collapse:collapse}.money th,.money td{padding:.8rem;border-bottom:1px solid var(--color-border);text-align:left}.money th{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .footer-note{margin-top:var(--space-6);padding:var(--space-4);border:1px dashed var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-sm);color:var(--color-text-muted)}
+    .path-choice{display:grid;gap:.5rem;margin-top:1rem}.path-choice select{width:100%;padding:.8rem 1rem;border-radius:12px;background:var(--color-surface-2);color:var(--color-text);border:1px solid var(--color-border)}
+    @media (max-width: 980px){.hero,.grid,.outcomes{grid-template-columns:1fr}.timeline:before{left:20px}.node{margin-left:2.6rem}.node:before{left:-1.7rem}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 4.6-2.8 7.8-7 10-4.2-2.2-7-5.4-7-10V6l7-4Z"/><path d="M8 12h8M12 8v8"/></svg>
+      </div>
+      <div>
+        <div class="title">20-Year Service Adventure Map</div>
+        <div class="subtitle">A decision-path guide for military, family, education, money, and retirement planning</div>
+      </div>
+    </div>
+    <button class="btn" data-theme-toggle aria-label="Switch theme">Theme</button>
+  </div>
+
+  <section class="hero">
+    <div class="card hero-main">
+      <div class="eyebrow">Mission start</div>
+      <h1>Infantry → Recon → Sniper → Raider... with real forks, real risks, and my real life.</h1>
+      <p>This map treats my plan like an adventure game. Each stage shows what the path unlocks, how long it usually takes, what could derail it, and what choices matter around marriage, kids, school, housing, saving, and getting to a 20-year retirement.</p>
+      <div class="hero-actions">
+        <span class="pill">Goal: my 20-year retirement</span>
+        <span class="pill">School: Tuition Assistance + GI Bill</span>
+        <span class="pill">Money rule: save first, avoid debt</span>
+        <span class="pill">Housing: on base while it helps</span>
+      </div>
+      <div class="path-choice">
+        <label class="small" for="scenario">Try a life fork and read it aloud together:</label>
+        <select id="scenario">
+          <option value="ideal">Ideal path: I make Recon and later MARSOC</option>
+          <option value="married">I get married early and live in family housing</option>
+          <option value="injury">Injury or failure changes my path</option>
+          <option value="msg">I do not make Raider and choose Marine Security Guard</option>
+          <option value="civilian">I get out before 20 and pivot to civilian life</option>
+        </select>
+      </div>
+      <div id="scenarioText" class="footer-note"></div>
+    </div>
+    <div class="card hero-side">
+      <div class="stat"><div class="small">Boot camp</div><strong>13 weeks</strong><div class="small">Recruit training before follow-on schools.</div></div>
+      <div class="stat"><div class="small">College while in</div><strong>$4,500/yr TA</strong><div class="small">Usually up to two TA-funded classes at once.</div></div>
+      <div class="stat"><div class="small">Early enlisted pay</div><strong>E-1: $2,407/mo</strong><div class="small">Basic pay only, before allowances and taxes.</div></div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <aside class="card panel">
+      <h2>Decision checkpoints</h2>
+      <div class="small">Use these at every major fork. I should answer them out loud and write my answer down.</div>
+      <div class="check">
+        <label><input type="checkbox"> <span><strong>Mission:</strong> What am I trying to earn next, and why does it matter?</span></label>
+        <label><input type="checkbox"> <span><strong>Reality:</strong> What are the gate standards, wait times, and failure risks?</span></label>
+        <label><input type="checkbox"> <span><strong>Life:</strong> Am I single, married, or planning kids? How does that change tempo and housing?</span></label>
+        <label><input type="checkbox"> <span><strong>Money:</strong> Am I saving, investing, and avoiding a car or housing decision that traps me?</span></label>
+        <label><input type="checkbox"> <span><strong>School:</strong> Can I take one class now without hurting performance?</span></label>
+        <label><input type="checkbox"> <span><strong>Backup:</strong> If I fail, get hurt, or the mission changes, what is my next honorable move?</span></label>
+      </div>
+      <h2 style="margin-top:1.2rem">Big life rules</h2>
+      <div class="tags">
+        <span class="tag">No high-interest car debt</span>
+        <span class="tag">Build emergency fund early</span>
+        <span class="tag">TSP from the start</span>
+        <span class="tag">Use housing strategically</span>
+        <span class="tag">Don’t marry just for BAH</span>
+        <span class="tag">Always keep a Plan B MOS/job</span>
+      </div>
+    </aside>
+
+    <main>
+      <section class="card timeline">
+        <div class="node">
+          <h3>1. Enlistment, MEPS, contract choice</h3>
+          <div class="meta">Age 17–18 • Before shipping</div>
+          <div>I want infantry, but this is the first fork: I need to understand what is guaranteed in contract terms, what is just a goal, and what happens if availability changes.</div>
+          <div class="tags"><span class="tag">Choose branch</span><span class="tag">Read contract carefully</span><span class="tag">Ask what happens if MOS not available</span></div>
+        </div>
+        <div class="node">
+          <h3>2. Boot camp</h3>
+          <div class="meta">13 weeks</div>
+          <div>This is my first major filter. Success here unlocks the rest; injury, disciplinary issues, or medical issues can alter my timeline immediately.</div>
+          <div class="tags"><span class="tag">Single life likely simplest</span><span class="tag">Do not plan marriage around boot camp</span></div>
+        </div>
+        <div class="node">
+          <h3>3. School of Infantry / Infantry pipeline</h3>
+          <div class="meta">Follow-on training after boot camp</div>
+          <div>This is where I start becoming the Marine I pictured. I should ask: am I good enough to dominate infantry first before I chase elite follow-ons?</div>
+          <div class="tags"><span class="tag">Start savings habit</span><span class="tag">Barracks/on base helps savings</span></div>
+        </div>
+        <div class="node">
+          <h3>4. First unit: prove himself in infantry</h3>
+          <div class="meta">Roughly years 1–3</div>
+          <div>Recon, sniper-related opportunities, and later MARSOC ambitions rest on my fitness, reputation, discipline, and performance in the regular fleet first.</div>
+          <div class="tags"><span class="tag">Take 1 class if tempo allows</span><span class="tag">Avoid debt</span><span class="tag">Rank up</span></div>
+        </div>
+        <div class="node">
+          <h3>5. Recon attempt</h3>
+          <div class="meta">Usually after proving himself first • Recon course pipeline has changed in 2026</div>
+          <div>If I pass screening and follow-on recon training, my path narrows into a harder but more selective track. If not, I return to infantry and re-evaluate.</div>
+          <div class="tags"><span class="tag">High injury risk</span><span class="tag">More training tempo</span><span class="tag">Failure is a branch, not the end</span></div>
+        </div>
+        <div class="node">
+          <h3>6. Sniper goal / advanced specialization</h3>
+          <div class="meta">Depends on unit needs, timing, and qualification</div>
+          <div>This is another ambition layer, not a guaranteed stop. I should ask whether the timing helps or delays my longer-term MARSOC goal.</div>
+          <div class="tags"><span class="tag">Requires strong reputation</span><span class="tag">May depend on unit structure</span></div>
+        </div>
+        <div class="node">
+          <h3>7. MARSOC / Raider selection attempt</h3>
+          <div class="meta">Later career gate • selection-based</div>
+          <div>Big fork: I make it and enter a new career track, or I do not make it and choose the next high-value move such as returning to infantry, a B-billet, or another career-building path.</div>
+          <div class="tags"><span class="tag">Selection risk</span><span class="tag">Marriage/kids stress test</span><span class="tag">Need mature backup plan</span></div>
+        </div>
+        <div class="node">
+          <h3>8. B-billet / Marine Security Guard option</h3>
+          <div class="meta">If Raider path does not happen</div>
+          <div>MSG can satisfy my interest in serving overseas and at embassies, while broadening my life experience and leadership. It also changes my family and housing choices depending on assignment rules and timing.</div>
+          <div class="tags"><span class="tag">Overseas possibility</span><span class="tag">Embassy security duty</span><span class="tag">Another fork, not a consolation prize</span></div>
+        </div>
+        <div class="node">
+          <h3>9. Mid-career decision: stay to 20 or transition out</h3>
+          <div class="meta">Roughly years 8–12</div>
+          <div>By this point I should know if I am building toward retirement or using the military to launch phase two. Either way, I should have savings, college progress, and a civilian-ready identity.</div>
+          <div class="tags"><span class="tag">Promotion matters</span><span class="tag">Family stability matters more</span><span class="tag">Civilian resume should already exist</span></div>
+        </div>
+        <div class="node">
+          <h3>10. Retirement target</h3>
+          <div class="meta">20 years of service</div>
+          <div>Ultimate win state: I retire with pension eligibility, no crushing debt, meaningful education progress or completion, a place to live by design, and a strong next-career plan.</div>
+          <div class="tags"><span class="tag">Retirement is not the end</span><span class="tag">Phase two career</span><span class="tag">Use pension + next income wisely</span></div>
+        </div>
+      </section>
+
+      <h2 class="section-title">Adventure outcomes</h2>
+      <section class="outcomes">
+        <div class="outcome"><strong>Path A: Elite track</strong><div class="small">Infantry → Recon → possible sniper role → MARSOC attempt. Highest ambition, highest washout and injury risk, highest pressure on family life.</div></div>
+        <div class="outcome"><strong>Path B: Broad service track</strong><div class="small">Infantry → strong fleet Marine → B-billet/MSG/leadership roles → retirement. More stable than the elite pipeline, still meaningful and global.</div></div>
+        <div class="outcome"><strong>Path C: Pivot track</strong><div class="small">Injury, failure, or changed goals lead to another MOS, school progress, and a civilian or hybrid future. Not failure if he pivots with discipline.</div></div>
+      </section>
+
+      <h2 class="section-title">Pay and money checkpoints</h2>
+      <section class="card panel money">
+        <div class="small" style="margin-bottom:1rem">Basic pay only, selected 2026 enlisted grades for planning conversation. Actual take-home pay also depends on allowances, taxes, location, dependents, and time in service.</div>
+        <table>
+          <thead><tr><th>Rank</th><th>Under 2 years</th><th>Over 4 years</th><th>Over 8 years</th><th>Planning use</th></tr></thead>
+          <tbody>
+            <tr><td>E-1</td><td>$2,407</td><td>$2,407</td><td>$2,407</td><td>Boot camp/very early entry baseline</td></tr>
+            <tr><td>E-2</td><td>$2,698</td><td>$2,698</td><td>$2,698</td><td>Early junior enlisted planning</td></tr>
+            <tr><td>E-3</td><td>$2,837</td><td>$3,198</td><td>$3,198</td><td>First serious budget stage</td></tr>
+            <tr><td>E-4</td><td>$3,142</td><td>$3,659</td><td>$3,815</td><td>Car temptation stage; stay disciplined</td></tr>
+            <tr><td>E-5</td><td>$3,058</td><td>$3,492</td><td>$4,105</td><td>Marriage/kids budget gets real</td></tr>
+            <tr><td>E-6</td><td>$3,401</td><td>$4,068</td><td>$4,612</td><td>Mid-career stability and saving window</td></tr>
+            <tr><td>E-7</td><td>$3,932</td><td>$4,673</td><td>$5,135</td><td>Leadership years; retirement runway</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="footer-note">
+        Use this map as a conversation tool, not as a promise. The exact order of recon, sniper-related opportunities, MARSOC, B-billets, housing eligibility, and overseas duty can change with policy, timing, unit needs, injuries, and world events. The real win is that I learn to make deliberate choices at every fork.
+      </section>
+    </main>
+  </div>
+</div>
+<script>
+const scenarios = {
+  ideal: 'Ideal path: I stay single or keep life simple early, dominate infantry, earn a recon shot, keep college to one class at a time, build a reputation, attempt MARSOC later, and treat every promotion as a step toward my 20-year retirement and a second career.',
+  married: 'Early marriage path: married housing and family decisions may create more stability emotionally but less flexibility for high-tempo assignments, more pressure for me to budget carefully, and harder conversations around deployments, schools, and when to have kids.',
+  injury: 'Injury or setback path: a medical issue, failed selection, or changing force needs can reroute me back to infantry, another MOS, or a more stable assignment. This path works best if I already have savings, no toxic debt, and steady college progress.',
+  msg: 'MSG path: if Raider does not happen, embassy duty can still be a prestigious, global, growth-heavy path. I should ask how overseas life, spouse restrictions, schooling, and long-term promotion goals line up with that choice.',
+  civilian: 'Early exit path: if I leave before 20, the decision scorecard becomes location, civilian income, degree progress, savings runway, family stability, and whether I have translated my military skills into a real next job.'
+};
+const sel = document.getElementById('scenario');
+const box = document.getElementById('scenarioText');
+function renderScenario(){ box.textContent = scenarios[sel.value]; }
+sel.addEventListener('change', renderScenario); renderScenario();
+(function(){const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;let d='dark';r.setAttribute('data-theme',d);t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);});})();
+</script>
+</body>
+</html>

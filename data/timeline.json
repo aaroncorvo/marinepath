@@ -1,0 +1,317 @@
+{
+  "source": "marines.mil, marsoc.marines.mil, dfas.mil, mcesg.marines.mil",
+  "note": "All times in months from enlistment date (Day 0). Ranges given where timing varies by individual performance and assignment.",
+  "primary_path": [
+    {
+      "stage": "MEPS / Enlistment",
+      "months_start": -3,
+      "months_end": 0,
+      "rank": "Civilian",
+      "pay_monthly": 0
+    },
+    {
+      "stage": "Boot Camp (13 wks)",
+      "months_start": 0,
+      "months_end": 3.25,
+      "rank": "E-1\u2192E-2",
+      "pay_monthly": 2261
+    },
+    {
+      "stage": "SOI Infantry Rifleman Course (14 wks)",
+      "months_start": 3.25,
+      "months_end": 6.75,
+      "rank": "E-2",
+      "pay_monthly": 2261
+    },
+    {
+      "stage": "Fleet Infantry (Year 1)",
+      "months_start": 6.75,
+      "months_end": 18,
+      "rank": "E-2\u2192E-3",
+      "pay_monthly": 2378
+    },
+    {
+      "stage": "RSAT Screening (1-2 wks)",
+      "months_start": 18,
+      "months_end": 19,
+      "rank": "E-3",
+      "pay_monthly": 2378
+    },
+    {
+      "stage": "Ground Reconnaissance Course - GRC (9 wks)",
+      "months_start": 19,
+      "months_end": 21.25,
+      "rank": "E-3",
+      "pay_monthly": 2378
+    },
+    {
+      "stage": "Amphibious Reconnaissance Course - ARC (9 wks)",
+      "months_start": 21.25,
+      "months_end": 23.5,
+      "rank": "E-3\u2192E-4",
+      "pay_monthly": 2634
+    },
+    {
+      "stage": "Combatant Diver Course - CDC (8 wks)",
+      "months_start": 23.5,
+      "months_end": 25.5,
+      "rank": "E-4",
+      "pay_monthly": 2634
+    },
+    {
+      "stage": "Basic Airborne Course - BAC (3 wks)",
+      "months_start": 25.5,
+      "months_end": 26.25,
+      "rank": "E-4",
+      "pay_monthly": 2634
+    },
+    {
+      "stage": "Military Free Fall - MFF (3 wks)",
+      "months_start": 26.25,
+      "months_end": 27,
+      "rank": "E-4",
+      "pay_monthly": 2634
+    },
+    {
+      "stage": "SERE Level C (3 wks)",
+      "months_start": 27,
+      "months_end": 27.75,
+      "rank": "E-4",
+      "pay_monthly": 2634
+    },
+    {
+      "stage": "Recon Assignment (0321/0326)",
+      "months_start": 28,
+      "months_end": 54,
+      "rank": "E-4\u2192E-5",
+      "pay_monthly": 3207
+    },
+    {
+      "stage": "Scout Sniper Basic Course (10-13 wks)",
+      "months_start": 54,
+      "months_end": 57,
+      "rank": "E-5 Sgt",
+      "pay_monthly": 3207
+    },
+    {
+      "stage": "MARSOC A&S Phase I (3 wks)",
+      "months_start": 60,
+      "months_end": 60.75,
+      "rank": "E-5",
+      "pay_monthly": 3207
+    },
+    {
+      "stage": "MARSOC A&S Phase II (3 wks)",
+      "months_start": 60.75,
+      "months_end": 61.5,
+      "rank": "E-5",
+      "pay_monthly": 3207
+    },
+    {
+      "stage": "Marine Raider Course - MRC (39 wks / 9 mo)",
+      "months_start": 63,
+      "months_end": 72,
+      "rank": "E-5\u2192E-6",
+      "pay_monthly": 4068
+    },
+    {
+      "stage": "MARSOC Assignment (1st tour)",
+      "months_start": 72,
+      "months_end": 108,
+      "rank": "E-6 SSgt",
+      "pay_monthly": 4235,
+      "add_pays": "SODI $1,000 + Jump $150 + Dive $150"
+    },
+    {
+      "stage": "MARSOC Assignment (2nd tour / GySgt)",
+      "months_start": 108,
+      "months_end": 156,
+      "rank": "E-7 GySgt",
+      "pay_monthly": 5592,
+      "add_pays": "SODI $1,000 + Jump $150 + Dive $150"
+    },
+    {
+      "stage": "Senior NCO Tour (GySgt/MSgt to retirement)",
+      "months_start": 156,
+      "months_end": 240,
+      "rank": "E-7\u2192E-8",
+      "pay_monthly": 6062
+    },
+    {
+      "stage": "20-Year Retirement",
+      "months_start": 240,
+      "months_end": null,
+      "rank": "E-7 or E-8",
+      "pension_monthly_BRS": 2425,
+      "pension_monthly_legacy": 3031,
+      "healthcare": "TRICARE for life"
+    }
+  ],
+  "alternate_paths": {
+    "no_recon_infantry_only": [
+      {
+        "stage": "Boot Camp",
+        "months_start": 0,
+        "months_end": 3.25
+      },
+      {
+        "stage": "SOI IRC",
+        "months_start": 3.25,
+        "months_end": 6.75
+      },
+      {
+        "stage": "Fleet Infantry 0311",
+        "months_start": 6.75,
+        "months_end": 48
+      },
+      {
+        "stage": "Scout Sniper School (if from 03XX billet)",
+        "months_start": 36,
+        "months_end": 39
+      },
+      {
+        "stage": "Senior NCO 03XX",
+        "months_start": 48,
+        "months_end": 240
+      },
+      {
+        "stage": "20-Year Retirement",
+        "months_start": 240,
+        "months_end": null
+      }
+    ],
+    "marsoc_fail_msg_path": [
+      {
+        "stage": "Same as primary through Recon/Sniper",
+        "months_start": 0,
+        "months_end": 60
+      },
+      {
+        "stage": "MARSOC A&S \u2014 Not Selected",
+        "months_start": 60,
+        "months_end": 62
+      },
+      {
+        "stage": "MSG School (8 wks)",
+        "months_start": 62,
+        "months_end": 64
+      },
+      {
+        "stage": "MSG Post 1 (embassy)",
+        "months_start": 64,
+        "months_end": 76
+      },
+      {
+        "stage": "MSG Post 2 (embassy)",
+        "months_start": 76,
+        "months_end": 88
+      },
+      {
+        "stage": "MSG Post 3 / Det Commander",
+        "months_start": 88,
+        "months_end": 104
+      },
+      {
+        "stage": "Return to Recon/03XX \u2014 re-apply MARSOC or 20yr track",
+        "months_start": 104,
+        "months_end": 240
+      },
+      {
+        "stage": "20-Year Retirement",
+        "months_start": 240,
+        "months_end": null
+      }
+    ],
+    "marsoc_fail_di_path": [
+      {
+        "stage": "Same as primary through Recon/Sniper/MARSOC fail",
+        "months_start": 0,
+        "months_end": 62
+      },
+      {
+        "stage": "DI School (11 wks)",
+        "months_start": 62,
+        "months_end": 65
+      },
+      {
+        "stage": "DI Tour (24-36 months)",
+        "months_start": 65,
+        "months_end": 101
+      },
+      {
+        "stage": "Return to unit / re-apply MARSOC",
+        "months_start": 101,
+        "months_end": 240
+      },
+      {
+        "stage": "20-Year Retirement",
+        "months_start": 240,
+        "months_end": null
+      }
+    ]
+  },
+  "rank_promotion_milestones": [
+    {
+      "rank": "E-1 Pvt",
+      "typical_months_TIS": 0,
+      "base_pay_2026": 2216.69,
+      "automatic": true
+    },
+    {
+      "rank": "E-2 PFC",
+      "typical_months_TIS": 6,
+      "base_pay_2026": 2261.0,
+      "automatic": true,
+      "note": "6 months TIS + 4 months TIG"
+    },
+    {
+      "rank": "E-3 LCpl",
+      "typical_months_TIS": 9,
+      "base_pay_2026": 2378.0,
+      "automatic": true,
+      "note": "9 months TIS + 8 months TIG"
+    },
+    {
+      "rank": "E-4 Cpl",
+      "typical_months_TIS": 24,
+      "base_pay_2026_start": 2634.0,
+      "automatic": false,
+      "note": "Cutting score system. Competitive. Average 24 months TIS."
+    },
+    {
+      "rank": "E-5 Sgt",
+      "typical_months_TIS": 40,
+      "base_pay_2026_start": 2872.0,
+      "automatic": false,
+      "note": "Cutting score. Average 36-48 months TIS."
+    },
+    {
+      "rank": "E-6 SSgt",
+      "typical_months_TIS": 96,
+      "base_pay_2026_start": 3136.0,
+      "automatic": false,
+      "note": "Average 8-10 years TIS. SOF/Recon billet weight helps."
+    },
+    {
+      "rank": "E-7 GySgt",
+      "typical_months_TIS": 144,
+      "base_pay_2026_start": 3626.0,
+      "automatic": false,
+      "note": "Average 12-14 years TIS. SOF experience strongly supports competitive selection."
+    },
+    {
+      "rank": "E-8 MSgt/1stSgt",
+      "typical_months_TIS": 192,
+      "base_pay_2026_start": 5657.0,
+      "automatic": false,
+      "note": "Average 16-18 years TIS. Very competitive. ~5% of SSgts selected."
+    },
+    {
+      "rank": "E-9 MGySgt/SgtMaj",
+      "typical_months_TIS": 228,
+      "base_pay_2026_start": 6371.0,
+      "automatic": false,
+      "note": "< 1% of enlisted reach E-9. Exceptional performance required."
+    }
+  ]
+}
