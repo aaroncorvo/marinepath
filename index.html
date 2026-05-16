@@ -312,6 +312,7 @@ tr:hover td{background:var(--off)}
     </div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center">
+    <a href="military-career-explorer.html" target="_blank" rel="noopener" class="acct-btn" style="text-decoration:none;color:var(--gold)" title="Open the Mission Ready bonus explorer in a new tab">💰 Bonus Explorer →</a>
     <button class="acct-btn" id="acctBtn" onclick="openAcctModal()">👤 Sign In</button>
     <button class="tbtn" data-theme-toggle aria-label="Toggle theme">🌙 Theme</button>
   </div>
@@ -1310,6 +1311,8 @@ function defaultState(){
     // money — current balances
     savings:1500, tsp:0, debt:0, debt_apr:0.08, tsp_pct:5,
     roth_ira:0, taxable_invest:0,
+    // Sign-on bonus tracking (set at enlistment, paid in tranches at milestones)
+    signing_bonus_total:0, signing_bonus_paid:0, signing_bonus_key:'',
     // Sub-goals (separate accumulating buckets)
     emergency_fund:0, home_fund:0,
     // investment monthly allocations (apply in settleCashFlow)
@@ -1368,40 +1371,40 @@ const SCENES = {
     title:'Day 1 — At the Recruiter\'s Office',
     text:`Age 18. I\'m sitting across from a Marine recruiter. He has my paperwork open. The dream is <strong>Infantry → Recon → Sniper → Raider</strong>. The first decision is real: what branch and what contract?`,
     choices:[
-      {label:'Marine Corps — HZ Contract (Recon guarantee)',
-       desc:'5-year contract. Recon pipeline guaranteed. If I fail a gate I get reclassed. Starting E-1 base pay: $2,217/mo (~$2,000/mo after federal tax + FICA).',
-       tags:['ok:Guaranteed Recon shot','warn:5-yr commit'],
-       apply:g=>{g.branch='usmc';g.mos='0321 (HZ)';g.path.push('Enlisted: USMC HZ');},
+      {label:'Marine Corps — HZ Contract (Recon guarantee) · $15K bonus',
+       desc:'5-year contract. Recon pipeline guaranteed. If I fail a gate I get reclassed. Starting E-1 base pay: $2,217/mo (~$2,000/mo after federal tax + FICA). FY2026 bonus: $15K via QW (add 2 yrs to contract) — paid at SOI graduation. USMC is ONE bonus only.',
+       tags:['ok:Guaranteed Recon shot','warn:5-yr commit','ok:+$15K bonus'],
+       apply:g=>{g.branch='usmc';g.mos='0321 (HZ)';g.path.push('Enlisted: USMC HZ · $15K bonus');setEnlistmentBonus(g,'usmc_0321');},
        next:'meps'},
-      {label:'Marine Corps — UH Contract (Open Infantry, 0311)',
-       desc:'4-year contract. I become 0311 first, then volunteer for Recon laterally. More flexible, but Recon not guaranteed.',
-       tags:['info:4-yr commit','warn:Recon not guaranteed'],
-       apply:g=>{g.branch='usmc';g.mos='0311';g.path.push('Enlisted: USMC UH (0311)');},
+      {label:'Marine Corps — UH Contract (Open Infantry, 0311) · $15K bonus',
+       desc:'4-year contract. I become 0311 first, then volunteer for Recon laterally. More flexible, but Recon not guaranteed. $15K bonus paid at SOI graduation.',
+       tags:['info:4-yr commit','warn:Recon not guaranteed','ok:+$15K bonus'],
+       apply:g=>{g.branch='usmc';g.mos='0311';g.path.push('Enlisted: USMC UH (0311) · $15K bonus');setEnlistmentBonus(g,'usmc_0311');},
        next:'meps'},
-      {label:'Army — 11X with Option 40 (Ranger contract)',
-       desc:'4-year contract. RASP attempt guaranteed for 75th Ranger Regiment.',
-       tags:['info:Different branch','ok:Ranger-guaranteed'],
-       apply:g=>{g.branch='army';g.mos='11B (Option 40)';g.path.push('Enlisted: Army Option 40');},
+      {label:'Army — 11X with Option 40 (Ranger contract) · up to $50K bonus + $65K LRP',
+       desc:'4-year contract. RASP attempt guaranteed for 75th Ranger Regiment. FY2026 stack: EB $25K + Ranger Option 40 +$20K + Quick Ship +$10K = up to $50K, plus $65K LRP eligibility. Paid in tranches: $10K at boot grad, rest at first unit.',
+       tags:['info:Different branch','ok:Ranger-guaranteed','ok:+$50K + $65K LRP'],
+       apply:g=>{g.branch='army';g.mos='11B (Option 40)';g.path.push('Enlisted: Army Option 40 · $50K bonus + LRP');setEnlistmentBonus(g,'army_11b');},
        next:'meps'},
-      {label:'Army — 13F Fire Support / JTAC (Option 40 RASP2)',
-       desc:'Field Artillery Forward Observer. Embedded at platoon level with infantry/armor/cavalry. JTAC-qualified — coordinates artillery, mortars, CAS, attack aviation, naval gunfire. Ranger Regiment actively recruits 13F via Option 40 / RASP2. Strongest non-infantry SOF path.',
-       tags:['info:Different branch','ok:JTAC qual','ok:SOF-recruited','warn:Heavy academic'],
-       apply:g=>{g.branch='army';g.mos='13F (Option 40 RASP2)';g.path.push('Enlisted: Army 13F JTAC');g.has_clearance=true;},
+      {label:'Army — 13F Fire Support / JTAC (Option 40 RASP2) · $30K + $65K LRP',
+       desc:'Field Artillery Forward Observer. JTAC-qualified — coordinates artillery, mortars, CAS, attack aviation, naval gunfire. Ranger Regiment actively recruits 13F. FY2026 bonus: $20K EB + $8K college credit + Quick Ship = ~$30K, plus $65K LRP.',
+       tags:['info:Different branch','ok:JTAC qual','ok:SOF-recruited','ok:+$30K + $65K LRP'],
+       apply:g=>{g.branch='army';g.mos='13F (Option 40 RASP2)';g.path.push('Enlisted: Army 13F JTAC · $30K bonus + LRP');g.has_clearance=true;setEnlistmentBonus(g,'army_13f');},
        next:'meps'},
-      {label:'Navy — SEAL Challenge Contract (NSW)',
-       desc:'6-year contract with guaranteed BUD/S attempt. NSW prep + BUD/S (~24 wks) + SQT (~26 wks). Highest-attrition SOF pipeline (~75% drop). Pass = SEAL trident, $1,000/mo SODI.',
-       tags:['info:Navy','warn:6-yr commit','danger:~75% BUD/S drop'],
-       apply:g=>{g.branch='navy';g.mos='SO (SEAL Candidate)';g.path.push('Enlisted: Navy SEAL Challenge');},
+      {label:'Navy — SEAL Challenge Contract (NSW) · up to $140K stacked',
+       desc:'6-year contract with guaranteed BUD/S attempt. NSW prep + BUD/S (~24 wks) + SQT (~26 wks). Highest-attrition SOF pipeline (~75% drop). FY2026 stack: EBSR $15K + EBPST $15K + EBSHP $5K + LRP $65K + EBHS $5K = up to $140K. **EBSR paid AFTER SQT, not at boot.** Only ~9.5% of SEAL contracts earn a Trident.',
+       tags:['info:Navy','warn:6-yr commit','danger:~75% BUD/S drop','ok:+$35K post-SQT + LRP'],
+       apply:g=>{g.branch='navy';g.mos='SO (SEAL Candidate)';g.path.push('Enlisted: Navy SEAL Challenge · $35K post-SQT');setEnlistmentBonus(g,'navy_seal');},
        next:'meps'},
-      {label:'Air Force — Special Warfare (CCT / PJ / SR / TACP)',
-       desc:'6-year contract. AF BMT → SW prep → Zulu Course (2026 unified pipeline) → specialty school. Combat Controller, Pararescue, Special Recon, or TACP.',
-       tags:['info:Air Force','warn:6-yr commit','ok:2026 unified pipeline'],
-       apply:g=>{g.branch='air_force';g.mos='1Z (SW Candidate)';g.path.push('Enlisted: AF Special Warfare');},
+      {label:'Air Force — Special Warfare (CCT / PJ / SR / TACP) · $40K bonus',
+       desc:'6-year contract. AF BMT → SW prep → Zulu Course → specialty school. Combat Controller, Pararescue, Special Recon, or TACP. FY2026: $40K enlistment bonus paid 50% at first duty station, 50% spread. Retention SRB up to $125K for SNCOs.',
+       tags:['info:Air Force','warn:6-yr commit','ok:2026 unified pipeline','ok:+$40K bonus'],
+       apply:g=>{g.branch='air_force';g.mos='1Z (SW Candidate)';g.path.push('Enlisted: AF Special Warfare · $40K bonus');setEnlistmentBonus(g,'af_pj');},
        next:'meps'},
-      {label:'Coast Guard — Maritime Enforcement / MSRT track',
-       desc:'4-year contract. CG basic → A-school → operational tour → MSRT/TACLET/Diver tryouts. New Special Missions Command stood up Oct 2026.',
-       tags:['info:Coast Guard','ok:Domestic SOF','info:New SMC 2026'],
-       apply:g=>{g.branch='coast_guard';g.mos='ME (Maritime Enforcement)';g.path.push('Enlisted: Coast Guard ME');},
+      {label:'Coast Guard — Maritime Enforcement / MSRT track · $0 enlistment',
+       desc:'4-year contract. CG basic → A-school → operational tour → MSRT/TACLET/Diver tryouts. New Special Missions Command stood up Oct 2026. **CG MSRT has NO dedicated enlistment bonus** — internal selection 3-4 yrs after enlistment. AST (Rescue Swimmer) does have $75K critical-rating bonus.',
+       tags:['info:Coast Guard','ok:Domestic SOF','info:New SMC 2026','warn:$0 MSRT bonus'],
+       apply:g=>{g.branch='coast_guard';g.mos='ME (Maritime Enforcement)';g.path.push('Enlisted: Coast Guard ME · $0 bonus');setEnlistmentBonus(g,'cg_msrt');},
        next:'meps'},
       {label:'Marine Corps Officer — OCS / TBS (commission as 2ndLt)',
        desc:'Requires bachelor\'s degree first. ~10 weeks OCS, then 6 mo TBS. Higher starting pay (~$4,150/mo O-1), longer initial commit. Path to Infantry Officer (0302) → Reconnaissance Officer or MARSOC Special Operations Officer (0370).',
@@ -1693,6 +1696,7 @@ const SCENES = {
        apply:g=>{
          g.tis_months+=6;g.quals.push('BUD/S','SQT','Airborne','SERE');g.has_clearance=true;g.mos='SO1 (SEAL)';
          g.event={type:'win',text:'🎖 SEAL trident pinned. Reporting to a SEAL Team. +$1,000/mo SODI starts.'};
+         payBonusAt(g,'sqt_grad'); // SEAL EBSR finally lands
        },
        next:'navy_seal_team'}
     ]
@@ -1991,7 +1995,7 @@ const SCENES = {
     choices:[
       {label:'Take 10 days leave, ship to School of Infantry',
        desc:'Standard. Visit home, decompress, then report to SOI as a single Marine.',
-       apply:g=>{g.tis_months+=1;g.morale+=10;},
+       apply:g=>{g.tis_months+=1;g.morale+=10;payBonusAt(g,'boot_grad');},
        next:'soi_arrive'},
       {label:'Take leave AND spend $3k on something nice',
        desc:'Truck down payment? New phone? Expensive trip? Felt good — but is it worth it?',
@@ -2080,6 +2084,7 @@ const SCENES = {
          if(rng()<0.7){g.reputation+=10;g.path.push('SOI Honor Grad');g.event={type:'win',text:'🏅 Honor Graduate. Instructor letter in my record. Rep +10.'};}
          else {g.path.push('SOI: top performer');g.event={type:'info',text:'Top performer. Not quite honor grad — somebody else got it. Still strong.'};g.reputation+=4;}
          if(rng()<0.12){g.health='minor-injury';g.event={type:'warn',text:'Stress fracture late in IRC. Pushed through grad but my body remembers.'};g.fitness=Math.max(60,g.fitness-5);}
+         payBonusAt(g,'soi_grad');
        },
        next:'first_unit_arrive'},
       {label:'Solid middle — graduate clean',
@@ -2089,6 +2094,7 @@ const SCENES = {
          g.tis_months+=4;g.quals.push('0311 Rifleman');g.fitness=Math.min(100,g.fitness+5);
          if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI: clean graduate');
          g.event={type:'info',text:'Qualified 0311. Clean record. Auto-promote to LCpl at ~14mo TIS.'};
+         payBonusAt(g,'soi_grad');
        },
        next:'first_unit_arrive'},
       {label:'Coast — minimum effort',
@@ -2099,6 +2105,7 @@ const SCENES = {
          if(g.rank==='E-1')g.rank='E-2';g.path.push('SOI: minimum effort');
          g.reputation-=8;g.morale+=3;
          g.event={type:'warn',text:'Graduated by the skin of my teeth. Instructors noticed. Recon packet will be harder to push through.'};
+         payBonusAt(g,'soi_grad');
        },
        next:'first_unit_arrive'},
       {label:'Hurt in field — recycled',
@@ -2113,7 +2120,7 @@ const SCENES = {
     text:`I check into my first battalion. <strong>{{arrivalSituation}}</strong> My monthly base pay is {{base}}{{arrivalIncomeNote}}.`,
     choices:[
       {label:'{{arrivalCta}}',
-       apply:g=>{g.tis_months+=1;},
+       apply:g=>{g.tis_months+=1;payBonusAt(g,'first_unit');payBonusAt(g,'first_duty');},
        next:'first_paycheck'}
     ]
   },
@@ -4101,12 +4108,13 @@ async function loadGameData(){
   };
   const [pay, mos, stages, timeline, tree] = await Promise.all(files.map(n=>tryFetch(`${branchPath}/${n}.json`)));
   // Always also fetch the expanded research files so panels can show them regardless of current branch
-  const [armyCombatArms, afPj, crossBranch] = await Promise.all([
+  const [armyCombatArms, afPj, crossBranch, bonuses] = await Promise.all([
     tryFetch('data/army/combat_arms_complete.json'),
     tryFetch('data/air_force/pj_expanded.json'),
-    tryFetch('data/_shared/cross_branch_comparison.json')
+    tryFetch('data/_shared/cross_branch_comparison.json'),
+    tryFetch('data/_shared/bonuses_2026.json')
   ]);
-  DATA = { pay, mos, stages, timeline, tree, branch: G.branch, armyCombatArms, afPj, crossBranch, loaded: !!(pay||mos||stages||timeline||tree) };
+  DATA = { pay, mos, stages, timeline, tree, branch: G.branch, armyCombatArms, afPj, crossBranch, bonuses, loaded: !!(pay||mos||stages||timeline||tree) };
   // Update the save status indicator
   const status = document.getElementById('saveStatus');
   if(status && DATA.loaded){
@@ -4677,6 +4685,43 @@ function renderBudgetLiveSummary(){
       <div><strong>Home fund balance:</strong> <span style="font-family:var(--mono);color:var(--success)">${fmt(G.home_fund||0)}</span></div>
     </div>
   `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  💰  SIGN-ON BONUS — FY2026 data + milestone-based tranche payouts
+// ═══════════════════════════════════════════════════════════════════
+function setEnlistmentBonus(g, key){
+  g.signing_bonus_key = key;
+  // Look up data if loaded; fall back to a small default
+  const b = (DATA.bonuses && DATA.bonuses.bonuses && DATA.bonuses.bonuses[key]) || null;
+  if(b){
+    g.signing_bonus_total = b.max_eb || 0;
+    g._bonus_milestones = (b.payment_milestones || []).slice(); // queue copy
+  } else {
+    g.signing_bonus_total = 0;
+    g._bonus_milestones = [];
+  }
+  g.signing_bonus_paid = 0;
+}
+
+// Call this from any scene's apply when a milestone is reached
+function payBonusAt(g, milestone){
+  if(!g._bonus_milestones || !g._bonus_milestones.length) return 0;
+  let paid = 0;
+  g._bonus_milestones = g._bonus_milestones.filter(m=>{
+    if(m.milestone === milestone){
+      g.savings += m.amount;
+      g.signing_bonus_paid += m.amount;
+      paid += m.amount;
+      return false; // consumed
+    }
+    return true;
+  });
+  if(paid > 0){
+    const remaining = (g.signing_bonus_total - g.signing_bonus_paid);
+    g.event = { type:'win', text:`💰 Sign-on bonus tranche paid: <strong>${fmt(paid)}</strong> added to savings. ${remaining>0?fmt(remaining)+' still owed at later milestones.':'Full bonus now received.'}` };
+  }
+  return paid;
 }
 
 // Auto-allocate leftover unallocated cash following priority playbook:

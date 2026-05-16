@@ -18,3 +18,18 @@
   from = "/sim"
   to = "/index.html#play"
   status = 200
+
+[[redirects]]
+  from = "/careers"
+  to = "/military-career-explorer.html"
+  status = 200
+
+[[redirects]]
+  from = "/bonuses"
+  to = "/military-career-explorer.html"
+  status = 200
+
+[[redirects]]
+  from = "/explorer"
+  to = "/military-career-explorer.html"
+  status = 200
