@@ -548,6 +548,13 @@ tr:hover td{background:var(--off)}
         <div class="dash-row"><span>Monthly take-home</span><strong id="d-income">$0</strong></div>
       </div>
       <div class="dash-card">
+        <h4>💰 Sign-On Bonus</h4>
+        <div class="dash-row big pos"><span>Earned (career)</span><strong id="d-bonus-paid">$0</strong></div>
+        <div class="dash-row"><span>Pending owed</span><strong id="d-bonus-pending">—</strong></div>
+        <div class="dash-row" style="font-size:var(--text-xs);color:var(--muted)"><span>Contract</span><strong id="d-bonus-key" style="font-family:var(--mono);font-size:.7rem">—</strong></div>
+        <div class="dash-row pos" style="border-top:1px solid var(--border);padding-top:.4rem"><span>↳ If invested @ 8% to age 60</span><strong id="d-bonus-fv">—</strong></div>
+      </div>
+      <div class="dash-card">
         <h4>Life</h4>
         <div class="dash-row"><span>Marital status</span><strong id="d-marital">Single</strong></div>
         <div class="dash-row"><span>Kids</span><strong id="d-kids">0</strong></div>
@@ -684,6 +691,26 @@ tr:hover td{background:var(--off)}
 
       <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--primary) 10%,transparent);border:1px solid var(--primary);border-radius:var(--r-md);font-size:var(--text-sm)">
         <strong>Real talk:</strong> Max Roth IRA every year. The $7,000 limit in 2026 grows to $200k+ by retirement if invested at 22. Use TSP for the DoD 5% match (free money). Index funds in taxable for everything above that. Bonds for liquidity, not growth.
+      </div>
+
+      <!-- 💰 LUMP-SUM INVESTOR — for sign-on bonuses, refunds, gifts -->
+      <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid var(--gold);border-radius:var(--r-md)">
+        <h3 style="font-size:var(--text-base);color:var(--gold);margin-bottom:.4rem">💰 Lump Sum Investor</h3>
+        <p style="font-size:var(--text-xs);color:var(--muted);margin-bottom:var(--s3)">Move a one-time chunk from cash savings into investments. Use this when a <strong>sign-on bonus pays</strong>, a tax refund hits, or any windfall. Avoids letting the cash sit at 0% return.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:end">
+          <label style="font-size:var(--text-xs);color:var(--muted)">Amount $<input type="number" id="lump-amount" min="0" step="100" placeholder="5000" style="width:120px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font:inherit;font-family:var(--mono);margin-top:.2rem;display:block"></label>
+          <label style="font-size:var(--text-xs);color:var(--muted)">Send to
+            <select id="lump-target" style="padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font:inherit;margin-top:.2rem;display:block">
+              <option value="roth_ira">Roth IRA</option>
+              <option value="taxable_invest">Index funds (taxable)</option>
+              <option value="emergency_fund">Emergency fund</option>
+              <option value="home_fund">Home down-payment fund</option>
+              <option value="debt">Pay down debt</option>
+            </select>
+          </label>
+          <button onclick="investLumpSum()" style="padding:.6rem 1rem;background:var(--gold);color:#000;border:none;border-radius:var(--r-full);font-family:var(--mono);font-size:var(--text-xs);cursor:pointer;font-weight:600;height:fit-content">▶ Move Money</button>
+        </div>
+        <div id="lump-status" style="margin-top:.5rem;font-size:var(--text-xs);color:var(--muted)"></div>
       </div>
     </div>
 
@@ -3273,6 +3300,21 @@ function renderDash(){
   if(taxEl) taxEl.textContent = fmt(G.taxable_invest||0);
   if(efEl)  efEl.textContent  = fmt(G.emergency_fund||0);
   if(hfEl)  hfEl.textContent  = fmt(G.home_fund||0);
+  // Sign-on bonus card
+  const bonusPaid = G.signing_bonus_paid || 0;
+  const bonusOwed = Math.max(0, (G.signing_bonus_total||0) - bonusPaid);
+  const yrsTo60 = Math.max(0, 60 - (G.birth_date?currentAge(G):(G.age||22)));
+  const bpEl = document.getElementById('d-bonus-paid');
+  const boEl = document.getElementById('d-bonus-pending');
+  const bkEl = document.getElementById('d-bonus-key');
+  const bfvEl = document.getElementById('d-bonus-fv');
+  if(bpEl) bpEl.textContent = fmt(bonusPaid);
+  if(boEl) boEl.textContent = bonusOwed > 0 ? fmt(bonusOwed) : ((G.signing_bonus_total||0)>0?'✓ Complete':'—');
+  if(bkEl) bkEl.textContent = G.signing_bonus_key || '—';
+  if(bfvEl){
+    const fv = bonusPaid * Math.pow(1.08, yrsTo60);
+    bfvEl.textContent = bonusPaid > 0 ? fmt(fv) : '—';
+  }
   document.getElementById('d-debt').textContent = fmt(G.debt);
   document.getElementById('d-net').textContent = fmt(G.savings + G.tsp + (G.roth_ira||0) + (G.taxable_invest||0) + (G.emergency_fund||0) + (G.home_fund||0) - G.debt);
   const b = calcBudget(G);
@@ -3334,6 +3376,18 @@ function renderBudget(){
     ${b.special?`<div class="budget-row"><span>Special pays <span style="color:var(--muted);font-size:.85em">(jump/dive/SDAP · taxable)</span></span><span class="budget-amt pos">+${fmt(b.special)}</span></div>`:''}
     ${b.spouse_income?`<div class="budget-row"><span>👰 Spouse income <span style="color:var(--muted);font-size:.85em">(post-tax)</span></span><span class="budget-amt pos">+${fmt(b.spouse_income)}</span></div>`:''}
     <div class="budget-row total"><span>${b.spouse_income?'Household Gross':'Gross Income'}</span><span class="budget-amt"><strong>${fmt(b.gross + (b.spouse_income||0))}/mo</strong></span></div>
+
+    ${(G.signing_bonus_paid > 0 || G.signing_bonus_total > 0) ? `
+      <div style="margin-top:.75rem;padding:var(--s3);background:color-mix(in srgb,var(--gold) 10%,transparent);border:1px solid var(--gold);border-radius:var(--r-md);font-size:var(--text-sm)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <strong style="color:var(--gold)">💰 Sign-On Bonus (one-time)</strong>
+          <span style="font-family:var(--mono);font-size:var(--text-xs);color:var(--muted)">${G.signing_bonus_key||''}</span>
+        </div>
+        ${G.signing_bonus_paid>0?`<div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:var(--text-xs)"><span>Earned to date</span><strong style="font-family:var(--mono);color:var(--success)">+${fmt(G.signing_bonus_paid)} → savings</strong></div>`:''}
+        ${(G.signing_bonus_total - (G.signing_bonus_paid||0)) > 0 ? `<div style="display:flex;justify-content:space-between;font-size:var(--text-xs)"><span>Still owed at later milestones</span><strong style="font-family:var(--mono);color:var(--gold)">${fmt(G.signing_bonus_total - G.signing_bonus_paid)}</strong></div>`:''}
+        ${G._bonus_milestones && G._bonus_milestones.length ? `<div style="margin-top:.4rem;font-size:.7rem;color:var(--muted);font-family:var(--mono)">Next milestone: ${G._bonus_milestones[0].milestone.replace(/_/g,' ')} → ${fmt(G._bonus_milestones[0].amount)}</div>`:''}
+      </div>
+    ` : ''}
 
     <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--error);text-transform:uppercase;letter-spacing:.08em">━ Taxes & Pre-Tax Deductions ━</div>
     <div class="budget-row"><span>Federal income tax <span style="color:var(--muted);font-size:.85em">(~10% of taxable)</span></span><span class="budget-amt neg">−${fmt(b.ftax)}</span></div>
@@ -3708,7 +3762,16 @@ function renderRetirementScorecard(){
       <div class="score-card"><div class="val">${G.deployments}</div><div class="lbl">Deployments</div></div>
       <div class="score-card"><div class="val">${G.kids}</div><div class="lbl">Kids</div></div>
       <div class="score-card"><div class="val">${G.quals.length}</div><div class="lbl">Quals earned</div></div>
+      <div class="score-card"><div class="val">${fmt(G.signing_bonus_paid||0)}</div><div class="lbl">Sign-on bonus earned</div></div>
     </div>
+    ${(G.signing_bonus_paid||0)>0?`
+    <div style="margin-top:var(--s5);padding:var(--s4);background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid var(--gold);border-radius:var(--r-md)">
+      <h4 style="font-size:var(--text-base);margin-bottom:.5rem;color:var(--gold)">💰 Sign-On Bonus Recap</h4>
+      <div style="font-size:var(--text-sm);line-height:1.7">
+        <div><strong>Contract:</strong> ${G.signing_bonus_key||''} — earned <strong style="color:var(--success);font-family:var(--mono)">${fmt(G.signing_bonus_paid)}</strong> across milestones</div>
+        <div style="margin-top:.4rem;color:var(--muted);font-size:var(--text-xs)">Had I invested the full bonus at 8% from enlistment, it would have compounded to <strong style="color:var(--gold);font-family:var(--mono)">${fmt((G.signing_bonus_paid||0) * Math.pow(1.08, Math.max(0,60-(G.birth_date?currentAge(G):(G.age||22))) + (G.tis_months/12)))}</strong> by age 60. The path I picked at the recruiter mattered.</div>
+      </div>
+    </div>`:''}
     <!-- Civilian career projection card -->
     ${(()=>{ const proj = civilianCareerProjection(G); const totalAnnual = proj.salaryMid + annualPension; return `
     <div style="margin-top:var(--s5);padding:var(--s5);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md)">
@@ -4945,6 +5008,35 @@ function setStrategy(s){
   autoSave();
 }
 
+// Lump-sum move from cash savings -> chosen investment bucket
+function investLumpSum(){
+  const amt = parseFloat(document.getElementById('lump-amount').value) || 0;
+  const target = document.getElementById('lump-target').value;
+  const status = document.getElementById('lump-status');
+  if(amt < 50){ status.innerHTML = '<span style="color:var(--warn)">Enter at least $50.</span>'; return; }
+  if(amt > G.savings){ status.innerHTML = `<span style="color:var(--error)">Only ${fmt(G.savings)} available in cash savings.</span>`; return; }
+  G.savings -= amt;
+  if(target === 'debt'){
+    const reduced = Math.min(G.debt, amt);
+    G.debt -= reduced;
+    status.innerHTML = `<span style="color:var(--success)">✓ Paid down ${fmt(reduced)} of debt.</span>`;
+  } else {
+    // Roth IRA enforcement: $7k annual cap roughly = lifetime add up to remaining
+    if(target === 'roth_ira'){
+      // Allow lump up to annual cap delta; for sim purposes just add
+      G.roth_ira = (G.roth_ira||0) + amt;
+    } else {
+      G[target] = (G[target]||0) + amt;
+    }
+    status.innerHTML = `<span style="color:var(--success)">✓ Moved ${fmt(amt)} → ${target.replace(/_/g,' ')}. Compounding at strategy rate.</span>`;
+  }
+  document.getElementById('lump-amount').value = '';
+  renderInvestmentsTab();
+  if(typeof renderDash==='function') renderDash();
+  if(typeof renderBudget==='function') renderBudget();
+  autoSave();
+}
+
 /* ════════════════════════════════════════════════════════════
    💰  BONUSES TAB — FY2026 sign-on amounts + stacking strategy
    ═══════════════════════════════════════════════════════════ */
@@ -5038,6 +5130,11 @@ function renderBonusesTab(){
                   ${b.payment_milestones.map(m=>`<div style="font-size:var(--text-xs);color:var(--muted);display:flex;justify-content:space-between"><span>↳ ${m.milestone.replace(/_/g,' ')}</span><strong style="color:var(--success);font-family:var(--mono)">+${fmt(m.amount)}</strong></div>`).join('')}
                 </div>
               ` : ''}
+              ${eb > 0 ? (()=>{
+                const yrsTo60 = Math.max(0, 60 - (G.birth_date?currentAge(G):(G.age||22)));
+                const fv = eb * Math.pow(1.08, yrsTo60);
+                return `<div style="margin-top:.5rem;padding:.4rem .5rem;background:color-mix(in srgb,var(--gold) 10%,transparent);border-radius:var(--r-sm);font-size:.7rem;display:flex;justify-content:space-between"><span style="color:var(--muted)">📈 Invested @ 8% to age 60</span><strong style="font-family:var(--mono);color:var(--gold)">${fmt(fv)}</strong></div>`;
+              })() : ''}
               ${b.note ? `<div style="margin-top:.5rem;font-size:var(--text-xs);color:var(--muted);line-height:1.5;font-style:italic">${b.note}</div>` : ''}
             </div>`;
           }).join('')}
@@ -5234,8 +5331,17 @@ FINANCIAL SNAPSHOT
   TSP balance:    ${fmt(G.tsp)}
   Roth IRA:       ${fmt(G.roth_ira||0)}
   Taxable invest: ${fmt(G.taxable_invest||0)}
+  Emergency fund: ${fmt(G.emergency_fund||0)}
+  Home fund:      ${fmt(G.home_fund||0)}
   Debt:           ${fmt(G.debt)} (blended APR ~${((G.debt_apr||0.08)*100).toFixed(1)}%)
-  Net worth:      ${fmt(G.savings+G.tsp+(G.roth_ira||0)+(G.taxable_invest||0)-G.debt)}
+  Net worth:      ${fmt(G.savings+G.tsp+(G.roth_ira||0)+(G.taxable_invest||0)+(G.emergency_fund||0)+(G.home_fund||0)-G.debt)}
+
+SIGN-ON BONUS (FY2026)
+  Contract:        ${G.signing_bonus_key||'(none)'}
+  Total awarded:   ${fmt(G.signing_bonus_total||0)}
+  Earned to date:  ${fmt(G.signing_bonus_paid||0)}
+  Pending owed:    ${fmt(Math.max(0,(G.signing_bonus_total||0)-(G.signing_bonus_paid||0)))}
+  If full bonus invested @8% to age 60: ${fmt((G.signing_bonus_total||0) * Math.pow(1.08, Math.max(0,60-(G.birth_date?currentAge(G):(G.age||22)))))}
 
 INVESTMENT PLAN
   TSP contribution:    ${G.tsp_pct}% of base
