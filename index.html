@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>military-path-adventure</title>
+<title>Military Path — Career Sim</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -296,7 +296,7 @@ tr:hover td{background:var(--off)}
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="brand">
-    <div class="logo" title="Semper Fidelis">
+    <div class="logo" title="Military Path">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.6" aria-hidden="true">
         <!-- Anchor + globe + eagle wings stylized — non-official EGA-inspired mark -->
         <circle cx="12" cy="10" r="4.5" stroke="currentColor" fill="none"/>
@@ -307,8 +307,8 @@ tr:hover td{background:var(--off)}
       </svg>
     </div>
     <div>
-      <div class="site-title"><span class="scarlet">SEMPER</span> <span class="gold">FIDELIS</span> — Career Sim</div>
-      <div class="site-sub">My 20-Year Path · Infantry → Recon → Sniper → Raider → Retirement</div>
+      <div class="site-title"><span class="scarlet">MILITARY</span> <span class="gold">PATH</span> — Career Sim</div>
+      <div class="site-sub">20-Year Plan Across All Branches · USMC · Army · Navy · Air Force · Coast Guard · Officer Paths</div>
     </div>
   </div>
   <div style="display:flex;gap:.5rem;align-items:center">
@@ -1383,6 +1383,11 @@ const SCENES = {
        tags:['info:Different branch','ok:Ranger-guaranteed'],
        apply:g=>{g.branch='army';g.mos='11B (Option 40)';g.path.push('Enlisted: Army Option 40');},
        next:'meps'},
+      {label:'Army — 13F Fire Support / JTAC (Option 40 RASP2)',
+       desc:'Field Artillery Forward Observer. Embedded at platoon level with infantry/armor/cavalry. JTAC-qualified — coordinates artillery, mortars, CAS, attack aviation, naval gunfire. Ranger Regiment actively recruits 13F via Option 40 / RASP2. Strongest non-infantry SOF path.',
+       tags:['info:Different branch','ok:JTAC qual','ok:SOF-recruited','warn:Heavy academic'],
+       apply:g=>{g.branch='army';g.mos='13F (Option 40 RASP2)';g.path.push('Enlisted: Army 13F JTAC');g.has_clearance=true;},
+       next:'meps'},
       {label:'Navy — SEAL Challenge Contract (NSW)',
        desc:'6-year contract with guaranteed BUD/S attempt. NSW prep + BUD/S (~24 wks) + SQT (~26 wks). Highest-attrition SOF pipeline (~75% drop). Pass = SEAL trident, $1,000/mo SODI.',
        tags:['info:Navy','warn:6-yr commit','danger:~75% BUD/S drop'],
@@ -1770,10 +1775,10 @@ const SCENES = {
        apply:g=>{g.tis_months+=18;g.quals.push('CCT','Airborne','MFF','SERE');g.has_clearance=true;g.mos='1Z3 Combat Controller';g.event={type:'win',text:'🎖 Combat Controller qualified. Most coveted AFSWC path.'};},
        next:'afsoc_unit'},
       {label:'Pararescue (PJ) — combat search-and-rescue',
-       desc:'~2-yr pipeline: paramedic, dive, jump, SERE, mountain rescue. The "That Others May Live" mission.',
-       tags:['ok:Medical + ops','warn:Long pipeline'],
-       apply:g=>{g.tis_months+=18;g.quals.push('PJ','Airborne','MFF','SERE','Combatant Diver','EMT-P');g.has_clearance=true;g.mos='1T2 Pararescue';g.event={type:'win',text:'🎖 PJ qualified. Combat medic + jumper.'};},
-       next:'afsoc_unit'},
+       desc:'~30-mo pipeline: Combat Dive (6wk) → Airborne (3wk) → MFF (5wk) → SERE (3wk) → MP3 Paramedic (39wk · NR-P credential) → PJ Apprentice (22wk). The "That Others May Live" mission. Best civilian transition of any AFSWC path.',
+       tags:['ok:Medical + ops','ok:NR-P civilian credential','warn:Longest pipeline'],
+       apply:g=>{g.event={type:'info',text:'Selected for PJ track. ~30-month pipeline ahead. The MP3 paramedic course alone is 39 weeks — toughest enlisted training in any branch.'};},
+       next:'af_pj_dive'},
       {label:'Special Reconnaissance (SR) — intel + comms',
        desc:'~1.5-yr pipeline: linguistics, recon, jump, SERE. Renamed from SOWT in 2019.',
        tags:['ok:Tech-heavy','info:Smaller community'],
@@ -1793,6 +1798,91 @@ const SCENES = {
     choices:[
       {label:'Operate 4–5 years',
        apply:g=>{g.tis_months+=54;g.rank='E-6';g.deployments+=3;g.reputation+=12;g.morale-=6;g.savings+=22000;g.path.push('Active AFSOC operator');g.event={type:'win',text:'4-5 years operational. Made E-6. AFSOC patch on my flight suit.'};},
+       next:'mid_career_check'}
+    ]
+  },
+  // ════════ AIR FORCE PJ (PARARESCUE) PIPELINE ════════
+  'af_pj_dive':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Pipeline — Combat Dive School (6 weeks · Panama City, FL)`,
+    text:`First school post-Zulu. Open-circuit SCUBA + closed-circuit rebreather. Same pool comp as Marine Recon dive. Pool harassment phase washes the underprepared.`,
+    choices:[
+      {label:'Send it through pool comp',
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.85){g.quals.push('Combatant Diver');g.event={type:'win',text:'Combat Dive complete. Dive pay $240/mo starts.'};}
+         else {g.tis_months+=2;g.quals.push('Combatant Diver');g.event={type:'warn',text:'Recycled once at pool comp. Picked it up next class.'};}
+       },
+       next:'af_pj_air'}
+    ]
+  },
+  'af_pj_air':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Pipeline — Airborne (3 wks) + Military Free Fall (5 wks)`,
+    text:`Static-line wings at Fort Liberty, then HALO at Yuma. PJ MFF is 5 weeks vs the standard 3 — extra emphasis on combat-loaded jumps and rescue-bundle drops.`,
+    choices:[
+      {label:'Earn wings + HALO qual',
+       apply:g=>{
+         g.tis_months+=2;
+         if(rng()<0.92){g.quals.push('Airborne','MFF');g.event={type:'win',text:'Wings + HALO qualified. +$150/mo jump pay starts.'};}
+         else {g.health='minor-injury';g.fitness=Math.max(60,g.fitness-3);g.quals.push('Airborne','MFF');g.event={type:'warn',text:'Sprained ankle on a hard landing. Graduated but limped through MFF.'};}
+       },
+       next:'af_pj_sere'}
+    ]
+  },
+  'af_pj_sere':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Pipeline — SERE (3 weeks · Fairchild AFB, WA)`,
+    text:`Survival, Evasion, Resistance, Escape — Level C. Resistance phase is the hardest week of training so far. Mental toughness compounds for the long road ahead.`,
+    choices:[
+      {label:'Complete SERE',
+       apply:g=>{g.tis_months+=1;g.quals.push('SERE');g.has_clearance=true;g.morale-=8;g.event={type:'info',text:'SERE complete. Heading to the longest enlisted course in any branch: MP3 Paramedic (39 weeks).'};},
+       next:'af_pj_mp3'}
+    ]
+  },
+  'af_pj_mp3':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Pipeline — MP3 Paramedic Course (39 weeks · Kirtland AFB, NM)`,
+    text:`The defining course. <strong>39 weeks</strong> of EMT-Basic → EMT-Paramedic → Nationally Registered Paramedic (NR-P) credential. <strong>Same credential as civilian flight paramedics make $70-120K with.</strong> Hospital rotations on real patients. Combat trauma scenarios. Academic washouts here are real.`,
+    choices:[
+      {label:'Grind through 39 weeks of medical school',
+       desc:'Maximum academic effort. Pass odds high. NR-P credential is the single most valuable civilian skill the military hands out at the enlisted level.',
+       tags:['ok:NR-P credential','warn:Hardest enlisted course','ok:+Civilian salary $$$'],
+       apply:g=>{
+         g.tis_months+=10;
+         if(rng()<0.80){g.quals.push('EMT-P','NR-P');g.edu_credits+=40;g.event={type:'win',text:'🎓 Earned NR-P credential. Civilian flight paramedic value: $70-120k/yr just from this credential. +40 college credits awarded.'};}
+         else {g.tis_months+=4;g.quals.push('EMT-P','NR-P');g.edu_credits+=30;g.event={type:'warn',text:'Recycled twice on the academic side. Eventually earned NR-P. Slightly slower but graduated.'};}
+       },
+       next:'af_pj_apprentice'}
+    ]
+  },
+  'af_pj_apprentice':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Pipeline — Apprentice Course (22 weeks · Kirtland AFB)`,
+    text:`Final course before earning the Maroon Beret. Combat tactics, advanced rescue, alpine and aquatic rescue, helicopter ops. <strong>~30 months from BMT — this is the moment.</strong>`,
+    choices:[
+      {label:'Earn the Maroon Beret',
+       apply:g=>{
+         g.tis_months+=5;g.quals.push('PJ');g.mos='1T2 Pararescue';g.rank='E-4';
+         g.event={type:'win',text:'🎖 Maroon Beret pinned. MOS 1T2X1 Pararescue. ~30 months from MEPS. Now: AFSOC ST track or ACC Rescue track?'};
+       },
+       next:'afsoc_pj_track_decision'}
+    ]
+  },
+  'afsoc_pj_track_decision':{
+    stage:'AF Specialty Pipeline',
+    title:`PJ Track Decision — AFSOC Special Tactics or ACC Rescue?`,
+    text:`Two distinct operational tracks for PJs. <strong>AFSOC Special Tactics Squadron (STS)</strong>: deploys integrated with SEALs, SF, Rangers, JSOC. Highest tempo. <strong>ACC Rescue Squadron</strong>: helicopter-centric, downed-pilot recovery, disaster response, more domestic missions. Both earn full PJ pay stack.`,
+    choices:[
+      {label:'AFSOC Special Tactics Squadron — deploy with JSOC',
+       desc:'Tier-1-adjacent ops with SEALs/SF/Rangers. Highest reputation payoff. Highest body wear.',
+       tags:['ok:JSOC integration','warn:Highest tempo'],
+       apply:g=>{g.tis_months+=54;g.rank='E-6';g.deployments+=4;g.reputation+=18;g.morale-=10;g.fitness=Math.max(55,g.fitness-3);g.savings+=25000;g.path.push('PJ → AFSOC STS operator');g.event={type:'win',text:'4.5 years AFSOC STS. E-6 SSgt. Deployed with JSOC task forces. Stacked pay (~$7,000+/mo deployed). Body shows the wear.'};},
+       next:'mid_career_check'},
+      {label:'ACC Rescue Squadron — downed pilot + disaster',
+       desc:'Helo-based combat search and rescue + hurricane / wildfire / mountain rescue. Real lives saved at home + abroad. More stable home life.',
+       tags:['ok:Domestic mission','ok:Family-friendlier'],
+       apply:g=>{g.tis_months+=54;g.rank='E-6';g.deployments+=2;g.reputation+=12;g.morale-=4;g.savings+=22000;g.path.push('PJ → ACC Rescue Squadron');g.event={type:'win',text:'4.5 years ACC Rescue. E-6 SSgt. Real lives saved — downed pilots, hurricane victims, mountain climbers. Family life held up.'};},
        next:'mid_career_check'}
     ]
   },
@@ -4002,15 +4092,21 @@ async function loadGameData(){
   // Branch-aware: each branch has its own folder; fall back to Marines (data/) for files a branch doesn't have yet
   const branchMap = { usmc:'data', army:'data/army', navy:'data/navy', air_force:'data/air_force', coast_guard:'data/coast_guard' };
   const branchPath = branchMap[G.branch] || 'data';
-  const tryFetch = async (name)=>{
+  const tryFetch = async (path)=>{
     try{
-      const r = await fetch(`${branchPath}/${name}.json`, {cache:'no-cache'});
+      const r = await fetch(path, {cache:'no-cache'});
       if(!r.ok) throw new Error(r.status);
       return await r.json();
-    }catch(e){ console.warn(`Could not load ${branchPath}/${name}.json:`, e.message, '— using hardcoded fallback'); return null; }
+    }catch(e){ console.warn(`Could not load ${path}:`, e.message); return null; }
   };
-  const [pay, mos, stages, timeline, tree] = await Promise.all(files.map(tryFetch));
-  DATA = { pay, mos, stages, timeline, tree, branch: G.branch, loaded: !!(pay||mos||stages||timeline||tree) };
+  const [pay, mos, stages, timeline, tree] = await Promise.all(files.map(n=>tryFetch(`${branchPath}/${n}.json`)));
+  // Always also fetch the expanded research files so panels can show them regardless of current branch
+  const [armyCombatArms, afPj, crossBranch] = await Promise.all([
+    tryFetch('data/army/combat_arms_complete.json'),
+    tryFetch('data/air_force/pj_expanded.json'),
+    tryFetch('data/_shared/cross_branch_comparison.json')
+  ]);
+  DATA = { pay, mos, stages, timeline, tree, branch: G.branch, armyCombatArms, afPj, crossBranch, loaded: !!(pay||mos||stages||timeline||tree) };
   // Update the save status indicator
   const status = document.getElementById('saveStatus');
   if(status && DATA.loaded){
@@ -4163,11 +4259,45 @@ function renderMosFromData(){
     dynamicWrap.style.marginTop = 'var(--s5)';
     mosSection.appendChild(dynamicWrap);
   }
+  // Army Combat Arms expanded panel — appears whenever the expanded JSON is loaded
+  let armyPanel = '';
+  if(DATA.armyCombatArms && DATA.armyCombatArms.combat_arms_branches){
+    const branches = DATA.armyCombatArms.combat_arms_branches;
+    armyPanel = `
+      <div style="padding:var(--s4);background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid var(--gold);border-radius:var(--r-md);margin-bottom:var(--s4);margin-top:var(--s6);font-size:var(--text-sm)">
+        <strong>🪖 Live from /data/army/combat_arms_complete.json</strong> — Army combat arms: every 11/12/13/14/19-series + 68W + 18X + RASP.
+      </div>
+      ${Object.entries(branches).map(([cmfKey, cmf])=>{
+        if(!cmf || typeof cmf !== 'object') return '';
+        const mosList = cmf.mos_options || cmf.mos || {};
+        const rows = Object.entries(mosList).filter(([k,v])=>v && typeof v === 'object').map(([code, info])=>`
+          <tr>
+            <td>${code}</td>
+            <td>${info.title||info.name||''}</td>
+            <td>${info.asvab_line||info.asvab||info.line_score||''}</td>
+            <td>${info.osut_weeks?info.osut_weeks+' wk OSUT':(info.school_weeks?info.school_weeks+' wk':'—')}</td>
+            <td style="font-size:.85em;color:var(--muted)">${info.notes||info.description||info.summary||''}</td>
+          </tr>
+        `).join('');
+        if(!rows) return '';
+        return `<div class="card pad" style="margin-bottom:var(--s4)">
+          <h3 style="font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">${(cmf.cmf_name||cmfKey).replace(/_/g,' ')}</h3>
+          <p style="font-size:var(--text-xs);color:var(--muted);margin-bottom:.5rem">${cmf.description||cmf.overview||''}</p>
+          <div class="mos-table"><table>
+            <thead><tr><th>MOS</th><th>Title</th><th>ASVAB</th><th>School</th><th>Notes</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+        </div>`;
+      }).join('')}
+    `;
+  }
+
   dynamicWrap.innerHTML = `
     <div style="padding:var(--s4);background:color-mix(in srgb,var(--success) 10%,transparent);border:1px solid var(--success);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-sm)">
       <strong>🔄 Live from /data/mos_complete.json</strong> · Source: ${DATA.mos.source} · Updated: ${DATA.mos.last_updated}
     </div>
     ${fieldHtml}
+    ${armyPanel}
   `;
 }
 
@@ -4962,7 +5092,7 @@ SETBACKS WORKED THROUGH
 ${G.failed_stages.length?G.failed_stages.map(s=>'  • '+s).join('\n'):'  (none)'}
 
 ${'='.repeat(50)}
-Generated by Semper Fidelis Career Sim
+Generated by Military Path — Career Sim
   https://github.com/aaroncorvo/marinepath
 `;
 }
