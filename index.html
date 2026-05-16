@@ -168,6 +168,14 @@ tr:hover td{background:var(--off)}
 .tree-stage.failed::before{background:var(--error)}
 .tree-stage.failed{color:var(--error)}
 .tree-branch{margin-left:1rem;padding-left:.5rem;border-left:1px dashed var(--border);font-size:var(--text-xs);color:var(--faint);margin-bottom:.25rem;padding-top:.3rem;padding-bottom:.3rem}
+/* Decision Log */
+.dlog-wrap{margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border)}
+.dlog-item{position:relative;padding:.5rem .55rem;margin-bottom:.4rem;background:var(--surf2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:var(--r-md);font-size:var(--text-xs);transition:all .15s}
+.dlog-item:hover{border-color:var(--primary);border-left-color:var(--primary);background:color-mix(in srgb,var(--primary) 6%,var(--surf2))}
+.dlog-stage{font-family:var(--mono);font-size:.65rem;color:var(--primary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.15rem}
+.dlog-choice{color:var(--text);line-height:1.4;font-size:var(--text-xs)}
+.dlog-revert{margin-top:.4rem;padding:.25rem .5rem;border:1px solid var(--border);background:var(--bg);color:var(--muted);border-radius:var(--r-full);font-family:var(--mono);font-size:.65rem;cursor:pointer;transition:all .12s}
+.dlog-revert:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
 /* Scene area */
 .scene{padding:var(--s5);background:var(--surf);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);margin-bottom:var(--s4)}
 .scene-stage{font-family:var(--mono);font-size:var(--text-xs);color:var(--primary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
@@ -411,6 +419,7 @@ tr:hover td{background:var(--off)}
 <div id="play" class="section">
   <div class="game-controls">
     <button class="gc-btn" onclick="newGame()">🔄 New Character</button>
+    <button class="gc-btn" onclick="undoLast()" style="border-color:var(--gold);color:var(--gold)">↺ Undo Last Decision</button>
     <button class="gc-btn" onclick="saveGame()">💾 Save</button>
     <button class="gc-btn" onclick="loadGame()">📂 Load Last</button>
     <button class="gc-btn warn" onclick="resetGame()">⚠️ Reset Everything</button>
@@ -418,10 +427,11 @@ tr:hover td{background:var(--off)}
   </div>
 
   <div class="game-grid">
-    <!-- LEFT: Branching tree / progression map -->
+    <!-- LEFT: Branching tree / progression map + Decision log -->
     <div class="game-tree" id="gameTree">
       <div class="tree-label">My Journey</div>
-      <!-- populated by JS -->
+      <div id="treeStages"><!-- populated by JS --></div>
+      <div class="dlog-wrap" id="decisionLog"><!-- populated by JS --></div>
     </div>
 
     <!-- CENTER: Current scene -->
@@ -1030,6 +1040,7 @@ function defaultState(){
 }
 
 let G = defaultState();
+let G_HISTORY = []; // [{scene_id, scene_stage, scene_title, choice_idx, choice_label, state_before, timestamp}]
 
 // ── SCENES (state machine) — LINEAR STORY MODE ──
 // Each scene is a moment in time. Player advances chronologically through ~40 stages.
@@ -1100,16 +1111,75 @@ const SCENES = {
   'boot_grad':{
     stage:'Boot Camp',
     title:'EGA Ceremony — I\'m a United States Marine',
-    text:`13 weeks done. I get the Eagle, Globe, and Anchor. 10 days of leave to see family. My new base pay: <strong>{{base}}/mo</strong>. After 3 months of zero expenses, my savings: <strong>{{savings}}</strong>. No debt. No bills yet. This is the cleanest financial baseline I\'ll ever have.`,
+    text:`13 weeks done. I get the Eagle, Globe, and Anchor. 10 days of leave to see family. My new base pay: <strong>{{base}}/mo</strong>. After 3 months of zero expenses, my savings: <strong>{{savings}}</strong>. No debt. No bills yet. This is the cleanest financial baseline I\'ll ever have. <strong>Some Marines marry their partner during this leave — courthouse wedding, BAH starts immediately.</strong>`,
     choices:[
       {label:'Take 10 days leave, ship to School of Infantry',
-       desc:'Standard. Visit home, decompress, then report to SOI.',
+       desc:'Standard. Visit home, decompress, then report to SOI as a single Marine.',
        apply:g=>{g.tis_months+=1;g.morale+=10;},
        next:'soi_arrive'},
       {label:'Take leave AND spend $3k on something nice',
        desc:'Truck down payment? New phone? Expensive trip? Felt good — but is it worth it?',
        tags:['warn:-$3k savings','info:+Morale'],
        apply:g=>{g.tis_months+=1;g.savings=Math.max(0,g.savings-3000);g.morale+=15;},
+       next:'soi_arrive'},
+      {label:'Marry my partner during leave (BAH starts immediately)',
+       desc:'Common move for Marines who came in already serious. Courthouse wedding, BAH (~$1,500/mo at E-2) starts the day we sign. Spouse can move near SOI. Real responsibilities begin.',
+       tags:['info:+BAH starts','ok:+Morale','warn:New responsibilities'],
+       requires:g=>!g.married && (g.starting_relationship==='dating'||g.starting_relationship==='engaged'),
+       apply:g=>{
+         g.married=true;g.housing='off_base';g.rent_extra=300;g.tis_months+=1;g.morale+=15;
+         g.path.push('Married during post-boot leave');
+         g.event={type:'info',text:'Got married during leave. BAH starts now (~{{bah}}/mo). I\'m no longer a single Marine.'};
+       },
+       next:'kids_post_marriage'},
+      {label:'Already married — bring spouse to first duty station',
+       desc:'Skip ahead — I came in married. Spouse will join me after SOI.',
+       requires:g=>g.married,
+       apply:g=>{g.tis_months+=1;g.morale+=8;},
+       next:'kids_post_marriage'}
+    ]
+  },
+  'kids_post_marriage':{
+    stage:'Newly Married',
+    title:`Newly Married — Family Planning Conversation`,
+    text:`Married now. The kids conversation comes up early — TRICARE covers prenatal and delivery essentially free, but having a baby during pipeline training or a deployment is a real stress test. Some Marines do it. Some wait. <strong>Both are valid. What's the plan?</strong>`,
+    choices:[
+      {label:'Have kids immediately — start a family right now',
+       desc:'First kid arrives within a year. Plus side: my spouse has a built-in mission. Minus side: deployments with a newborn are punishing on both of us.',
+       tags:['info:+Kid','warn:Deployment stress','ok:TRICARE coverage'],
+       apply:g=>{g.kids+=1;g.tis_months+=10;g.morale+=8;g.event={type:'info',text:'Welcomed a kid. Childcare costs and life complexity just went up — but TRICARE covered the medical side.'};},
+       next:'housing_married_choice'},
+      {label:'Wait — first kid after first enlistment',
+       desc:'Build savings, finish first 4 years, have kids when more stable.',
+       tags:['ok:Stable timing'],
+       apply:g=>{g.tis_months+=1;},
+       next:'housing_married_choice'},
+      {label:'No kids planned — focus on career first',
+       desc:'Career-first marriage. Kids stay an open question, but not the priority right now.',
+       tags:['ok:Career focus'],
+       apply:g=>{g.tis_months+=1;g.morale+=3;},
+       next:'housing_married_choice'}
+    ]
+  },
+  'housing_married_choice':{
+    stage:'Housing',
+    title:`Where Do We Live? — Married Housing Decision`,
+    text:`As a married Marine I have three real options. <strong>BAH at my rank is ~{{bah}}/mo</strong> — that\'s the housing money the Corps pays me. The question: how do I spend it?`,
+    choices:[
+      {label:'On-base family housing (BAH paid direct)',
+       desc:'BAH goes straight to the housing office. No surprises, no utilities to track. Shorter commute, community of other Marine families, less privacy. The safe-and-stable pick.',
+       tags:['ok:Predictable','ok:Community','info:Less privacy'],
+       apply:g=>{g.housing='on_base';g.rent_extra=0;g.tis_months+=1;g.path.push('Moved into on-base family housing');},
+       next:'soi_arrive'},
+      {label:'Off-base, rent below BAH (the smart play)',
+       desc:'Rent a modest place for less than my BAH. Pocket the difference (~$200-400/mo) and invest it. Compounds over 20 years. This is rule #3 in the financial playbook.',
+       tags:['ok:Pocket BAH difference','ok:Privacy'],
+       apply:g=>{g.housing='off_base';g.rent_extra=-300;g.tis_months+=1;g.path.push('Off-base, rent < BAH');g.event={type:'win',text:'Pocketing ~$300/mo of BAH. Invested over 20 years, that\'s $200k+.'};},
+       next:'soi_arrive'},
+      {label:'Off-base, splurge — nice rental above BAH',
+       desc:'Nicer apartment or rental in a desirable area. Costs $300-600/mo above BAH out of pocket. Spouse gets the lifestyle they wanted but it eats my savings rate.',
+       tags:['warn:-$400/mo cash','info:+Morale'],
+       apply:g=>{g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.morale+=8;g.path.push('Off-base splurge');},
        next:'soi_arrive'}
     ]
   },
@@ -1973,19 +2043,19 @@ const TREE_STAGES = [
   'Mid-Career','Degree Completion','Last Tour','Civilian Transition','Retirement'
 ];
 function renderTree(){
-  const cur = SCENES[G.stage]?.stage || '—';
-  // Determine which stages have been visited based on SCENES path
-  const visitedStages = new Set();
-  const curIdx = TREE_STAGES.indexOf(cur);
-  for(let i=0;i<curIdx;i++) visitedStages.add(TREE_STAGES[i]);
-  const tree = document.getElementById('gameTree');
-  tree.innerHTML = '<div class="tree-label">My Journey</div>' + TREE_STAGES.map(s=>{
-    let cls = 'tree-stage';
-    if(visitedStages.has(s)) cls += ' done';
-    if(s===cur) cls += ' current';
-    if(G.failed_stages.some(f=>f.toLowerCase().includes(s.toLowerCase().split(' ')[0]))) cls += ' failed';
-    return `<div class="${cls}">${s}</div>`;
-  }).join('');
+  const cur = SCENES[G.stage]?.stage || (G.stage==='setup' ? 'Character Setup' : '—');
+  const visitedStages = new Set(G_HISTORY.map(h=>h.scene_stage).filter(Boolean));
+  const stagesContainer = document.getElementById('treeStages');
+  if(stagesContainer){
+    stagesContainer.innerHTML = TREE_STAGES.map(s=>{
+      let cls = 'tree-stage';
+      if(visitedStages.has(s)) cls += ' done';
+      if(s===cur) cls += ' current';
+      if(G.failed_stages.some(f=>f.toLowerCase().includes(s.toLowerCase().split(' ')[0]))) cls += ' failed';
+      return `<div class="${cls}">${s}</div>`;
+    }).join('');
+  }
+  renderDecisionLog();
 }
 
 function renderScene(){
@@ -2101,11 +2171,61 @@ function chooseChoice(i){
   const s = SCENES[G.stage];
   const c = s.choices[i];
   if(!c) return;
+  // Snapshot BEFORE applying so revert restores the pre-decision state
+  G_HISTORY.push({
+    scene_id: G.stage,
+    scene_stage: s.stage,
+    scene_title: s.title,
+    choice_idx: i,
+    choice_label: c.label,
+    state_before: JSON.parse(JSON.stringify(G)),
+    timestamp: Date.now()
+  });
   if(c.apply) c.apply(G);
   let next = c.next;
   if(typeof next==='function') next = next(G);
   if(next){ G.stage = next; }
   renderScene();
+}
+
+// ════════════════════════════════════════════════════════════
+//  ⏪  HISTORY / TIME TRAVEL — undo + revert to any past decision
+// ════════════════════════════════════════════════════════════
+function undoLast(){
+  if(G_HISTORY.length === 0){ alert('No decisions to undo.'); return; }
+  const entry = G_HISTORY.pop();
+  G = JSON.parse(JSON.stringify(entry.state_before));
+  _lastTisCheckpoint = G.tis_months;
+  renderScene();
+}
+
+function revertToDecision(idx){
+  if(idx < 0 || idx >= G_HISTORY.length) return;
+  const entry = G_HISTORY[idx];
+  const after = G_HISTORY.length - idx;
+  if(!confirm(`Revert to "${entry.scene_title}"?\n\nThis will discard ${after} decision${after===1?'':'s'} that came after it. You can then take a different path.`)) return;
+  G = JSON.parse(JSON.stringify(entry.state_before));
+  G_HISTORY = G_HISTORY.slice(0, idx);
+  _lastTisCheckpoint = G.tis_months;
+  renderScene();
+}
+
+function renderDecisionLog(){
+  const wrap = document.getElementById('decisionLog');
+  if(!wrap) return;
+  if(G_HISTORY.length === 0){
+    wrap.innerHTML = `<div class="tree-label">📜 My Decisions</div><div style="font-size:var(--text-xs);color:var(--muted);padding:.5rem;font-style:italic">No decisions yet — choices will appear here as I make them, and I can click any one to go back and change it.</div>`;
+    return;
+  }
+  const items = G_HISTORY.slice().reverse().map((h,iRev)=>{
+    const idx = G_HISTORY.length - 1 - iRev;
+    return `<div class="dlog-item" title="Click to revert to this decision">
+      <div class="dlog-stage">${h.scene_stage||''}</div>
+      <div class="dlog-choice">${h.choice_label}</div>
+      <button class="dlog-revert" onclick="revertToDecision(${idx})">↺ revert here</button>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = `<div class="tree-label">📜 My Decisions (${G_HISTORY.length})</div>${items}`;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2237,27 +2357,39 @@ function confirmCharacterSetup(){
   renderScene();
 }
 
-// ── localStorage ──
+// ── localStorage (game state + decision history) ──
 function autoSave(){
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(G)); document.getElementById('saveStatus').textContent = 'Saved • '+new Date().toLocaleTimeString(); }catch(e){}
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({game:G, history:G_HISTORY, version:2}));
+    document.getElementById('saveStatus').textContent = 'Saved • '+new Date().toLocaleTimeString();
+  }catch(e){}
 }
 function saveGame(){ autoSave(); document.getElementById('saveStatus').textContent = '💾 Saved manually • '+new Date().toLocaleTimeString(); }
 function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw){ alert('No saved game found.'); return; }
-    G = Object.assign(defaultState(), JSON.parse(raw));
+    const parsed = JSON.parse(raw);
+    if(parsed && parsed.version >= 2){
+      G = Object.assign(defaultState(), parsed.game);
+      G_HISTORY = parsed.history || [];
+    } else {
+      // legacy v1 save (raw G object)
+      G = Object.assign(defaultState(), parsed);
+      G_HISTORY = [];
+    }
     _lastTisCheckpoint = G.tis_months;
     renderScene();
   }catch(e){ alert('Save corrupted, starting fresh.'); newGame(); }
 }
 function newGame(){
   G = defaultState();
+  G_HISTORY = [];
   _lastTisCheckpoint = 0;
   renderScene();
 }
 function resetGame(){
-  if(confirm('Delete saved game and start over?')){ localStorage.removeItem(SAVE_KEY); newGame(); }
+  if(confirm('Delete saved game + all decision history. Start over?')){ localStorage.removeItem(SAVE_KEY); newGame(); }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2527,8 +2659,18 @@ function renderPayTableFromData(){
 (function initGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
-    if(raw){ G = Object.assign(defaultState(), JSON.parse(raw)); _lastTisCheckpoint = G.tis_months; }
-  }catch(e){}
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.version >= 2){
+        G = Object.assign(defaultState(), parsed.game);
+        G_HISTORY = parsed.history || [];
+      } else {
+        G = Object.assign(defaultState(), parsed);
+        G_HISTORY = [];
+      }
+      _lastTisCheckpoint = G.tis_months;
+    }
+  }catch(e){ console.warn('Save load failed, starting fresh:', e); }
   renderScene();
   // Load data after first paint so the app is interactive immediately
   loadGameData();
