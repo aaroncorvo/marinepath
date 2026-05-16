@@ -525,6 +525,14 @@ tr:hover td{background:var(--off)}
         <div class="dash-row"><span>Time in Service</span><strong id="d-tis">0 mo</strong></div>
       </div>
       <div class="dash-card">
+        <h4>📅 Calendar</h4>
+        <div class="dash-row"><span>Enlisted</span><strong id="d-enlist">—</strong></div>
+        <div class="dash-row"><span>Today</span><strong id="d-today">—</strong></div>
+        <div class="dash-row"><span>Year of service</span><strong id="d-yos">—</strong></div>
+        <div class="dash-row pos" style="border-top:1px solid var(--border);margin-top:.4rem;padding-top:.4rem"><span>20-yr retirement</span><strong id="d-retdate">—</strong></div>
+        <div class="dash-row"><span>↳ My age then</span><strong id="d-retage">—</strong></div>
+      </div>
+      <div class="dash-card">
         <h4>Money</h4>
         <div class="dash-row big pos"><span>Savings</span><strong id="d-savings">$0</strong></div>
         <div class="dash-row pos"><span>TSP / Retirement</span><strong id="d-tsp">$0</strong></div>
@@ -1178,16 +1186,41 @@ function basePay(rank, tisMonths){
   return p;
 }
 
+// ── Date helpers ──
+function parseDate(s){ if(!s) return new Date(); if(s instanceof Date) return s; return new Date(s+'T12:00:00'); }
+function addMonthsToDate(date, months){ const d = parseDate(date); d.setMonth(d.getMonth()+months); return d; }
+function formatDate(d, opts){ if(!d) return '—'; return parseDate(d).toLocaleDateString('en-US', opts||{month:'short',day:'numeric',year:'numeric'}); }
+function formatMonthYear(d){ return formatDate(d, {month:'short',year:'numeric'}); }
+function currentDate(g){ g = g||G; return g.enlistment_date ? addMonthsToDate(g.enlistment_date, g.tis_months) : new Date(); }
+function birthDateFromAge(enlistDate, age){
+  const d = parseDate(enlistDate); d.setFullYear(d.getFullYear()-age); return d.toISOString().slice(0,10);
+}
+function ageAtDate(g, date){
+  if(!g.birth_date) return g.age;
+  const b = parseDate(g.birth_date), d = parseDate(date);
+  let a = d.getFullYear() - b.getFullYear();
+  if(d.getMonth() < b.getMonth() || (d.getMonth()===b.getMonth() && d.getDate()<b.getDate())) a--;
+  return a;
+}
+function currentAge(g){ g = g||G; return ageAtDate(g, currentDate(g)); }
+function retirementDate(g){ g = g||G; return g.enlistment_date ? addMonthsToDate(g.enlistment_date, 240) : null; }
+function retirementAge(g){ g = g||G; const rd = retirementDate(g); return rd ? ageAtDate(g, rd) : null; }
+function yearsOfService(g){ g = g||G; return (g.tis_months/12); }
+
 // ── Default character ──
 function defaultState(){
+  const today = new Date().toISOString().slice(0,10);
   return {
     name:'Marine', age:18, branch:'usmc',
     player_email:'', player_name:'',
+    // Dates — calendar time tracking
+    enlistment_date: today,
+    birth_date: '',  // computed from enlistment_date - age years
     rank:'E-1', tis_months:0, stage:'setup',
     mos:'', path:[], // log of completed stages
     failed_stages:[],
     // money — current balances
-    savings:1500, tsp:0, debt:0, tsp_pct:5,
+    savings:1500, tsp:0, debt:0, debt_apr:0.08, tsp_pct:5,
     roth_ira:0, taxable_invest:0,
     // investment monthly allocations (apply in settleCashFlow)
     ira_monthly:0, taxable_monthly:0, extra_savings_monthly:0,
@@ -2113,6 +2146,11 @@ function settleCashFlow(){
   const monthly_allocated = ira_in + tax_in + sav_in;
   const remaining_after_alloc = b.net_to_savings - monthly_allocated;
 
+  // Effective debt APR — financed truck pushes blended rate higher
+  const carApr = (G.car==='financed' || G.car==='upgrade') ? 0.14 : 0;
+  const otherDebt = Math.max(0, G.debt - (G.car_value||0));
+  const blendedApr = G.debt > 0 ? (carApr * Math.min(G.car_value||0, G.debt) + (G.debt_apr||0.08) * otherDebt) / G.debt : 0;
+
   // Grow each bucket with monthly compounding for the elapsed period
   for(let i=0;i<elapsed;i++){
     // TSP: contribution + DoD 5% match (after 2yr TIS) + growth
@@ -2121,13 +2159,17 @@ function settleCashFlow(){
     G.roth_ira = ((G.roth_ira||0) + ira_in) * (1 + strat.ira/12);
     G.taxable_invest = ((G.taxable_invest||0) + tax_in) * (1 + strat.taxable/12);
     G.savings = (G.savings + remaining_after_alloc + sav_in) * (1 + strat.savings/12);
+    // Debt: accrue monthly interest, then apply any scheduled payment (car_payment) + extra paydown
+    if(G.debt > 0){
+      G.debt = G.debt * (1 + blendedApr/12);
+      const sched = (G.car_payment||0) + (G.mortgage||0);
+      const extra = Math.max(0, remaining_after_alloc*0.3);
+      G.debt = Math.max(0, G.debt - sched - extra);
+    }
   }
 
-  // debt paydown if positive cashflow remains
-  if(G.debt>0 && remaining_after_alloc>0){
-    G.debt = Math.max(0, G.debt - (remaining_after_alloc*0.3*elapsed));
-  }
-  G.age = 18 + Math.floor(G.tis_months/12);
+  // Age tracks calendar — uses birth_date if set, otherwise old TIS-based fallback
+  G.age = G.birth_date ? currentAge(G) : (18 + Math.floor(G.tis_months/12));
   _lastTisCheckpoint = G.tis_months;
 }
 
@@ -2137,8 +2179,19 @@ function fmt(n){return '$'+Math.round(n).toLocaleString();}
 function renderDash(){
   document.getElementById('d-branch').textContent = (G.branch==='army'?'Army · ':G.branch==='usmc'?'USMC · ':'') + (G.mos||'—');
   document.getElementById('d-rank').textContent = `${G.rank} (${RANK_TITLE[G.rank]||''})`;
-  document.getElementById('d-age').textContent = G.age;
+  document.getElementById('d-age').textContent = G.birth_date ? currentAge(G) : G.age;
   document.getElementById('d-tis').textContent = `${Math.floor(G.tis_months/12)}y ${G.tis_months%12}mo`;
+  // Calendar card
+  const enlistEl = document.getElementById('d-enlist');
+  const todayEl = document.getElementById('d-today');
+  const yosEl = document.getElementById('d-yos');
+  const retDateEl = document.getElementById('d-retdate');
+  const retAgeEl = document.getElementById('d-retage');
+  if(enlistEl) enlistEl.textContent = G.enlistment_date ? formatDate(G.enlistment_date) : '—';
+  if(todayEl) todayEl.textContent = G.enlistment_date ? formatDate(currentDate(G)) : '—';
+  if(yosEl) yosEl.textContent = `${yearsOfService(G).toFixed(1)} yrs`;
+  if(retDateEl) retDateEl.textContent = G.enlistment_date ? formatMonthYear(retirementDate(G)) : '—';
+  if(retAgeEl) retAgeEl.textContent = G.enlistment_date && G.birth_date ? `age ${retirementAge(G)}` : '—';
   document.getElementById('d-savings').textContent = fmt(G.savings);
   document.getElementById('d-tsp').textContent = fmt(G.tsp);
   document.getElementById('d-debt').textContent = fmt(G.debt);
@@ -2286,7 +2339,11 @@ function renderScene(){
     '{{fit}}': G.fitness,
     '{{rep}}': G.reputation,
     '{{reconpct}}': Math.round(reconChance(G)*100)+'%',
-    '{{marsocpct}}': Math.round(marsocChance(G)*100)+'%'
+    '{{marsocpct}}': Math.round(marsocChance(G)*100)+'%',
+    '{{date}}': G.enlistment_date ? formatDate(currentDate(G)) : '—',
+    '{{year}}': G.enlistment_date ? currentDate(G).getFullYear() : '—',
+    '{{retdate}}': G.enlistment_date ? formatMonthYear(retirementDate(G)) : '—',
+    '{{retage}}': G.birth_date ? retirementAge(G) : '—'
   };
   const sub = (str)=>{ if(!str) return str; let o=str; Object.entries(tokens).forEach(([k,v])=>{o=o.split(k).join(v);}); return o; };
 
@@ -2308,8 +2365,9 @@ function renderScene(){
       <div>${tags}</div>
     </button>`;
   }).join('');
+  const dateBadge = G.enlistment_date ? `<span style="float:right;font-family:var(--mono);font-size:var(--text-xs);color:var(--gold);font-weight:600">📅 ${formatDate(currentDate(G))} · age ${G.birth_date?currentAge(G):G.age} · ${yearsOfService(G).toFixed(1)}y TIS</span>` : '';
   document.getElementById('sceneCard').innerHTML = `
-    <div class="scene-stage">${s.stage}</div>
+    <div class="scene-stage">${s.stage}${dateBadge}</div>
     <div class="scene-title">${sub(s.title)}</div>
     ${eventHtml}
     <div class="scene-text">${sub(s.text)}</div>
@@ -2361,6 +2419,7 @@ function chooseChoice(i){
   const s = SCENES[G.stage];
   const c = s.choices[i];
   if(!c) return;
+  const prevBranch = G.branch;
   // Snapshot BEFORE applying so revert restores the pre-decision state
   G_HISTORY.push({
     scene_id: G.stage,
@@ -2369,12 +2428,16 @@ function chooseChoice(i){
     choice_idx: i,
     choice_label: c.label,
     state_before: JSON.parse(JSON.stringify(G)),
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    at_date: G.enlistment_date ? formatDate(currentDate(G)) : null,
+    at_age: G.birth_date ? currentAge(G) : G.age
   });
   if(c.apply) c.apply(G);
   let next = c.next;
   if(typeof next==='function') next = next(G);
   if(next){ G.stage = next; }
+  // If branch changed (player picked Army vs USMC), reload branch-aware data
+  if(prevBranch !== G.branch){ loadGameData(); }
   renderScene();
 }
 
@@ -2409,7 +2472,9 @@ function renderDecisionLog(){
   }
   const items = G_HISTORY.slice().reverse().map((h,iRev)=>{
     const idx = G_HISTORY.length - 1 - iRev;
+    const dateMeta = h.at_date ? `<div class="dlog-stage" style="color:var(--gold)">📅 ${h.at_date}${h.at_age?' · age '+h.at_age:''}</div>` : '';
     return `<div class="dlog-item" title="Click to revert to this decision">
+      ${dateMeta}
       <div class="dlog-stage">${h.scene_stage||''}</div>
       <div class="dlog-choice">${h.choice_label}</div>
       <button class="dlog-revert" onclick="revertToDecision(${idx})">↺ revert here</button>
@@ -2436,9 +2501,13 @@ function renderCharacterCreator(){
 
       <!-- Identity -->
       <div>
-        <div class="label" style="margin-bottom:.6rem">━ Identity ━</div>
-        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;font-size:var(--text-sm)">
-          <label>Age: <input type="number" id="cc-age" value="${G.age||18}" min="17" max="35" style="width:70px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+        <div class="label" style="margin-bottom:.6rem">━ Identity & Timeline ━</div>
+        <div style="display:grid;gap:.7rem;font-size:var(--text-sm)">
+          <label>Age when I enlist: <input type="number" id="cc-age" value="${G.age||18}" min="17" max="35" style="width:70px;padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem"></label>
+          <label>Enlistment date (Day 0 of my career):
+            <input type="date" id="cc-enlist" value="${G.enlistment_date || new Date().toISOString().slice(0,10)}" style="padding:.45rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;color:var(--text);font:inherit;margin-left:.3rem">
+          </label>
+          <div id="cc-date-preview" style="padding:.6rem .8rem;background:var(--surf2);border:1px solid var(--border);border-radius:.4rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--muted)"></div>
         </div>
       </div>
 
@@ -2512,13 +2581,40 @@ function renderCharacterCreator(){
   };
   document.querySelectorAll('input[name="cc-car"]').forEach(r=>r.addEventListener('change',updateCarDetails));
   updateCarDetails();
+
+  // Live date preview — shows boot camp, MOS school, 4-yr mark, 20-yr retirement dates
+  const updateDatePreview = ()=>{
+    const enlist = document.getElementById('cc-enlist').value;
+    const age = parseInt(document.getElementById('cc-age').value)||18;
+    if(!enlist){ document.getElementById('cc-date-preview').textContent = ''; return; }
+    const bootStart = addMonthsToDate(enlist, 1);
+    const bootEnd = addMonthsToDate(enlist, 4);
+    const soiEnd = addMonthsToDate(enlist, 7);
+    const yr4 = addMonthsToDate(enlist, 48);
+    const yr20 = addMonthsToDate(enlist, 240);
+    const retAge = age + 20;
+    document.getElementById('cc-date-preview').innerHTML = `
+      Enlist: ${formatDate(enlist)} (age ${age}) →
+      Boot Camp: ${formatMonthYear(bootStart)}–${formatMonthYear(bootEnd)} →
+      Out of SOI: ${formatMonthYear(soiEnd)} →
+      End of 1st enlistment: ${formatMonthYear(yr4)} (age ${age+4}) →
+      <strong>20-yr retirement: ${formatMonthYear(yr20)} (age ${retAge})</strong>
+    `;
+  };
+  document.getElementById('cc-enlist').addEventListener('input', updateDatePreview);
+  document.getElementById('cc-age').addEventListener('input', updateDatePreview);
+  updateDatePreview();
 }
 
 function confirmCharacterSetup(){
   const val = (id, fallback=0)=>{ const v = parseInt(document.getElementById(id).value); return isNaN(v) ? fallback : v; };
   G.age = val('cc-age',18);
+  G.enlistment_date = document.getElementById('cc-enlist').value || new Date().toISOString().slice(0,10);
+  G.birth_date = birthDateFromAge(G.enlistment_date, G.age);
   G.savings = val('cc-savings',1500);
   G.debt = val('cc-debt',0);
+  // Set blended debt APR if they have starting debt (mix of student loans + credit card)
+  if(G.debt > 0) G.debt_apr = 0.08; // 8% blended (6% loans + 22% CC weighted)
   G.edu_credits = val('cc-credits',0);
   G.kids = val('cc-kids',0);
   G.pets = val('cc-pets',0);
@@ -2590,15 +2686,17 @@ let DATA = { pay:null, mos:null, stages:null, timeline:null, tree:null, loaded:f
 
 async function loadGameData(){
   const files = ['pay_2026','mos_complete','career_stages','timeline','decision_tree'];
+  // Branch-aware: Army players get data/army/*.json, everyone else data/*.json (Marines)
+  const branchPath = (G.branch === 'army') ? 'data/army' : 'data';
   const tryFetch = async (name)=>{
     try{
-      const r = await fetch(`data/${name}.json`, {cache:'no-cache'});
+      const r = await fetch(`${branchPath}/${name}.json`, {cache:'no-cache'});
       if(!r.ok) throw new Error(r.status);
       return await r.json();
-    }catch(e){ console.warn(`Could not load data/${name}.json:`, e.message, '— using hardcoded fallback'); return null; }
+    }catch(e){ console.warn(`Could not load ${branchPath}/${name}.json:`, e.message, '— using hardcoded fallback'); return null; }
   };
   const [pay, mos, stages, timeline, tree] = await Promise.all(files.map(tryFetch));
-  DATA = { pay, mos, stages, timeline, tree, loaded: !!(pay||mos||stages||timeline||tree) };
+  DATA = { pay, mos, stages, timeline, tree, branch: G.branch, loaded: !!(pay||mos||stages||timeline||tree) };
   // Update the save status indicator
   const status = document.getElementById('saveStatus');
   if(status && DATA.loaded){
@@ -3089,17 +3187,29 @@ function buildReport(){
   const b = calcBudget(G);
   const p = projectToAge60();
   const visited = [...new Set(G_HISTORY.map(h=>h.scene_stage).filter(Boolean))];
-  const decisions = G_HISTORY.map((h,i)=>`  ${i+1}. [${h.scene_stage}] ${h.choice_label}`).join('\n');
-  return `MARINE CAREER SIM — PATH REPORT
+  const decisions = G_HISTORY.map((h,i)=>{
+    const dt = h.at_date ? ` ${h.at_date}` : '';
+    const ag = h.at_age ? ` (age ${h.at_age})` : '';
+    return `  ${i+1}.${dt}${ag} [${h.scene_stage}] ${h.choice_label}`;
+  }).join('\n');
+  const branch = G.branch==='army' ? 'US ARMY' : 'US MARINE CORPS';
+  return `${branch} CAREER SIM — PATH REPORT
 ${'='.repeat(50)}
 
 PLAYER
   Name:           ${G.player_name||'(not set)'}
   Email:          ${G.player_email||'(not set)'}
-  Saved:          ${new Date().toLocaleString()}
+  Report saved:   ${new Date().toLocaleString()}
+
+TIMELINE
+  Born:           ${G.birth_date?formatDate(G.birth_date):'(not set)'}
+  Enlisted:       ${G.enlistment_date?formatDate(G.enlistment_date):'(not set)'} (age ${G.age||'?'})
+  Today (in sim): ${G.enlistment_date?formatDate(currentDate(G)):'—'}
+  Years served:   ${yearsOfService(G).toFixed(1)} years
+  20-yr retire:   ${G.enlistment_date?formatMonthYear(retirementDate(G)):'—'} at age ${G.birth_date?retirementAge(G):'?'}
 
 CURRENT STATE
-  Age:            ${G.age}
+  Age:            ${G.birth_date?currentAge(G):G.age}
   Rank:           ${G.rank} (${RANK_TITLE[G.rank]||''})
   Time in service:${(G.tis_months/12).toFixed(1)} years
   MOS:            ${G.mos||'—'}
@@ -3108,6 +3218,7 @@ CURRENT STATE
 FINANCIAL SNAPSHOT
   Base pay:       ${fmt(b.bp)}/mo
   Gross pay:      ${fmt(b.gross)}/mo
+  Federal tax:    ${fmt(b.ftax)}/mo · FICA: ${fmt(b.fica)}/mo · State: ${fmt(b.stax)}/mo
   Net take-home:  ${fmt(b.net)}/mo
   Total bills:    ${fmt(b.total_bills)}/mo
   Savings rate:   ${b.gross>0?Math.round((b.net_to_savings/b.gross)*100):0}%
@@ -3116,7 +3227,7 @@ FINANCIAL SNAPSHOT
   TSP balance:    ${fmt(G.tsp)}
   Roth IRA:       ${fmt(G.roth_ira||0)}
   Taxable invest: ${fmt(G.taxable_invest||0)}
-  Debt:           ${fmt(G.debt)}
+  Debt:           ${fmt(G.debt)} (blended APR ~${((G.debt_apr||0.08)*100).toFixed(1)}%)
   Net worth:      ${fmt(G.savings+G.tsp+(G.roth_ira||0)+(G.taxable_invest||0)-G.debt)}
 
 INVESTMENT PLAN
