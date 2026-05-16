@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0d0c08"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Military Path"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='monospace' font-size='40' font-weight='bold' fill='%23e9b434'%3EMP%3C/text%3E%3C/svg%3E"/>
 <title>Military Path — Career Sim</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,10 +289,85 @@ tr:hover td{background:var(--off)}
 .budget-amt{font-family:var(--mono);text-align:right}
 .budget-amt.pos{color:var(--success)}
 .budget-amt.neg{color:var(--error)}
+/* ─── MOBILE FAB BUTTONS ─── */
+.mobile-fab{display:none;position:fixed;bottom:1rem;z-index:999;width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:2px solid var(--gold);box-shadow:0 4px 16px rgba(0,0,0,.4);align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;line-height:1}
+.mobile-fab.path{left:1rem}
+.mobile-fab.stats{right:1rem}
+.mobile-fab:active{transform:scale(.92)}
+.mobile-fab.has-alert::after{content:'';position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--surf)}
+.mobile-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998}
+.mobile-backdrop.open{display:block}
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:1100px){.game-grid{grid-template-columns:1fr}.game-tree,.dash{position:static;max-height:none}}
 @media(max-width:900px){.hero-grid,.two-col,.three-col,.aside-main{grid-template-columns:1fr}.timeline{padding:var(--s5) var(--s4) var(--s5) 3rem}.timeline::before{left:16px}.tnode::before{left:-1.8rem}}
-@media(max-width:600px){.tabs{gap:.25rem}.tab{padding:.5rem .75rem;font-size:.75rem}.topbar{flex-wrap:wrap}}
+@media(max-width:768px){
+  /* Tighter padding everywhere */
+  .app{padding:var(--s3)}
+  .pad{padding:var(--s4)}
+  .pad-sm{padding:var(--s3)}
+  /* Topbar compacts: hide subtitle, smaller logo, single row */
+  .topbar{padding-bottom:var(--s3);margin-bottom:var(--s4)}
+  .site-title{font-size:var(--text-base)}
+  .site-sub{display:none}
+  .logo{width:36px;height:36px}
+  /* Bottom padding so FABs don't cover content */
+  main, body{padding-bottom:6rem}
+  /* Game grid: hide tree and dash by default; surface via FABs */
+  .game-grid{grid-template-columns:1fr;gap:var(--s3)}
+  .game-tree{
+    position:fixed;top:0;left:0;bottom:0;width:85vw;max-width:340px;max-height:100vh;
+    z-index:1000;background:var(--surf);border-right:2px solid var(--gold);
+    border-radius:0 var(--r-xl) var(--r-xl) 0;padding:var(--s4) var(--s4) 6rem;
+    transform:translateX(-105%);transition:transform .3s ease;overflow-y:auto;box-shadow:6px 0 20px rgba(0,0,0,.4)
+  }
+  .game-tree.mobile-open{transform:translateX(0)}
+  .dash{
+    position:fixed;left:0;right:0;bottom:0;max-height:85vh;
+    z-index:1000;background:var(--surf);border-top:2px solid var(--gold);
+    border-radius:var(--r-xl) var(--r-xl) 0 0;padding:var(--s4) var(--s4) 6rem;
+    transform:translateY(105%);transition:transform .3s ease;overflow-y:auto;box-shadow:0 -6px 20px rgba(0,0,0,.4);
+    display:grid;gap:var(--s3)
+  }
+  .dash.mobile-open{transform:translateY(0)}
+  /* Drag handle indicator on mobile dash */
+  .dash::before{content:'';display:block;width:40px;height:4px;background:var(--gold);border-radius:2px;margin:0 auto var(--s3);opacity:.6}
+  /* FABs visible only on mobile */
+  .mobile-fab{display:flex}
+  /* All multi-col grids stack on mobile */
+  .three-col, .two-col, .invest-grid, .game-grid, .cc-grid, .edu-cards, .score-grid{grid-template-columns:1fr!important}
+  /* Tabs full-bleed scroll */
+  .tabs{gap:.25rem;margin-bottom:var(--s4);padding:.15rem;margin-left:calc(-1*var(--s3));margin-right:calc(-1*var(--s3));padding-left:var(--s3);padding-right:var(--s3)}
+  .tab{padding:.55rem .85rem;font-size:.75rem;min-height:44px;white-space:nowrap}
+  /* Scene + budget rows tighten */
+  .scene{padding:var(--s4)}
+  .scene-title{font-size:var(--text-lg)}
+  .budget-row{font-size:var(--text-xs);grid-template-columns:1.4fr 1fr}
+  /* Tap targets — minimum 44px height on actionable elements */
+  button, .choice, .gc-btn, .tbtn, .acct-btn, .chk{min-height:44px}
+  /* Modal full-bleed */
+  .modal{max-width:100%;border-radius:var(--r-xl) var(--r-xl) 0 0;margin:auto var(--s2)}
+  /* Decision log compact */
+  .dlog-item{padding:.45rem .5rem}
+  .dlog-choice{font-size:.7rem}
+  /* Game controls wrap nicely */
+  .game-controls{flex-direction:column;align-items:stretch}
+  .game-controls .gc-btn{width:100%;text-align:left}
+  /* MOS table goes scrollable */
+  .mos-table{margin-left:calc(-1*var(--s3));margin-right:calc(-1*var(--s3))}
+  .mos-table table{font-size:.75rem}
+  /* Hero compact */
+  h1{font-size:var(--text-xl)}
+  .hero-desc{font-size:var(--text-sm)}
+  /* Topbar account/theme row */
+  .topbar{flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .scene-stage span[style*="float:right"]{display:block;float:none!important;margin-top:.3rem}
+  .alloc-row{grid-template-columns:1fr!important;gap:.3rem}
+  .alloc-input{width:100%!important}
+  .strategy-grid{grid-template-columns:1fr!important}
+}
 </style>
 <!-- Netlify Identity widget — gracefully no-op if Identity is not enabled in Netlify dashboard -->
 <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer></script>
@@ -518,8 +600,8 @@ tr:hover td{background:var(--off)}
       </div>
     </div>
 
-    <!-- RIGHT: Live stats dashboard -->
-    <div class="dash">
+    <!-- RIGHT: Live stats dashboard (slides up from bottom on mobile) -->
+    <div class="dash" id="dashRail">
       <div class="dash-card">
         <h4>Identity</h4>
         <div class="dash-row"><span>Branch / MOS</span><strong id="d-branch">—</strong></div>
@@ -1251,6 +1333,11 @@ tr:hover td{background:var(--off)}
 
 </div><!-- end .app -->
 
+<!-- Mobile floating action buttons + backdrop — only visible on small screens -->
+<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobilePanels()"></div>
+<button class="mobile-fab path" onclick="toggleMobilePanel('gameTree')" aria-label="Open my path">📍</button>
+<button class="mobile-fab stats" onclick="toggleMobilePanel('dashRail')" aria-label="Open stats">📊</button>
+
 <script>
 // ── Scenarios ──
 const scenarios = {
@@ -1273,6 +1360,31 @@ function showSection(id,btn){
   btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// ── Mobile panel toggle (tree + dashboard slide in) ──
+function toggleMobilePanel(id){
+  const el = document.getElementById(id);
+  const backdrop = document.getElementById('mobileBackdrop');
+  if(!el) return;
+  const isOpen = el.classList.contains('mobile-open');
+  // Close any other open panel first
+  document.querySelectorAll('.mobile-open').forEach(p=>p.classList.remove('mobile-open'));
+  if(!isOpen){
+    el.classList.add('mobile-open');
+    backdrop && backdrop.classList.add('open');
+  } else {
+    backdrop && backdrop.classList.remove('open');
+  }
+}
+function closeMobilePanels(){
+  document.querySelectorAll('.mobile-open').forEach(p=>p.classList.remove('mobile-open'));
+  const backdrop = document.getElementById('mobileBackdrop');
+  if(backdrop) backdrop.classList.remove('open');
+}
+// Close panels when player taps a scene choice
+document.addEventListener('click', e=>{
+  if(e.target.closest('.choice') || e.target.closest('.tab')) closeMobilePanels();
+});
 
 // ── Theme ──
 (function(){
