@@ -2,7 +2,29 @@
 
 This directory holds the structured data files that drive the interactive simulator in `/index.html`. Each file is plain JSON — no build step required.
 
-## Files (target structure)
+## Structure
+
+```
+data/
+├── README.md             ← you are here
+├── *.json                ← Marines (default branch; loaded by the sim today)
+└── army/                 ← Army research data (parallel structure)
+    ├── README.md
+    ├── pay_2026.json
+    ├── mos_complete.json
+    ├── career_stages.json
+    ├── timeline.json
+    └── decision_tree.json
+```
+
+The Marines files at the root of `/data/` are the live data the simulator currently consumes. The `army/` subfolder holds parallel research files for when the simulator adds Army-track parity. To wire Army support, swap the fetch path based on `G.branch`:
+
+```js
+const branch = G.branch === 'army' ? 'army/' : '';
+fetch(`data/${branch}pay_2026.json`)
+```
+
+## Marines files (target structure)
 
 | File | Purpose | Status |
 |------|---------|--------|

@@ -22,12 +22,13 @@ jobs:
         with:
           node-version: "20"
 
-      # ── JSON syntax + required-key checks ──
-      - name: Validate JSON files in /data
+      # ── JSON syntax + required-key checks (all branches) ──
+      - name: Validate JSON files in /data (Marines + Army)
         run: |
           set -e
           fail=0
-          for f in data/*.json; do
+          for f in data/*.json data/army/*.json; do
+            [ -f "$f" ] || continue
             if ! python3 -c "import json; json.load(open('$f'))" 2>/tmp/jsonerr; then
               echo "::error file=$f::Invalid JSON — $(cat /tmp/jsonerr)"
               fail=1
