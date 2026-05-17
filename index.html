@@ -1516,6 +1516,7 @@ function defaultState(){
     car:'none', // none | used_cash | financed | upgrade
     car_payment:0, car_value:0, mortgage:0,
     rent_extra:0, // extra paid above BAH for off-base
+    tenant_extra:0, // utilities + internet + renter's insurance when housing='off_base' (on-base covers these)
     homeowner_extra:0, // utilities + maintenance reserve + HOA on top of mortgage when housing='own'
     // starting-life flags (set by character creator)
     had_starting_car:false, starting_relationship:'single',
@@ -2206,7 +2207,7 @@ const SCENES = {
        tags:['info:+BAH starts','ok:+Morale','warn:New responsibilities'],
        requires:g=>!g.married && (g.starting_relationship==='dating'||g.starting_relationship==='engaged'),
        apply:g=>{
-         g.married=true;g.housing='off_base';g.rent_extra=300;g.tis_months+=1;g.morale+=15;
+         g.married=true;g.housing='off_base';g.rent_extra=300;g.tenant_extra=265;g.tis_months+=1;g.morale+=15;
          g.path.push('Married during post-boot leave');
          g.event={type:'info',text:'Got married during leave. BAH starts now (~{{bah}}/mo). I\'m no longer a single Marine.'};
        },
@@ -2254,17 +2255,17 @@ const SCENES = {
       {label:'On-base family housing (BAH paid direct)',
        desc:'BAH goes straight to the housing office. No surprises, no utilities to track. Shorter commute, community of other Marine families, less privacy. The safe-and-stable pick.',
        tags:['ok:Predictable','ok:Community','info:Less privacy'],
-       apply:g=>{g.housing='on_base';g.rent_extra=0;g.tis_months+=1;g.path.push('Moved into on-base family housing');},
+       apply:g=>{g.housing='on_base';g.rent_extra=0;g.tenant_extra=0;g.tis_months+=1;g.path.push('Moved into on-base family housing');g.event={type:'win',text:'On-base family housing. BAH paid direct to housing office, utilities included, maintenance handled. Zero out-of-pocket beyond BAH.'};},
        next:'soi_arrive'},
       {label:'Off-base, rent below BAH (the smart play)',
        desc:'Rent a modest place for less than my BAH. Pocket the difference (~$200-400/mo) and invest it. Compounds over 20 years. This is rule #3 in the financial playbook.',
        tags:['ok:Pocket BAH difference','ok:Privacy'],
-       apply:g=>{g.housing='off_base';g.rent_extra=-300;g.tis_months+=1;g.path.push('Off-base, rent < BAH');g.event={type:'win',text:'Pocketing ~$300/mo of BAH. Invested over 20 years, that\'s $200k+.'};},
+       apply:g=>{g.housing='off_base';g.rent_extra=-300;g.tenant_extra=265;g.tis_months+=1;g.path.push('Off-base, rent < BAH');g.event={type:'win',text:'Pocketing ~$300/mo of BAH on rent, but +$265/mo utilities/internet/renter\'s insurance. Net pocket: ~$35/mo. Still ~$120k over 20 yrs invested.'};},
        next:'soi_arrive'},
       {label:'Off-base, splurge — nice rental above BAH',
        desc:'Nicer apartment or rental in a desirable area. Costs $300-600/mo above BAH out of pocket. Spouse gets the lifestyle they wanted but it eats my savings rate.',
        tags:['warn:-$400/mo cash','info:+Morale'],
-       apply:g=>{g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.morale+=8;g.path.push('Off-base splurge');},
+       apply:g=>{g.housing='off_base';g.rent_extra=400;g.tenant_extra=300;g.tis_months+=1;g.morale+=8;g.path.push('Off-base splurge');g.event={type:'info',text:'Nicer place: $400 above BAH + $300 utilities/internet/renter\'s insurance = $700/mo over what on-base would cost.'};},
        next:'soi_arrive'}
     ]
   },
@@ -2823,13 +2824,13 @@ const SCENES = {
        desc:'BAH added (~{{bah}}/mo). $1,800/mo rental + utilities. Spouse may or may not work.',
        tags:['info:+BAH','warn:New expenses'],
        requires:g=>!g.married,
-       apply:g=>{g.married=true;g.housing='off_base';g.rent_extra=400;g.tis_months+=1;g.event={type:'info',text:'Got married. BAH starts (~{{bah}}/mo). Rent + utilities ~$2,200/mo. Net is positive but smaller than people think.'};},
+       apply:g=>{g.married=true;g.housing='off_base';g.rent_extra=400;g.tenant_extra=275;g.tis_months+=1;g.event={type:'info',text:'Got married. BAH starts (~{{bah}}/mo). Rent above BAH + $275 utilities/internet/renter\'s insurance. Net is positive but smaller than people think — off-base costs more than just rent.'};},
        next:'spouse_profile'},
       {label:'Get married, take on-base family housing',
        desc:'BAH paid directly to housing office. No surprises. Less privacy.',
        tags:['ok:Predictable cost'],
        requires:g=>!g.married,
-       apply:g=>{g.married=true;g.housing='on_base';g.tis_months+=1;g.event={type:'info',text:'Got married. On-base housing. BAH covers it 1:1. Predictable.'};},
+       apply:g=>{g.married=true;g.housing='on_base';g.rent_extra=0;g.tenant_extra=0;g.tis_months+=1;g.event={type:'info',text:'Got married. On-base housing. BAH covers it 1:1. Utilities included. Most predictable + cheapest path.'};},
        next:'spouse_profile'},
       {label:'Stay single — focus on MARSOC',
        desc:'Recon→MARSOC tempo punishes relationships. Consider marriage post-ITC.',
@@ -2885,7 +2886,7 @@ const SCENES = {
       {label:'Buy with VA loan ($0 down, $350k home)',
        desc:'$2,400 mortgage + ~$450/mo utilities/maintenance/HOA = $2,850 all-in. Mortgage replaces rent. Build equity. Tax deduction.',
        tags:['ok:Build equity','warn:+$350k debt'],
-       apply:g=>{g.housing='own';g.mortgage=2400;g.homeowner_extra=450;g.debt+=350000;g.rent_extra=0;g.path.push('Bought first home (VA)');g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down. $2,400 PITI + $450 utilities/maintenance = $2,850/mo all-in. BAH covers most.'};},
+       apply:g=>{g.housing='own';g.mortgage=2400;g.homeowner_extra=450;g.debt+=350000;g.rent_extra=0;g.tenant_extra=0;g.path.push('Bought first home (VA)');g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down. $2,400 PITI + $450 utilities/maintenance = $2,850/mo all-in. BAH covers most.'};},
        next:'sniper_or_promo'},
       {label:'Keep renting — buy later when more stable',
        desc:'Less risk if I PCS soon.',
@@ -3212,13 +3213,13 @@ const SCENES = {
        desc:'$0 down. $2,500/mo PITI + ~$500/mo utilities/maintenance/HOA = $3,000 all-in. ~$15K closing costs from savings.',
        tags:['ok:Build equity','warn:+$380K mortgage','warn:$3K/mo all-in'],
        requires:g=>g.savings>=15000,
-       apply:g=>{g.housing='own';g.mortgage=2500;g.homeowner_extra=500;g.debt+=380000;g.savings-=15000;g.rent_extra=0;g.path.push('Bought house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down VA loan. Total housing: $2,500 mortgage + $500 utilities/maintenance/HOA = $3,000/mo.'};},
+       apply:g=>{g.housing='own';g.mortgage=2500;g.homeowner_extra=500;g.debt+=380000;g.savings-=15000;g.rent_extra=0;g.tenant_extra=0;g.path.push('Bought house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down VA loan. Total housing: $2,500 mortgage + $500 utilities/maintenance/HOA = $3,000/mo.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Buy a $480K bigger house — stretch a little',
        desc:'$3,100/mo PITI + ~$650/mo utilities/maintenance/HOA = ~$3,750 all-in. Nicer neighborhood, room to grow into. Tighter budget — only good if my spouse income is solid.',
        tags:['warn:$3,750/mo all-in','info:Room to grow'],
        requires:g=>g.savings>=22000,
-       apply:g=>{g.housing='own';g.mortgage=3100;g.homeowner_extra=650;g.debt+=480000;g.savings-=22000;g.rent_extra=0;g.path.push('Bought $480K house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on a bigger house. $3,100 mortgage + $650 utilities/maintenance = $3,750/mo all-in. Spouse income carrying it.'};},
+       apply:g=>{g.housing='own';g.mortgage=3100;g.homeowner_extra=650;g.debt+=480000;g.savings-=22000;g.rent_extra=0;g.tenant_extra=0;g.path.push('Bought $480K house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on a bigger house. $3,100 mortgage + $650 utilities/maintenance = $3,750/mo all-in. Spouse income carrying it.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Keep renting — building home fund instead',
        desc:'Wait for the right station and price. Bump home fund contribution. No mortgage debt.',
@@ -3242,7 +3243,7 @@ const SCENES = {
        desc:'Off-base housing, top-ranked public school. May pay extra rent above BAH. Worth it for kid academics.',
        tags:['ok:Top public','warn:Higher rent'],
        requires:g=>g.housing!=='own',
-       apply:g=>{g.housing='off_base';g.rent_extra=(g.rent_extra||0)+400;g.tis_months+=2;g.event={type:'info',text:'Moved into top school district. +$400/mo rent. Worth it for the kid.'};},
+       apply:g=>{g.housing='off_base';g.rent_extra=(g.rent_extra||0)+400;g.tenant_extra=Math.max(g.tenant_extra||0, 285);g.tis_months+=2;g.event={type:'info',text:'Moved into top school district. +$400 rent + $285 utilities/internet/insurance. Worth it for the kid academically.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Private school — $15K/yr per kid',
        desc:'Best academics + smaller classes. ~$1,250/mo per kid. Real money but lifetime advantage.',
@@ -3449,7 +3450,7 @@ function calcBudget(g){
   let housing_cost = 0;
   if(g.housing==='barracks') housing_cost = 0;
   else if(g.housing==='on_base') housing_cost = bah;
-  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
+  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra + (g.tenant_extra||0);
   else if(g.housing==='own') housing_cost = g.mortgage + (g.homeowner_extra||0);
   // Customizable bill categories (override default if user has set one)
   const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
@@ -3678,6 +3679,14 @@ function renderBudget(){
       </div>
       <div class="budget-row" style="font-size:.8rem;color:var(--muted);padding:.15rem var(--s2);margin-bottom:.3rem">
         <span>  ↳ utilities + maintenance + HOA</span><span class="budget-amt neg" style="opacity:.7">−${fmt(G.homeowner_extra||0)}</span>
+      </div>
+    `:''}
+    ${G.housing==='off_base' && (G.tenant_extra||0)>0 ? `
+      <div class="budget-row" style="font-size:.8rem;color:var(--muted);padding:.15rem var(--s2);margin-top:-.3rem">
+        <span>  ↳ rent (BAH ${G.rent_extra>=0?'+ '+fmt(G.rent_extra):'− '+fmt(Math.abs(G.rent_extra||0))} above/below)</span><span class="budget-amt neg" style="opacity:.7">−${fmt((b.bah||0) + (G.rent_extra||0))}</span>
+      </div>
+      <div class="budget-row" style="font-size:.8rem;color:var(--muted);padding:.15rem var(--s2);margin-bottom:.3rem">
+        <span>  ↳ utilities + internet + renter's insurance</span><span class="budget-amt neg" style="opacity:.7">−${fmt(G.tenant_extra||0)}</span>
       </div>
     `:''}
     ${G.car!=='none' ? `
@@ -4402,7 +4411,7 @@ function confirmCharacterSetup(){
   const rel = document.getElementById('cc-rel').value;
   G.starting_relationship = rel;
   G.married = (rel==='married');
-  if(G.married){ G.housing = 'off_base'; G.rent_extra = 400; }
+  if(G.married){ G.housing = 'off_base'; G.rent_extra = 400; G.tenant_extra = 275; }
   const car = (document.querySelector('input[name="cc-car"]:checked')||{}).value || 'none';
   if(car==='owned'){
     G.car = 'used_cash'; G.car_value = 8000; G.car_payment = 0; G.had_starting_car = true;
@@ -4686,7 +4695,7 @@ calcBudget = function(g){
   let housing_cost = 0;
   if(g.housing==='barracks') housing_cost = 0;
   else if(g.housing==='on_base') housing_cost = bah;
-  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
+  else if(g.housing==='off_base') housing_cost = bah + g.rent_extra + (g.tenant_extra||0);
   else if(g.housing==='own') housing_cost = g.mortgage + (g.homeowner_extra||0);
   const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
   const groceries     = _bill('groceries');
