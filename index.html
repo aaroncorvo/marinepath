@@ -289,6 +289,23 @@ tr:hover td{background:var(--off)}
 .budget-amt{font-family:var(--mono);text-align:right}
 .budget-amt.pos{color:var(--success)}
 .budget-amt.neg{color:var(--error)}
+/* ─── TIMELINE RIBBON (top of every scene) ─── */
+.timeline-ribbon{display:flex;align-items:center;gap:var(--s3);padding:.6rem .8rem;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 8%,var(--surf2)),color-mix(in srgb,var(--gold) 6%,var(--surf2)));border:1px solid var(--gold);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-xs);font-family:var(--mono)}
+.tr-end{display:flex;flex-direction:column;line-height:1.2;flex-shrink:0;min-width:90px}
+.tr-end.right{text-align:right}
+.tr-end .lbl{color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em}
+.tr-end .val{color:var(--text);font-weight:600;margin-top:1px}
+.tr-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;min-width:0}
+.tr-now{color:var(--gold);font-weight:700;font-size:.7rem;white-space:nowrap}
+.tr-bar{position:relative;width:100%;height:8px;background:var(--off);border-radius:var(--r-full)}
+.tr-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--primary),var(--gold));border-radius:var(--r-full);transition:width .5s}
+.tr-marker{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--surf);box-shadow:0 0 0 1px var(--gold);transform:translateX(-50%);transition:left .5s}
+@media(max-width:600px){
+  .timeline-ribbon{gap:.4rem;padding:.4rem .5rem}
+  .tr-end{min-width:60px;font-size:.65rem}
+  .tr-end .lbl{display:none}
+  .tr-now{font-size:.6rem}
+}
 /* ─── MOBILE FAB BUTTONS ─── */
 .mobile-fab{display:none;position:fixed;bottom:1rem;z-index:999;width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:2px solid var(--gold);box-shadow:0 4px 16px rgba(0,0,0,.4);align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;line-height:1}
 .mobile-fab.path{left:1rem}
@@ -3152,6 +3169,123 @@ const SCENES = {
        next:'mid_career_check'}
     ]
   },
+  // ════════ ⏳ LIFE EVENTS — interrupt scenes at TIS milestones ════════
+  'life_vehicle_aging':{
+    stage:'Life Event',
+    title:`🚗 Year ${'{{tisy}}'} — Vehicle Decision`,
+    text:`My current car is starting to nickel-and-dime me. 100k+ miles, a brake job, a transmission warning light. It's the moment every Marine faces: keep nursing it, replace with a cheap used car, or finally pull the trigger on the new truck I've been eyeing.`,
+    is_life_event:true,
+    choices:[
+      {label:'Keep nursing it — $1,500 in repairs',
+       desc:'Pay the shop, drive it another 2-3 years. Cheapest by far. Some maintenance hassle.',
+       tags:['ok:Cheap','warn:More repairs coming'],
+       apply:g=>{g.savings=Math.max(0,g.savings-1500);g.tis_months+=1;g.event={type:'info',text:'New tires + brakes + transmission flush. Bought another 2-3 years.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Sell + buy a $12K used car (cash)',
+       desc:'Sell current ($3K), put $9K from savings on a more reliable used vehicle. No debt.',
+       tags:['ok:No new debt','info:-$9K savings'],
+       requires:g=>g.savings>=9000,
+       apply:g=>{g.savings=Math.max(0,g.savings-9000);g.car='used_cash';g.car_value=12000;g.car_payment=0;g.tis_months+=1;g.event={type:'win',text:'Upgraded to a reliable used car in cash. No payment.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Finance a $52K truck at 14% APR',
+       desc:'$700/mo payment + $250 ins + $300 gas. Looks great in the parking lot. Wrecks savings rate for 6 years.',
+       tags:['danger:$700/mo payment','danger:6-yr loan'],
+       requires:g=>{const b=calcBudget(g);return (b.net_to_savings-700-250-300)>-100;},
+       apply:g=>{g.car='financed';g.car_value=52000;g.car_payment=700;g.debt+=52000;g.tis_months+=1;g.morale+=10;g.event={type:'warn',text:'Drove off the lot in a $52k truck. $700/mo for 6 years.'};},
+       next:s=>s._post_event_next||'mid_career_check'}
+    ]
+  },
+  'life_house_purchase':{
+    stage:'Life Event',
+    title:`🏠 Year ${'{{tisy}}'} — Time to Buy a House?`,
+    text:`Married, settled at this duty station, paying rent every month. With a <strong>VA loan</strong>: $0 down, no PMI, competitive rate. A $380K house = ~$2,500/mo PITI. If I'm here 3+ years it's smart equity. If I PCS in 18 months I could lose money on closing costs.`,
+    is_life_event:true,
+    choices:[
+      {label:'Buy with VA loan — $380K starter home',
+       desc:'$0 down. $2,500/mo PITI replaces rent. Building equity. ~$15K closing costs from savings.',
+       tags:['ok:Build equity','warn:+$380K mortgage'],
+       requires:g=>g.savings>=15000,
+       apply:g=>{g.housing='own';g.mortgage=2500;g.debt+=380000;g.savings-=15000;g.rent_extra=0;g.path.push('Bought house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down VA loan. Building equity.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Buy a $480K bigger house — stretch a little',
+       desc:'$3,100/mo PITI. Nicer neighborhood, room to grow into. Tighter budget — only good if my spouse income is solid.',
+       tags:['warn:$3,100/mo PITI','info:Room to grow'],
+       requires:g=>g.savings>=22000,
+       apply:g=>{g.housing='own';g.mortgage=3100;g.debt+=480000;g.savings-=22000;g.rent_extra=0;g.path.push('Bought $480K house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on a bigger house. $3,100/mo PITI. Spouse income carrying it.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Keep renting — building home fund instead',
+       desc:'Wait for the right station and price. Bump home fund contribution. No mortgage debt.',
+       tags:['ok:Flexible','info:Build home fund'],
+       apply:g=>{if(!g.bills_custom)g.bills_custom={};g.bills_custom.home_fund_monthly=(g.bills_custom.home_fund_monthly||0)+200;g.tis_months+=1;g.event={type:'info',text:'Decided to keep renting. Bumped home fund $200/mo.'};},
+       next:s=>s._post_event_next||'mid_career_check'}
+    ]
+  },
+  'life_kid_school':{
+    stage:'Life Event',
+    title:`🎒 Year ${'{{tisy}}'} — Kid School District Decision`,
+    text:`My oldest is school-age now. DoDEA schools on base are free and decent. Off-base public schools vary by district. Private school is $10-25K/yr per kid. Real money, real impact on the kid.`,
+    is_life_event:true,
+    choices:[
+      {label:'On-base DoDEA school — free + military community',
+       desc:'No extra cost. Other military families. Curriculum is solid. Default for most active-duty kids.',
+       tags:['ok:Free','ok:Military community'],
+       apply:g=>{g.tis_months+=2;g.event={type:'info',text:'Enrolled kid in DoDEA. Free and tight-knit community.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Move to a better off-base school district',
+       desc:'Off-base housing, top-ranked public school. May pay extra rent above BAH. Worth it for kid academics.',
+       tags:['ok:Top public','warn:Higher rent'],
+       requires:g=>g.housing!=='own',
+       apply:g=>{g.housing='off_base';g.rent_extra=(g.rent_extra||0)+400;g.tis_months+=2;g.event={type:'info',text:'Moved into top school district. +$400/mo rent. Worth it for the kid.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Private school — $15K/yr per kid',
+       desc:'Best academics + smaller classes. ~$1,250/mo per kid. Real money but lifetime advantage.',
+       tags:['danger:$1,250/mo per kid','ok:Best academics'],
+       requires:g=>{const b=calcBudget(g);return (b.net_to_savings-(1250*g.kids))>-50;},
+       apply:g=>{if(!g.bills_custom)g.bills_custom={};g.bills_custom.misc=(g.bills_custom.misc||0)+(1250*g.kids);g.tis_months+=2;g.event={type:'warn',text:'Enrolled kid(s) in private school. +$'+(1250*g.kids)+'/mo in tuition.'};},
+       next:s=>s._post_event_next||'mid_career_check'}
+    ]
+  },
+  'life_financial_review':{
+    stage:'Life Event',
+    title:`💼 Year ${'{{tisy}}'} — Mid-Career Financial Review`,
+    text:`10 years in. Time to look at the numbers honestly. Current portfolio: TSP ${'{{tsp}}'} · Roth IRA ${'{{tsp}}'} · Index funds · Net worth ${'{{savings}}'}+. Am I on track for the retirement I want? Time to rebalance, max contributions, or stay the course.`,
+    is_life_event:true,
+    choices:[
+      {label:'Bump TSP to 10% + max Roth IRA going forward',
+       desc:'Aggressive saving for next 10 years. Compounds heavily because of time horizon. Tighter monthly budget.',
+       tags:['ok:Compound power','warn:Tighter cash flow'],
+       apply:g=>{g.tsp_pct=Math.min(15,(g.tsp_pct||5)+5);g.ira_monthly=583;g.tis_months+=1;g.event={type:'win',text:'TSP bumped to '+g.tsp_pct+'%. Roth IRA maxed at $583/mo. Future me thanks me.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Shift to Aggressive strategy + invest house equity',
+       desc:'Re-allocate everything to 100% stocks (Aggressive). Higher volatility, higher return for 25-year horizon.',
+       tags:['ok:Higher growth','warn:Volatility'],
+       apply:g=>{g.invest_strategy='aggressive';g.tis_months+=1;g.event={type:'win',text:'Switched to Aggressive (10% avg return). Big leverage for 25-year horizon.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Stay the course — current allocations are working',
+       desc:'Don\'t fix what\'s not broken. Continue current plan.',
+       tags:['ok:Discipline'],
+       apply:g=>{g.tis_months+=1;g.event={type:'info',text:'Reviewed and stayed the course. Discipline compounds.'};},
+       next:s=>s._post_event_next||'mid_career_check'}
+    ]
+  },
+  'life_pet_decision':{
+    stage:'Life Event',
+    title:`🐕 Year ${'{{tisy}}'} — Spouse Wants a Dog`,
+    text:`Spouse has been hinting for months. Adopting from a shelter = ~$200 + ~$80/mo in food/vet/care. Real companionship during my deployments. Real responsibility too.`,
+    is_life_event:true,
+    choices:[
+      {label:'Adopt — rescue dog from base shelter',
+       desc:'$200 fee + $80/mo ongoing. Spouse + family love it. Companionship during deployments.',
+       tags:['ok:+Morale','info:+$80/mo'],
+       apply:g=>{g.pets+=1;g.savings-=200;g.tis_months+=1;g.morale+=8;g.event={type:'win',text:'Adopted a rescue. New family member. $80/mo in food/vet.'};},
+       next:s=>s._post_event_next||'mid_career_check'},
+      {label:'Skip — too much during high op-tempo',
+       desc:'Deployments + training tempo make dog ownership unfair to the animal.',
+       tags:['ok:Honest about lifestyle'],
+       apply:g=>{g.tis_months+=1;g.morale-=3;g.event={type:'info',text:'Talked it through. Decided to wait until life is more stable.'};},
+       next:s=>s._post_event_next||'mid_career_check'}
+    ]
+  },
   // ════════ ACT 7 — STAY TO 20 OR EXIT ════════
   'mid_career_check':{
     stage:'Mid-Career',
@@ -3900,9 +4034,38 @@ function renderScene(){
       <div>${tags}</div>
     </button>`;
   }).join('');
-  const dateBadge = G.enlistment_date ? `<span style="float:right;font-family:var(--mono);font-size:var(--text-xs);color:var(--gold);font-weight:600">📅 ${formatDate(currentDate(G))} · age ${G.birth_date?currentAge(G):G.age} · ${yearsOfService(G).toFixed(1)}y TIS</span>` : '';
+  // Timeline ribbon — shows enlist date, current position, retire date, with progress bar
+  let timelineRibbon = '';
+  if(G.enlistment_date){
+    const cur = currentDate(G);
+    const retDate = retirementDate(G);
+    const pctTo20 = Math.min(100, Math.max(0, (G.tis_months / 240) * 100));
+    const ageNow = G.birth_date ? currentAge(G) : G.age;
+    const ageRet = G.birth_date ? retirementAge(G) : (G.age + 20);
+    const yrsLeft = Math.max(0, 20 - yearsOfService(G));
+    timelineRibbon = `<div class="timeline-ribbon">
+      <div class="tr-end">
+        <span class="lbl">Enlisted</span>
+        <span class="val">${formatMonthYear(G.enlistment_date)}</span>
+        <span class="lbl">age ${G.age||18}</span>
+      </div>
+      <div class="tr-bar-wrap">
+        <div class="tr-now">📅 ${formatDate(cur)} · age ${ageNow} · ${yearsOfService(G).toFixed(1)}y TIS · ${yrsLeft.toFixed(1)}y to 20</div>
+        <div class="tr-bar">
+          <div class="tr-fill" style="width:${pctTo20}%"></div>
+          <div class="tr-marker" style="left:${pctTo20}%"></div>
+        </div>
+      </div>
+      <div class="tr-end right">
+        <span class="lbl">20-yr retire</span>
+        <span class="val">${formatMonthYear(retDate)}</span>
+        <span class="lbl">age ${ageRet}</span>
+      </div>
+    </div>`;
+  }
   document.getElementById('sceneCard').innerHTML = `
-    <div class="scene-stage">${s.stage}${dateBadge}</div>
+    ${timelineRibbon}
+    <div class="scene-stage">${s.stage}</div>
     <div class="scene-title">${sub(s.title)}</div>
     ${eventHtml}
     <div class="scene-text">${sub(s.text)}</div>
@@ -3972,6 +4135,43 @@ function renderRetirementScorecard(){
   `;
 }
 
+// ════════════════════════════════════════════════════════════
+//  ⏳  LIFE EVENT TRIGGERS — fire at TIS milestones, interrupt flow
+// ════════════════════════════════════════════════════════════
+const LIFE_EVENT_TRIGGERS = [
+  {
+    id: 'vehicle_aging', tis_months: 60,
+    condition: g => (g.car==='used_cash' || g.car==='financed') && !g._fired_vehicle_aging,
+    scene: 'life_vehicle_aging'
+  },
+  {
+    id: 'house_purchase', tis_months: 72,
+    condition: g => g.married && g.housing!=='own' && !g._fired_house_purchase,
+    scene: 'life_house_purchase'
+  },
+  {
+    id: 'kid_school', tis_months: 96,
+    condition: g => g.kids>0 && !g._fired_kid_school,
+    scene: 'life_kid_school'
+  },
+  {
+    id: 'financial_review', tis_months: 120,
+    condition: g => !g._fired_financial_review,
+    scene: 'life_financial_review'
+  },
+  {
+    id: 'pet_decision', tis_months: 36,
+    condition: g => g.married && g.pets===0 && !g._fired_pet_decision,
+    scene: 'life_pet_decision'
+  }
+];
+function checkLifeEventTriggers(g){
+  for(const t of LIFE_EVENT_TRIGGERS){
+    if(g.tis_months >= t.tis_months && t.condition(g)) return t;
+  }
+  return null;
+}
+
 function chooseChoice(i){
   const s = SCENES[G.stage];
   const c = s.choices[i];
@@ -3992,6 +4192,15 @@ function chooseChoice(i){
   if(c.apply) c.apply(G);
   let next = c.next;
   if(typeof next==='function') next = next(G);
+  // Life event interrupt: if a milestone trigger fires, route through the event scene first
+  if(next && !s.is_life_event){
+    const trig = checkLifeEventTriggers(G);
+    if(trig){
+      G['_fired_'+trig.id] = true;
+      G._post_event_next = next;
+      next = trig.scene;
+    }
+  }
   if(next){ G.stage = next; }
   // If branch changed (player picked Army vs USMC), reload branch-aware data
   if(prevBranch !== G.branch){ loadGameData(); }
