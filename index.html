@@ -290,15 +290,27 @@ tr:hover td{background:var(--off)}
 .budget-amt.pos{color:var(--success)}
 .budget-amt.neg{color:var(--error)}
 /* ─── CHARACTER SPRITE (cartoon figure showing family + uniform progression) ─── */
-.char-sprite{display:flex;align-items:flex-end;justify-content:center;gap:.4rem;padding:.6rem var(--s3);background:linear-gradient(180deg, color-mix(in srgb,var(--bg) 80%,transparent), var(--surf));border:1px solid var(--border);border-bottom:none;border-radius:var(--r-md) var(--r-md) 0 0;margin-bottom:-1px;min-height:120px;position:relative;overflow:hidden}
-.char-sprite svg{display:block;flex-shrink:0;height:110px;width:auto}
-.char-sprite svg.spouse,.char-sprite svg.kid,.char-sprite svg.dog{animation:popIn .4s ease}
-@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.char-sprite .ground{position:absolute;bottom:0;left:0;right:0;height:6px;background:linear-gradient(180deg, transparent, color-mix(in srgb,var(--success) 20%,transparent));pointer-events:none}
-.char-sprite .label-strip{position:absolute;top:.3rem;right:.5rem;font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.char-sprite{display:flex;align-items:flex-end;justify-content:center;gap:.6rem;padding:1rem var(--s3) .5rem;background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 8%,var(--surf)),color-mix(in srgb,var(--success) 6%,var(--surf)) 70%,color-mix(in srgb,var(--success) 15%,var(--surf)));border:1px solid var(--border);border-bottom:none;border-radius:var(--r-md) var(--r-md) 0 0;margin-bottom:-1px;min-height:170px;position:relative;overflow:hidden}
+.char-sprite svg{display:block;flex-shrink:0;height:150px;width:auto}
+.char-sprite svg.fig-main{animation:breathe 4s ease-in-out infinite;transform-origin:50% 100%}
+.char-sprite svg.fig-spouse{animation:breathe 4s ease-in-out -0.6s infinite;transform-origin:50% 100%}
+.char-sprite svg.fig-kid{animation:kidBounce 1.6s ease-in-out infinite;transform-origin:50% 100%}
+.char-sprite svg.fig-kid.k2{animation-delay:-0.4s}
+.char-sprite svg.fig-kid.k3{animation-delay:-0.8s}
+.char-sprite svg.fig-kid.k4{animation-delay:-1.2s}
+.char-sprite svg.fig-dog{animation:dogIdle 2s ease-in-out infinite;transform-origin:50% 100%}
+.char-sprite svg.fig-dog .tail{animation:wag .5s ease-in-out infinite;transform-origin:bottom left}
+.char-sprite svg.new-arrival{animation:popIn .5s cubic-bezier(.16,1.5,.5,1)}
+@keyframes breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-1px) scaleY(1.012)}}
+@keyframes kidBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes dogIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+@keyframes wag{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(20deg)}}
+@keyframes popIn{from{transform:scale(0) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.char-sprite .ground{position:absolute;bottom:0;left:0;right:0;height:8px;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--success) 30%,transparent));pointer-events:none}
+.char-sprite .label-strip{position:absolute;top:.3rem;right:.5rem;font-family:var(--mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:color-mix(in srgb,var(--surf) 90%,transparent);padding:.1rem .4rem;border-radius:var(--r-sm)}
 @media(max-width:600px){
-  .char-sprite{min-height:90px;padding:.3rem var(--s2)}
-  .char-sprite svg{height:80px}
+  .char-sprite{min-height:120px;padding:.5rem var(--s2) .3rem}
+  .char-sprite svg{height:100px}
 }
 /* ─── TIMELINE RIBBON (top of every scene) ─── */
 .timeline-ribbon{display:flex;align-items:center;gap:var(--s3);padding:.6rem .8rem;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 8%,var(--surf2)),color-mix(in srgb,var(--gold) 6%,var(--surf2)));border:1px solid var(--gold);border-radius:var(--r-md);margin-bottom:var(--s4);font-size:var(--text-xs);font-family:var(--mono)}
@@ -1411,105 +1423,255 @@ function rankChevrons(rank){
 }
 function isOfficer(g){ return !!g.is_officer; }
 
-function svgPerson(opts){
-  // opts: {x, y, scale, uniform, hairColor, skinColor, hasHair, rankCount, isOff, gender}
-  const s = opts.scale || 1;
-  const u = opts.uniform || { primary:'#3a4d6b', secondary:'#1f2a3d', cap:null };
-  const skin = opts.skinColor || '#e0b88a';
-  const hair = opts.hairColor || '#4a3a28';
-  const cap = u.cap;
-  // Rank insignia (gold chevrons on shoulder)
-  let insignia = '';
-  if(opts.rankCount > 0){
-    for(let i=0; i<Math.min(opts.rankCount, 3); i++){
-      const cy = 33 + i*3;
-      insignia += `<path d="M${10 - i*0.5},${cy} L13,${cy-1.5} L${16 + i*0.5},${cy}" stroke="${opts.isOff?'#e9b434':'#e9b434'}" stroke-width="1" fill="none"/>`;
-    }
-  }
+// ── Cartoon SVG helpers — clear faces, proper proportions, animated ──
+function svgFace(skin, mood){
+  // Eyes + mouth on the head circle. mood: 'smile'|'neutral'|'serious'
+  const m = mood||'smile';
+  const mouth = m==='smile' ? `<path d="M17,23.5 Q20,25.5 23,23.5" stroke="#1a1a1a" stroke-width=".7" fill="none" stroke-linecap="round"/>`
+              : m==='serious' ? `<line x1="17.5" y1="24" x2="22.5" y2="24" stroke="#1a1a1a" stroke-width=".7" stroke-linecap="round"/>`
+              : `<path d="M17.5,24 Q20,24.5 22.5,24" stroke="#1a1a1a" stroke-width=".6" fill="none" stroke-linecap="round"/>`;
   return `
-  <svg viewBox="0 0 26 60" xmlns="http://www.w3.org/2000/svg" style="height:${110*s}px" preserveAspectRatio="xMidYEnd meet">
-    ${opts.hasHair ? `<path d="M5,9 Q13,1 21,9 L21,14 Q13,8 5,14 Z" fill="${hair}"/>` : ''}
-    <circle cx="13" cy="13" r="6" fill="${skin}"/>
-    ${cap ? (opts.isOff
-      ? `<path d="M5,10 Q13,5 21,10 L21,12 L5,12 Z" fill="${cap}" stroke="${u.secondary}" stroke-width=".4"/>
-         <rect x="6" y="11" width="14" height="1.5" fill="${u.secondary}"/>
-         <rect x="11" y="9" width="4" height="3" fill="${u.secondary}"/>
-         <circle cx="13" cy="10.5" r=".8" fill="#e9b434"/>` // gold disk for officer
-      : `<path d="M4,11 Q13,6 22,11 L22,13 Q13,10 4,13 Z" fill="${cap}" stroke="${u.secondary}" stroke-width=".4"/>`) : ''}
-    <!-- torso -->
-    <path d="M7,20 L19,20 L21,38 L5,38 Z" fill="${u.primary}" stroke="${u.secondary}" stroke-width=".3"/>
+    <!-- ears -->
+    <ellipse cx="12" cy="20" rx="1.4" ry="2" fill="${skin}"/>
+    <ellipse cx="28" cy="20" rx="1.4" ry="2" fill="${skin}"/>
+    <!-- eye whites -->
+    <ellipse cx="17.5" cy="20.5" rx="1.3" ry="1.5" fill="#fff"/>
+    <ellipse cx="22.5" cy="20.5" rx="1.3" ry="1.5" fill="#fff"/>
+    <!-- pupils -->
+    <circle cx="17.5" cy="20.7" r=".7" fill="#1a1a1a"/>
+    <circle cx="22.5" cy="20.7" r=".7" fill="#1a1a1a"/>
+    <!-- mouth -->
+    ${mouth}
+    <!-- subtle cheek blush -->
+    <circle cx="15.5" cy="22.5" r="1.2" fill="#e89a9a" opacity=".35"/>
+    <circle cx="24.5" cy="22.5" r="1.2" fill="#e89a9a" opacity=".35"/>
+  `;
+}
+
+function svgCap(u, isOff){
+  if(!u.cap) return '';
+  if(isOff){
+    // Officer peaked cap with gold emblem
+    return `
+      <ellipse cx="20" cy="14.5" rx="11.5" ry="1.8" fill="${u.secondary}"/>
+      <path d="M10,9 L30,9 L30,14 L10,14 Z" fill="${u.cap}" stroke="${u.secondary}" stroke-width=".4"/>
+      <ellipse cx="20" cy="9" rx="10" ry="1.5" fill="${u.cap}"/>
+      <rect x="10" y="13" width="20" height="1.4" fill="${u.secondary}"/>
+      <circle cx="20" cy="11" r="1.7" fill="#e9b434" stroke="${u.secondary}" stroke-width=".3"/>
+      <circle cx="20" cy="11" r=".7" fill="${u.secondary}"/>
+    `;
+  }
+  // Enlisted utility cap (patrol cap / 8-point)
+  return `
+    <path d="M9,13 Q20,7 31,13 Q31,14.5 20,11.5 Q9,14.5 9,13 Z" fill="${u.cap}" stroke="${u.secondary}" stroke-width=".4"/>
+    <ellipse cx="20" cy="10.5" rx="10" ry="2.2" fill="${u.cap}" stroke="${u.secondary}" stroke-width=".4"/>
+    <ellipse cx="20" cy="10" rx="9" ry="1.5" fill="${u.cap}" opacity=".7"/>
+  `;
+}
+
+function svgPerson(opts){
+  const u = opts.uniform || { primary:'#3a4d6b', secondary:'#1f2a3d', cap:null };
+  const skin = opts.skinColor || '#e8b890';
+  const hair = opts.hairColor || '#4a3a28';
+  const isOff = !!opts.isOff;
+
+  // Hair only when no cap, OR shorter hair fringe peeking out under cap
+  const hairFringe = (opts.hasHair && !u.cap)
+    ? `<path d="M11.5,16 Q20,8 28.5,16 L28,19 Q20,12 12,19 Z" fill="${hair}"/>`
+    : (u.cap ? `` : `<path d="M11.5,16 Q20,8 28.5,16 L28,19 Q20,12 12,19 Z" fill="${hair}"/>`);
+
+  // Rank chevrons on right chest, gold V's
+  let insignia = '';
+  const n = Math.min(opts.rankCount||0, 3);
+  for(let i=0; i<n; i++){
+    const cy = 36 + i*3.2;
+    insignia += `<path d="M22,${cy} L24.5,${cy-1.6} L27,${cy}" stroke="#e9b434" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+  }
+
+  // Service-ribbon block (small color square) for promoted players
+  const ribbon = (opts.rankCount||0) >= 3 ? `<rect x="13" y="36" width="6" height="1.8" fill="#5aaa5a" stroke="${u.secondary}" stroke-width=".2"/><rect x="13" y="38.2" width="6" height="1.8" fill="#be0f34" stroke="${u.secondary}" stroke-width=".2"/>` : '';
+
+  return `
+  <svg viewBox="0 0 40 90" xmlns="http://www.w3.org/2000/svg" class="fig-main ${opts.classes||''}" preserveAspectRatio="xMidYEnd meet">
+    ${hairFringe}
+    <!-- Head -->
+    <circle cx="20" cy="20" r="8" fill="${skin}"/>
+    ${svgFace(skin, opts.mood)}
+    <!-- Cap rendered AFTER head so it overlays correctly -->
+    ${svgCap(u, isOff)}
+    <!-- Neck -->
+    <rect x="18.5" y="27" width="3" height="3" fill="${skin}"/>
+    <!-- Torso -->
+    <path d="M11,30 L29,30 L31,58 L9,58 Z" fill="${u.primary}" stroke="${u.secondary}" stroke-width=".4"/>
+    <!-- V-collar / lapel hint -->
+    <path d="M16,30 L20,34 L24,30 Z" fill="${u.secondary}"/>
+    <!-- Buttons -->
+    <circle cx="20" cy="40" r=".7" fill="${u.secondary}"/>
+    <circle cx="20" cy="46" r=".7" fill="${u.secondary}"/>
+    <circle cx="20" cy="52" r=".7" fill="${u.secondary}"/>
+    ${ribbon}
     ${insignia}
-    <!-- arms -->
-    <rect x="3" y="20" width="4" height="17" fill="${u.primary}" rx="1.5"/>
-    <rect x="19" y="20" width="4" height="17" fill="${u.primary}" rx="1.5"/>
-    <!-- hands -->
-    <circle cx="5" cy="38" r="1.7" fill="${skin}"/>
-    <circle cx="21" cy="38" r="1.7" fill="${skin}"/>
-    <!-- legs -->
-    <rect x="7" y="38" width="5" height="18" fill="${u.secondary}"/>
-    <rect x="14" y="38" width="5" height="18" fill="${u.secondary}"/>
-    <!-- boots -->
-    <rect x="7" y="56" width="6" height="3" fill="#1a1a1a" rx="1"/>
-    <rect x="13" y="56" width="6" height="3" fill="#1a1a1a" rx="1"/>
+    <!-- Arms -->
+    <path d="M6,30 L11,30 L12,55 L7,55 Z" fill="${u.primary}" stroke="${u.secondary}" stroke-width=".3"/>
+    <path d="M29,30 L34,30 L33,55 L28,55 Z" fill="${u.primary}" stroke="${u.secondary}" stroke-width=".3"/>
+    <!-- Hands -->
+    <circle cx="9" cy="56" r="2.2" fill="${skin}" stroke="${u.secondary}" stroke-width=".2"/>
+    <circle cx="31" cy="56" r="2.2" fill="${skin}" stroke="${u.secondary}" stroke-width=".2"/>
+    <!-- Belt -->
+    <rect x="9" y="56.5" width="22" height="2" fill="${u.secondary}"/>
+    <rect x="19" y="56.5" width="2" height="2" fill="#e9b434"/>
+    <!-- Legs -->
+    <rect x="11" y="58.5" width="8.5" height="25" fill="${u.secondary}"/>
+    <rect x="20.5" y="58.5" width="8.5" height="25" fill="${u.secondary}"/>
+    <!-- Trouser crease -->
+    <line x1="15" y1="62" x2="15" y2="82" stroke="${u.cap||u.primary}" stroke-width=".3" opacity=".4"/>
+    <line x1="25" y1="62" x2="25" y2="82" stroke="${u.cap||u.primary}" stroke-width=".3" opacity=".4"/>
+    <!-- Boots -->
+    <ellipse cx="15" cy="86" rx="5" ry="3" fill="#1a1a1a"/>
+    <ellipse cx="25" cy="86" rx="5" ry="3" fill="#1a1a1a"/>
+    <rect x="10" y="83" width="10" height="4" fill="#1a1a1a"/>
+    <rect x="20" y="83" width="10" height="4" fill="#1a1a1a"/>
   </svg>`;
 }
 
-function svgSpouse(){
-  return `<svg viewBox="0 0 24 56" xmlns="http://www.w3.org/2000/svg" class="spouse" style="height:90px" preserveAspectRatio="xMidYEnd meet">
-    <!-- hair -->
-    <path d="M3,9 Q12,1 21,9 L22,20 Q15,14 12,14 Q9,14 2,20 Z" fill="#6b4a2a"/>
-    <circle cx="12" cy="13" r="5.5" fill="#e8b890"/>
-    <!-- dress -->
-    <path d="M7,19 L17,19 L21,52 L3,52 Z" fill="#be0f34"/>
-    <!-- arms -->
-    <rect x="4" y="19" width="3" height="14" fill="#e8b890" rx="1"/>
-    <rect x="17" y="19" width="3" height="14" fill="#e8b890" rx="1"/>
-    <!-- legs (showing through dress hem) -->
-    <rect x="9" y="52" width="3" height="3" fill="#e8b890"/>
-    <rect x="13" y="52" width="3" height="3" fill="#e8b890"/>
-    <!-- shoes -->
-    <rect x="8" y="55" width="4" height="1.5" fill="#4a3020"/>
-    <rect x="13" y="55" width="4" height="1.5" fill="#4a3020"/>
+function svgSpouse(isNew){
+  return `<svg viewBox="0 0 40 90" xmlns="http://www.w3.org/2000/svg" class="fig-spouse ${isNew?'new-arrival':''}" preserveAspectRatio="xMidYEnd meet">
+    <!-- Long hair behind head -->
+    <path d="M9,18 Q9,30 12,40 L13,42 Q11,30 12,22 Z" fill="#6b4a2a"/>
+    <path d="M31,18 Q31,30 28,40 L27,42 Q29,30 28,22 Z" fill="#6b4a2a"/>
+    <!-- Hair top -->
+    <path d="M10,16 Q20,6 30,16 L30,22 Q20,12 10,22 Z" fill="#6b4a2a"/>
+    <!-- Head -->
+    <circle cx="20" cy="20" r="8" fill="#e8b890"/>
+    <!-- Ears -->
+    <ellipse cx="12" cy="20" rx="1.4" ry="2" fill="#e8b890"/>
+    <ellipse cx="28" cy="20" rx="1.4" ry="2" fill="#e8b890"/>
+    <!-- Earrings -->
+    <circle cx="12" cy="22" r=".6" fill="#e9b434"/>
+    <circle cx="28" cy="22" r=".6" fill="#e9b434"/>
+    <!-- Eye whites -->
+    <ellipse cx="17.5" cy="20.5" rx="1.3" ry="1.5" fill="#fff"/>
+    <ellipse cx="22.5" cy="20.5" rx="1.3" ry="1.5" fill="#fff"/>
+    <!-- Eyelashes -->
+    <path d="M16.3,19.5 L16.7,19.2 M17,19.3 L17.2,19 M18,19.2 L18.1,18.9" stroke="#1a1a1a" stroke-width=".4" stroke-linecap="round"/>
+    <path d="M21.7,19.2 L21.8,18.9 M22.6,19.3 L22.8,19 M23.4,19.5 L23.7,19.2" stroke="#1a1a1a" stroke-width=".4" stroke-linecap="round"/>
+    <!-- Pupils -->
+    <circle cx="17.5" cy="20.7" r=".7" fill="#1a1a1a"/>
+    <circle cx="22.5" cy="20.7" r=".7" fill="#1a1a1a"/>
+    <!-- Smile -->
+    <path d="M17,23.5 Q20,25.5 23,23.5" stroke="#1a1a1a" stroke-width=".7" fill="none" stroke-linecap="round"/>
+    <!-- Blush -->
+    <circle cx="15.5" cy="22.5" r="1.4" fill="#e89a9a" opacity=".5"/>
+    <circle cx="24.5" cy="22.5" r="1.4" fill="#e89a9a" opacity=".5"/>
+    <!-- Lipstick (red lips) -->
+    <path d="M18,23.5 Q20,24.7 22,23.5" stroke="#c41f44" stroke-width=".5" fill="none"/>
+    <!-- Neck -->
+    <rect x="18.5" y="27" width="3" height="3" fill="#e8b890"/>
+    <!-- Dress (scarlet, A-line) -->
+    <path d="M12,30 L28,30 L33,85 L7,85 Z" fill="#be0f34" stroke="#7a0a20" stroke-width=".4"/>
+    <!-- Dress neckline -->
+    <path d="M16,30 Q20,33 24,30" fill="#7a0a20"/>
+    <!-- Belt -->
+    <rect x="11" y="48" width="18" height="1.8" fill="#7a0a20"/>
+    <circle cx="20" cy="48.9" r=".8" fill="#e9b434"/>
+    <!-- Arms (skin showing) -->
+    <path d="M8,30 L12,30 L11,52 L7,52 Z" fill="#e8b890"/>
+    <path d="M28,30 L32,30 L33,52 L29,52 Z" fill="#e8b890"/>
+    <!-- Hands -->
+    <circle cx="9" cy="53" r="2.2" fill="#e8b890"/>
+    <circle cx="31" cy="53" r="2.2" fill="#e8b890"/>
+    <!-- Legs (under hem) -->
+    <rect x="14" y="85" width="4" height="3" fill="#e8b890"/>
+    <rect x="22" y="85" width="4" height="3" fill="#e8b890"/>
+    <!-- Heels -->
+    <path d="M13,88 L19,88 L17,90 L15,90 Z" fill="#4a3020"/>
+    <path d="M21,88 L27,88 L25,90 L23,90 Z" fill="#4a3020"/>
   </svg>`;
 }
 
-function svgKid(seed){
-  // Subtle variation by seed (0/1/2/3+ kids)
+function svgKid(seed, isNew){
   const shirts = ['#e9b434','#5aaa5a','#70a8d2','#d672b1'];
   const shirt = shirts[seed % shirts.length];
-  const isYoungest = seed === 0;
-  return `<svg viewBox="0 0 20 46" xmlns="http://www.w3.org/2000/svg" class="kid" style="height:${isYoungest?60:72}px" preserveAspectRatio="xMidYEnd meet">
-    <path d="M3,8 Q10,1 17,8 L18,15 Q10,11 2,15 Z" fill="#4a3a28"/>
-    <circle cx="10" cy="11" r="4.5" fill="#e8b890"/>
-    <path d="M6,17 L14,17 L16,33 L4,33 Z" fill="${shirt}"/>
-    <rect x="3" y="17" width="3" height="11" fill="${shirt}" rx="1"/>
-    <rect x="14" y="17" width="3" height="11" fill="${shirt}" rx="1"/>
-    <rect x="6" y="33" width="3" height="11" fill="#3a4d6b"/>
-    <rect x="11" y="33" width="3" height="11" fill="#3a4d6b"/>
-    <rect x="5" y="43" width="5" height="2" fill="#1a1a1a"/>
-    <rect x="10" y="43" width="5" height="2" fill="#1a1a1a"/>
+  const pants = '#3a4d6b';
+  const isToddler = seed === 0;
+  const heightCss = isToddler ? 'height:70px' : 'height:90px';
+  return `<svg viewBox="0 0 32 70" xmlns="http://www.w3.org/2000/svg" class="fig-kid k${seed+1} ${isNew?'new-arrival':''}" style="${heightCss}" preserveAspectRatio="xMidYEnd meet">
+    <!-- Hair -->
+    <path d="M7,12 Q16,4 25,12 L26,18 Q16,11 6,18 Z" fill="#4a3a28"/>
+    <!-- Head -->
+    <circle cx="16" cy="16" r="7" fill="#e8b890"/>
+    <!-- Ears -->
+    <ellipse cx="9" cy="16" rx="1.2" ry="1.7" fill="#e8b890"/>
+    <ellipse cx="23" cy="16" rx="1.2" ry="1.7" fill="#e8b890"/>
+    <!-- Eyes (bigger for kid feel) -->
+    <ellipse cx="13.5" cy="16.5" rx="1.5" ry="1.7" fill="#fff"/>
+    <ellipse cx="18.5" cy="16.5" rx="1.5" ry="1.7" fill="#fff"/>
+    <circle cx="13.5" cy="17" r=".9" fill="#1a1a1a"/>
+    <circle cx="18.5" cy="17" r=".9" fill="#1a1a1a"/>
+    <!-- Big smile -->
+    <path d="M13,20 Q16,22.5 19,20" stroke="#1a1a1a" stroke-width=".7" fill="none" stroke-linecap="round"/>
+    <!-- Cheek blush -->
+    <circle cx="11" cy="19" r="1.3" fill="#e89a9a" opacity=".5"/>
+    <circle cx="21" cy="19" r="1.3" fill="#e89a9a" opacity=".5"/>
+    <!-- Neck -->
+    <rect x="14.5" y="23" width="3" height="2" fill="#e8b890"/>
+    <!-- T-shirt -->
+    <path d="M9,25 L23,25 L25,42 L7,42 Z" fill="${shirt}" stroke="#1a1a1a" stroke-width=".3" stroke-opacity=".2"/>
+    <!-- Arms -->
+    <path d="M5,25 L9,25 L8,40 L4,40 Z" fill="${shirt}"/>
+    <path d="M23,25 L27,25 L28,40 L24,40 Z" fill="${shirt}"/>
+    <!-- Hands -->
+    <circle cx="6" cy="41" r="1.7" fill="#e8b890"/>
+    <circle cx="26" cy="41" r="1.7" fill="#e8b890"/>
+    <!-- Shorts/pants -->
+    <rect x="9" y="42" width="7" height="${isToddler?'14':'18'}" fill="${pants}"/>
+    <rect x="16" y="42" width="7" height="${isToddler?'14':'18'}" fill="${pants}"/>
+    <!-- Shoes -->
+    <ellipse cx="12.5" cy="${isToddler?'62':'62'}" rx="3.5" ry="2" fill="#1a1a1a"/>
+    <ellipse cx="19.5" cy="${isToddler?'62':'62'}" rx="3.5" ry="2" fill="#1a1a1a"/>
   </svg>`;
 }
 
-function svgDog(){
-  return `<svg viewBox="0 0 32 22" xmlns="http://www.w3.org/2000/svg" class="dog" style="height:40px" preserveAspectRatio="xMidYEnd meet">
-    <!-- body -->
-    <ellipse cx="17" cy="13" rx="11" ry="6" fill="#a8845a"/>
-    <!-- head -->
-    <circle cx="5" cy="11" r="5" fill="#a8845a"/>
-    <!-- ear -->
-    <path d="M2,7 L1,4 L4,8 Z" fill="#7a5a3a"/>
-    <!-- eye -->
-    <circle cx="3.5" cy="10" r=".6" fill="#1a1a1a"/>
-    <!-- snout -->
-    <ellipse cx="1.5" cy="12" rx="1.5" ry="1" fill="#7a5a3a"/>
-    <!-- legs -->
-    <rect x="10" y="17" width="2" height="5" fill="#a8845a"/>
-    <rect x="14" y="17" width="2" height="5" fill="#a8845a"/>
-    <rect x="20" y="17" width="2" height="5" fill="#a8845a"/>
-    <rect x="24" y="17" width="2" height="5" fill="#a8845a"/>
-    <!-- tail -->
-    <path d="M27,11 Q31,9 30,5" stroke="#a8845a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+function svgDog(isNew){
+  return `<svg viewBox="0 0 50 40" xmlns="http://www.w3.org/2000/svg" class="fig-dog ${isNew?'new-arrival':''}" style="height:55px" preserveAspectRatio="xMidYEnd meet">
+    <!-- Tail (animated) -->
+    <g class="tail">
+      <path d="M40,18 Q47,12 45,5" stroke="#a8845a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- Body -->
+    <ellipse cx="25" cy="22" rx="14" ry="8" fill="#a8845a"/>
+    <!-- Chest highlight -->
+    <ellipse cx="12" cy="24" rx="3" ry="4" fill="#c79b6e" opacity=".7"/>
+    <!-- Head -->
+    <circle cx="9" cy="18" r="7" fill="#a8845a"/>
+    <!-- Snout -->
+    <ellipse cx="3" cy="20" rx="3.5" ry="2.5" fill="#c79b6e"/>
+    <!-- Nose -->
+    <ellipse cx="1.5" cy="19" rx="1.2" ry=".9" fill="#1a1a1a"/>
+    <!-- Mouth -->
+    <path d="M3,21.5 Q4,22.5 5.5,22" stroke="#1a1a1a" stroke-width=".5" fill="none" stroke-linecap="round"/>
+    <!-- Eye -->
+    <circle cx="9" cy="16" r="1.4" fill="#fff"/>
+    <circle cx="9.3" cy="16.2" r=".9" fill="#1a1a1a"/>
+    <circle cx="9.5" cy="15.8" r=".3" fill="#fff"/>
+    <!-- Eyebrow (perky) -->
+    <path d="M7.5,13.5 Q9,13 10.5,13.5" stroke="#7a5a3a" stroke-width=".7" fill="none" stroke-linecap="round"/>
+    <!-- Ears -->
+    <path d="M4,12 Q3,7 6,9 L7,14 Z" fill="#7a5a3a"/>
+    <path d="M13,12 Q15,7 12,9 L11,14 Z" fill="#7a5a3a"/>
+    <!-- Collar -->
+    <rect x="4" y="22" width="9" height="1.5" fill="#be0f34"/>
+    <circle cx="8.5" cy="23.5" r=".7" fill="#e9b434"/>
+    <!-- Legs -->
+    <rect x="14" y="28" width="2.5" height="9" fill="#a8845a"/>
+    <rect x="20" y="28" width="2.5" height="9" fill="#a8845a"/>
+    <rect x="30" y="28" width="2.5" height="9" fill="#a8845a"/>
+    <rect x="36" y="28" width="2.5" height="9" fill="#a8845a"/>
+    <!-- Paws -->
+    <ellipse cx="15.25" cy="37" rx="2" ry="1" fill="#1a1a1a"/>
+    <ellipse cx="21.25" cy="37" rx="2" ry="1" fill="#1a1a1a"/>
+    <ellipse cx="31.25" cy="37" rx="2" ry="1" fill="#1a1a1a"/>
+    <ellipse cx="37.25" cy="37" rx="2" ry="1" fill="#1a1a1a"/>
   </svg>`;
 }
 
@@ -1517,22 +1679,28 @@ function renderCharacterSprite(g){
   if(!g) return '';
   const u = uniformColorsFor(g);
   const ageNow = g.birth_date ? currentAge(g) : (g.age||18);
-  const hasHair = ageNow < 22 || g.tis_months < 3 || isOfficer(g); // civvies / fresh enlistees / officers keep hair
+  // Hair only when no cap (civilians) — military covers it
+  const hasHair = !u.cap;
+  // Track which family members are NEW since last render to fire popIn animation
+  const newMembers = g._just_added || {};
   const main = svgPerson({
     uniform: u,
     rankCount: rankChevrons(g.rank),
     isOff: isOfficer(g),
     hasHair,
-    skinColor: '#e0b88a',
-    hairColor: ageNow > 38 ? '#888' : '#4a3a28'
+    skinColor: '#e8b890',
+    hairColor: ageNow > 38 ? '#a0a0a0' : '#4a3a28',
+    mood: g.morale > 70 ? 'smile' : g.morale > 45 ? 'neutral' : 'serious'
   });
-  const spouse = g.married ? svgSpouse() : '';
-  const kids = Array.from({length: Math.min(g.kids||0, 4)}, (_,i)=>svgKid(i)).join('');
-  const dog = (g.pets||0) > 0 ? svgDog() : '';
+  const spouse = g.married ? svgSpouse(newMembers.spouse) : '';
+  const kids = Array.from({length: Math.min(g.kids||0, 4)}, (_,i)=>svgKid(i, newMembers['kid'+i])).join('');
+  const dog = (g.pets||0) > 0 ? svgDog(newMembers.dog) : '';
   const branchLabel = g.tis_months===0 ? 'Civilian' :
     g.branch==='army'?'U.S. Army': g.branch==='navy'?'U.S. Navy':
     g.branch==='air_force'?'U.S. Air Force': g.branch==='coast_guard'?'U.S. Coast Guard':
     'U.S. Marine Corps';
+  // Reset the just-added flags after rendering
+  if(g._just_added) g._just_added = {};
   return `<div class="char-sprite" aria-label="Family sprite">
     <span class="label-strip">${branchLabel} · age ${ageNow}${g.rank?' · '+g.rank:''}</span>
     ${main}
