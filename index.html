@@ -1516,6 +1516,7 @@ function defaultState(){
     car:'none', // none | used_cash | financed | upgrade
     car_payment:0, car_value:0, mortgage:0,
     rent_extra:0, // extra paid above BAH for off-base
+    homeowner_extra:0, // utilities + maintenance reserve + HOA on top of mortgage when housing='own'
     // starting-life flags (set by character creator)
     had_starting_car:false, starting_relationship:'single',
     has_phone:true, phone_bill:65,
@@ -2372,7 +2373,9 @@ const SCENES = {
        tags:['danger:$760/mo payment','danger:7-yr loan'],
        // Block if it would push the player into negative cash flow
        requires:g=>{ const b = calcBudget(g); return (b.net_to_savings - 1210) > -100; },
-       apply:g=>{g.car='financed';g.car_value=42000;g.car_payment=760;g.debt+=42000;g.tis_months+=1;g.morale+=10;g.reputation-=2;g.event={type:'warn',text:'Drove off the lot in a $42k truck. Felt incredible. The dealer cheered. The cost compounds for 84 months.'};},
+       apply:g=>{g.car='financed';g.car_value=42000;g.car_payment=760;g.debt+=42000;
+         if(!g.bills_custom)g.bills_custom={}; g.bills_custom.car_insurance=200; g.bills_custom.gas=250;
+         g.tis_months+=1;g.morale+=10;g.reputation-=2;g.event={type:'warn',text:'Drove off the lot in a $42k truck. Felt incredible. $760 payment + $200 full-coverage ins + $250 gas = $1,210/mo for 84 months.'};},
        next:'school_choice'}
     ]
   },
@@ -2788,7 +2791,9 @@ const SCENES = {
        tags:['danger:All $ gone'],
        // Block if savings or post-purchase cashflow would crater
        requires:g=>{ if(g.savings < 15000) return false; const b=calcBudget(g); return (b.net_to_savings - 820) > -100; },
-       apply:g=>{g.savings=Math.max(0,g.savings-15000);g.car='upgrade';g.car_value=60000;g.debt+=30000;g.car_payment=820;g.morale+=15;g.event={type:'bad',text:'Upgraded. Jeep is gorgeous. So is the new $820/mo payment.'};g.tis_months+=1;},
+       apply:g=>{g.savings=Math.max(0,g.savings-15000);g.car='upgrade';g.car_value=60000;g.debt+=30000;g.car_payment=820;
+         if(!g.bills_custom)g.bills_custom={}; g.bills_custom.car_insurance=240; g.bills_custom.gas=240;
+         g.morale+=15;g.event={type:'bad',text:'Upgraded. Jeep is gorgeous. $820 payment + $240 full-coverage ins + $240 gas = $1,300/mo locked in.'};g.tis_months+=1;},
        next:'car_upgrade_temptation'}
     ]
   },
@@ -2878,9 +2883,9 @@ const SCENES = {
     text:`I\'m eligible for a VA loan: <strong>$0 down, no PMI, competitive rate</strong>. A $350k starter home = ~$2,400/mo PITI. Smart if I\'m here 3+ years. Costly if I PCS in 18 months.`,
     choices:[
       {label:'Buy with VA loan ($0 down, $350k home)',
-       desc:'$350k mortgage. Mortgage replaces rent. Build equity. Tax deduction.',
+       desc:'$2,400 mortgage + ~$450/mo utilities/maintenance/HOA = $2,850 all-in. Mortgage replaces rent. Build equity. Tax deduction.',
        tags:['ok:Build equity','warn:+$350k debt'],
-       apply:g=>{g.housing='own';g.mortgage=2400;g.debt+=350000;g.rent_extra=0;g.path.push('Bought first home (VA)');g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down. PITI $2,400/mo. BAH covers most.'};},
+       apply:g=>{g.housing='own';g.mortgage=2400;g.homeowner_extra=450;g.debt+=350000;g.rent_extra=0;g.path.push('Bought first home (VA)');g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down. $2,400 PITI + $450 utilities/maintenance = $2,850/mo all-in. BAH covers most.'};},
        next:'sniper_or_promo'},
       {label:'Keep renting — buy later when more stable',
        desc:'Less risk if I PCS soon.',
@@ -3188,10 +3193,12 @@ const SCENES = {
        apply:g=>{g.savings=Math.max(0,g.savings-9000);g.car='used_cash';g.car_value=12000;g.car_payment=0;g.tis_months+=1;g.event={type:'win',text:'Upgraded to a reliable used car in cash. No payment.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Finance a $52K truck at 14% APR',
-       desc:'$700/mo payment + $250 ins + $300 gas. Looks great in the parking lot. Wrecks savings rate for 6 years.',
+       desc:'$700/mo payment + $250 ins + $300 gas = <strong>$1,250/mo</strong>. Looks great in the parking lot. Wrecks savings rate for 6 years.',
        tags:['danger:$700/mo payment','danger:6-yr loan'],
        requires:g=>{const b=calcBudget(g);return (b.net_to_savings-700-250-300)>-100;},
-       apply:g=>{g.car='financed';g.car_value=52000;g.car_payment=700;g.debt+=52000;g.tis_months+=1;g.morale+=10;g.event={type:'warn',text:'Drove off the lot in a $52k truck. $700/mo for 6 years.'};},
+       apply:g=>{g.car='financed';g.car_value=52000;g.car_payment=700;g.debt+=52000;
+         if(!g.bills_custom)g.bills_custom={}; g.bills_custom.car_insurance=250; g.bills_custom.gas=300;
+         g.tis_months+=1;g.morale+=10;g.event={type:'warn',text:'Drove off the lot in a $52k truck. $700 payment + $250 full-coverage ins + $300 gas = $1,250/mo for 6 years.'};},
        next:s=>s._post_event_next||'mid_career_check'}
     ]
   },
@@ -3202,16 +3209,16 @@ const SCENES = {
     is_life_event:true,
     choices:[
       {label:'Buy with VA loan — $380K starter home',
-       desc:'$0 down. $2,500/mo PITI replaces rent. Building equity. ~$15K closing costs from savings.',
-       tags:['ok:Build equity','warn:+$380K mortgage'],
+       desc:'$0 down. $2,500/mo PITI + ~$500/mo utilities/maintenance/HOA = $3,000 all-in. ~$15K closing costs from savings.',
+       tags:['ok:Build equity','warn:+$380K mortgage','warn:$3K/mo all-in'],
        requires:g=>g.savings>=15000,
-       apply:g=>{g.housing='own';g.mortgage=2500;g.debt+=380000;g.savings-=15000;g.rent_extra=0;g.path.push('Bought house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down VA loan. Building equity.'};},
+       apply:g=>{g.housing='own';g.mortgage=2500;g.homeowner_extra=500;g.debt+=380000;g.savings-=15000;g.rent_extra=0;g.path.push('Bought house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on first home. $0 down VA loan. Total housing: $2,500 mortgage + $500 utilities/maintenance/HOA = $3,000/mo.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Buy a $480K bigger house — stretch a little',
-       desc:'$3,100/mo PITI. Nicer neighborhood, room to grow into. Tighter budget — only good if my spouse income is solid.',
-       tags:['warn:$3,100/mo PITI','info:Room to grow'],
+       desc:'$3,100/mo PITI + ~$650/mo utilities/maintenance/HOA = ~$3,750 all-in. Nicer neighborhood, room to grow into. Tighter budget — only good if my spouse income is solid.',
+       tags:['warn:$3,750/mo all-in','info:Room to grow'],
        requires:g=>g.savings>=22000,
-       apply:g=>{g.housing='own';g.mortgage=3100;g.debt+=480000;g.savings-=22000;g.rent_extra=0;g.path.push('Bought $480K house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on a bigger house. $3,100/mo PITI. Spouse income carrying it.'};},
+       apply:g=>{g.housing='own';g.mortgage=3100;g.homeowner_extra=650;g.debt+=480000;g.savings-=22000;g.rent_extra=0;g.path.push('Bought $480K house at year '+(g.tis_months/12).toFixed(1));g.tis_months+=2;g.event={type:'win',text:'Closed on a bigger house. $3,100 mortgage + $650 utilities/maintenance = $3,750/mo all-in. Spouse income carrying it.'};},
        next:s=>s._post_event_next||'mid_career_check'},
       {label:'Keep renting — building home fund instead',
        desc:'Wait for the right station and price. Bump home fund contribution. No mortgage debt.',
@@ -3443,7 +3450,7 @@ function calcBudget(g){
   if(g.housing==='barracks') housing_cost = 0;
   else if(g.housing==='on_base') housing_cost = bah;
   else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
-  else if(g.housing==='own') housing_cost = g.mortgage;
+  else if(g.housing==='own') housing_cost = g.mortgage + (g.homeowner_extra||0);
   // Customizable bill categories (override default if user has set one)
   const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
   const groceries     = _bill('groceries');
@@ -3665,6 +3672,14 @@ function renderBudget(){
     <div style="margin-top:1rem;margin-bottom:.75rem;font-family:var(--mono);font-size:var(--text-xs);color:var(--warn);text-transform:uppercase;letter-spacing:.08em">━ Monthly Bills ━</div>
     ${b.housing_cost?`<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(${G.housing.replace('_',' ')})</span></span><span class="budget-amt neg">−${fmt(b.housing_cost)}</span></div>`:'<div class="budget-row"><span>Housing <span style="color:var(--muted);font-size:.85em">(barracks — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
     ${b.food?`<div class="budget-row"><span>Food / groceries</span><span class="budget-amt neg">−${fmt(b.food)}</span></div>`:'<div class="budget-row"><span>Food <span style="color:var(--muted);font-size:.85em">(chow hall — FREE)</span></span><span class="budget-amt pos">$0</span></div>'}
+    ${G.housing==='own' && (G.homeowner_extra||0)>0 ? `
+      <div class="budget-row" style="font-size:.8rem;color:var(--muted);padding:.15rem var(--s2);margin-top:-.3rem">
+        <span>  ↳ mortgage P&amp;I+T+I</span><span class="budget-amt neg" style="opacity:.7">−${fmt(G.mortgage||0)}</span>
+      </div>
+      <div class="budget-row" style="font-size:.8rem;color:var(--muted);padding:.15rem var(--s2);margin-bottom:.3rem">
+        <span>  ↳ utilities + maintenance + HOA</span><span class="budget-amt neg" style="opacity:.7">−${fmt(G.homeowner_extra||0)}</span>
+      </div>
+    `:''}
     ${G.car!=='none' ? `
       ${G.car_payment?`<div class="budget-row"><span>Car payment</span><span class="budget-amt neg">−${fmt(G.car_payment)}</span></div>`:''}
       <div class="budget-row"><span>Car insurance</span><span class="budget-amt neg">−${fmt(b.car_insurance)}</span></div>
@@ -4672,7 +4687,7 @@ calcBudget = function(g){
   if(g.housing==='barracks') housing_cost = 0;
   else if(g.housing==='on_base') housing_cost = bah;
   else if(g.housing==='off_base') housing_cost = bah + g.rent_extra;
-  else if(g.housing==='own') housing_cost = g.mortgage;
+  else if(g.housing==='own') housing_cost = g.mortgage + (g.homeowner_extra||0);
   const _bill = (k)=> (typeof billValue==='function') ? billValue(g, k) : defaultBills(g)[k];
   const groceries     = _bill('groceries');
   const car_insurance = _bill('car_insurance');
@@ -5270,9 +5285,10 @@ function allocateBonus(strategy){
       const rest = amount - downpay;
       G.savings -= downpay; // gone to dealer
       G.car = 'financed'; G.car_value = 42000; G.car_payment = 600; G.debt += (42000 - downpay);
+      if(!G.bills_custom) G.bills_custom = {}; G.bills_custom.car_insurance = 200; G.bills_custom.gas = 250;
       if(rest>0) move('emergency', rest); // small EF cushion
       G.morale += 15; G.reputation -= 3;
-      summary = `Put ${fmt(downpay)} down on a financed truck (the classic E-4 move). New $600/mo payment. Remainder to emergency fund.`;
+      summary = `Put ${fmt(downpay)} down on a financed truck (the classic E-4 move). $600 payment + $200 full-coverage ins + $250 gas = $1,050/mo. Remainder to emergency fund.`;
       break;
     }
     case 'keep_cash': {
